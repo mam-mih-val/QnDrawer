@@ -1,0 +1,2 @@
+/usr/bin/ar qc libQnDrawer.a  CMakeFiles/QnDrawer.dir/src/CorrelationHelper.cxx.o CMakeFiles/QnDrawer.dir/src/Flow.cxx.o
+/usr/bin/ranlib libQnDrawer.a
