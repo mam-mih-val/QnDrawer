@@ -3,8 +3,8 @@
 Qn::DataContainer<Qn::Stats>& CorrelationHelper::GetDataContainer(std::string name){ 
 	Qn::DataContainer<Qn::Stats> empty;
 	Qn::DataContainer<Qn::Stats>* ptr{nullptr};
-	if( fHeap.count(name) !=0 ) 
-		return fHeap.at(name); 
+	if( heap_.count(name) !=0 )
+		return heap_.at(name);
 	else
 	{
 		if(!fFile)
@@ -15,7 +15,7 @@ Qn::DataContainer<Qn::Stats>& CorrelationHelper::GetDataContainer(std::string na
 			std::cout << "No such a data container: " << name << std::endl;
 			return empty;
 		}
-		fHeap.insert( make_pair(name, *ptr) );
+		heap_.insert( make_pair(name, *ptr) );
 		return GetDataContainer(name);
 	}
 }
@@ -34,7 +34,7 @@ Qn::DataContainer<Qn::Stats> CorrelationHelper::MakeComputations(
 	}
 	auto result = lambda(arg);
 	// result.SetSetting(Qn::Stats::Settings::CORRELATEDERRORS);
-	fHeap.insert(make_pair(resultName, result));
+	heap_.insert(make_pair(resultName, result));
 	return result;
 }
 
@@ -49,7 +49,7 @@ Qn::DataContainer<Qn::Stats> CorrelationHelper::Merge(std::vector<std::string> i
 		array->AddLast( (Qn::DataContainer<Qn::Stats>*) &(this->GetDataContainer(name)) );
 	}
 	out.Merge( (TList*) array );
-	fHeap.insert(make_pair(outName, out));
+	heap_.insert(make_pair(outName, out));
 	return out;
 }
 
@@ -157,7 +157,9 @@ TH1F* CorrelationHelper::GetTh1f(std::string name)
 		entries+=bin.GetProfile().Entries();
 		float mean = bin.Mean();
 		float error = bin.Error();
-		// std::cout << "bin: " << i << " mean:" << mean << " error:" << error << std::endl;
+		std::cout << "bin: " << i << " mean:" << mean << " error:" << error << std::endl;
+		if( mean != mean )
+			continue;
 		histo->SetBinContent(i+1, mean);
 		histo->SetBinError(i+1, error);
 		// std:: cout << histo->GetBinContent( i+1 ) << std::endl;
@@ -240,10 +242,12 @@ void CorrelationHelper::ResolutionRs(
 
 void CorrelationHelper::FlowRs(
 	std::string uName,
-	std::vector<std::string> qNames
+	std::vector<std::string> qNames,
+	std::string flowName
 )
 {
 	this->ResolutionRs(qNames);
+	std::vector<std::string> flowNames;
 	std::vector<std::string> components{"XX", "YY"};
 	auto flow = [](std::vector<Qn::DataContainer<Qn::Stats>> corr) {
 		auto result = corr.at(0) / corr.at(1) * sqrt(2);
@@ -257,18 +261,22 @@ void CorrelationHelper::FlowRs(
 			args.push_back(uName + "_" + Q + "_" + comp);
 			args.push_back("resolution_" + Q + "_" + comp);
 			this->MakeComputations(args, flow, "flow_" + Q + "_" + comp);
+			flowNames.push_back("flow_" + Q + "_" + comp);
 		}
 	}
+	Merge( flowNames, flowName );
 }
 
 void CorrelationHelper::Flow3Se(
 	std::string uName,
-	std::vector<std::string> qNames
+	std::vector<std::string> qNames,
+	std::string flowName
 )
 {
 	Resolution3Se(qNames);
 	std::vector<std::string>
 		components{"XX", "YY"};
+	std::vector<std::string> flowNames;
 	for (auto comp : components)
 	{
 		std::vector<std::string> corrNames;
@@ -279,29 +287,31 @@ void CorrelationHelper::Flow3Se(
 			auto Q = qNames.at(j);
 			corrNames.push_back( uName+"_"+Q+"_"+comp );
 		}
+		for(int k=0; k<qNames.size(); k++)
+			flowNames.push_back("flow_" + qNames.at(k) + "_" + comp);
 		this->BuildFlow3Se(corrNames, resNames, {
-			"flow_"+qNames.at(0)+"_"+comp,
-			"flow_"+qNames.at(1)+"_"+comp,
-			"flow_"+qNames.at(2)+"_"+comp
-		});
+			"flow_" + qNames.at(0) + "_" + comp, 
+			"flow_" + qNames.at(1) + "_" + comp, 
+			"flow_" + qNames.at(2) + "_" + comp});
 	}
+	Merge( flowNames, flowName);
 }
 
 void CorrelationHelper::FlowEp(
 	std::string uName,
-	std::vector<std::string> qNames // {Qa, Qb, Qfull}
-)
+	std::vector<std::string> qNames, // {Qa, Qb, Qfull}
+	std::string flowName)
 {
 	std::vector<std::string> components{"XX", "YY"};
-	auto R = [](std::vector<Qn::DataContainer<Qn::Stats>> corr) {
-		return Sqrt(corr.at(0));
-	};
+	std::vector<std::string> flowNames;
 	for (auto comp : components)
 	{
 		std::string corrName;
 		corrName = qNames.at(0) + "_" + qNames.at(1) + "_" + comp;
 		this->BuildFullEvtResolution(corrName, "resolution_Full_" + comp);
-		corrName = uName+"_"+qNames.at(2)+"_"+comp;
+		corrName = uName+"_"+qNames.back()+"_"+comp;
 		this->BuildFlowFullEvent(corrName, "resolution_Full_" + comp, "flow_Full_" + comp);
+		flowNames.push_back("flow_Full_" + comp);
 	}
+	Merge(flowNames, flowName);
 }

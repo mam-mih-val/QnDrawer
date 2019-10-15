@@ -13,10 +13,10 @@
 class CorrelationHelper{
 	public:
 	CorrelationHelper() = default;
-	~CorrelationHelper(){ fHeap.clear(); }
-	void SetFile(std::string fileName) { fFile.reset(TFile::Open(fileName.data())); }
-	void SetFile(std::shared_ptr<TFile> file) { fFile = file; }
-	void SetFile(TFile* file) { fFile.reset(file); }
+	~CorrelationHelper(){ heap_.clear(); }
+	void SetFile(std::string fileName) { file_.reset(TFile::Open(fileName.data())); }
+	void SetFile(std::shared_ptr<TFile> file) { file_ = file; }
+	void SetFile(TFile* file) { file_.reset(file); }
 	Qn::DataContainer<Qn::Stats>& GetDataContainer(std::string name);
 	
 	Qn::DataContainer<Qn::Stats> MakeComputations(
@@ -72,11 +72,11 @@ class CorrelationHelper{
 	void Resolution3Se(
 		std::vector<std::string> qNames
 	);
-	
+
 	void Flow3Se(
 		std::string uName,
-		std::vector<std::string> qNames
-	);
+		std::vector<std::string> qNames,
+		std::string flowName="3SE_SP");
 
 	void ResolutionRs(
 		std::vector<std::string> qNames
@@ -84,24 +84,24 @@ class CorrelationHelper{
 
 	void FlowRs(
 		std::string uName,
-		std::vector<std::string> qNames
-	);
-	
+		std::vector<std::string> qNames,
+		std::string flowName = "Rnd_SP");
+
 	void FlowEp(
 		std::string uName,
-		std::vector<std::string> qNames // {Qa, Qb, Qfull}
-	);
+		std::vector<std::string> qNames, // {Qa, Qb, Qfull}
+		std::string flowName = "Rnd_Full");
 
 	TH1F *GetTh1f(std::string name);
 	std::vector<TH1F*> GetVectorTh1f( std::vector<std::string> names );
 	void PrintHeap() {
-		for(auto pair : fHeap)
+		for(auto pair : heap_)
 			std::cout << pair.first << std::endl;
 	}
 	void SaveToFile(std::string fileName){
 		TFile* file = new TFile( fileName.data(),"recreate" );
 		file->cd();
-		for(auto &container : fHeap)
+		for(auto &container : heap_)
 		{
 			container.second.Write(container.first.data());
 		}
@@ -109,8 +109,8 @@ class CorrelationHelper{
 	protected:
 	
 	double GetResolutionRs( double meanCosine );
-	std::map<std::string, Qn::DataContainer<Qn::Stats> > fHeap;
+	std::map<std::string, Qn::DataContainer<Qn::Stats> > heap_;
 	std::map<std::string, TH1F*> fHistoHeap;
-	std::shared_ptr<TFile> fFile;
+	std::shared_ptr<TFile> file_;
 	std::vector<TH1F*> fRsResolution;
 };

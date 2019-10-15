@@ -30,3 +30,9 @@
 *.exe
 *.out
 *.app
+
+#build directory
+build/*
+
+#Input Files directory
+Input_Files/*
