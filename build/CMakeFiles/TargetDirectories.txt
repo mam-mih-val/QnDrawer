@@ -1,3 +1,0 @@
-/home/mikhail/QnDrawer/build/CMakeFiles/rebuild_cache.dir
-/home/mikhail/QnDrawer/build/CMakeFiles/QnDrawer.dir
-/home/mikhail/QnDrawer/build/CMakeFiles/edit_cache.dir

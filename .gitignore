@@ -33,6 +33,7 @@
 
 #build directory
 build/*
+cmake-build-debug/*
 
 #Input Files directory
 Input_Files/*
