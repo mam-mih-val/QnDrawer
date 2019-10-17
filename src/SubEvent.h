@@ -7,6 +7,7 @@
 
 #include <string>
 #include <array>
+#include <utility>
 #include "Container.h"
 #include "DataContainer.h"
 #include "Stats.h"
@@ -21,10 +22,10 @@ public:
     SubEvent() = default;
     SubEvent(
         std::string name,
-        std::function<Qn::DataContainer<Qn::Stats>(std::vector<Qn::DataContainer<Qn::Stats>>)> rule
+        const std::function<Qn::DataContainer<Qn::Stats>(std::vector<Qn::DataContainer<Qn::Stats>>)>& rule
     )
     {
-        name_=name;
+        name_=std::move(name);
         SetResolutionRule(rule);
         Init();
     }
@@ -39,12 +40,25 @@ public:
         };
         for(auto &v : flow_)
             v.SetRule(flow);
+        std::vector<std::string> componentsName{"_x", "_y"};
+        for(int i=0; i<number_of_components_; i++)
+        {
+            resolution_.at(i).SetName("resolution_"+name_+componentsName.at(i));
+            flow_.at(i).SetName("flow_"+name_+componentsName.at(i));
+        }
     }
-    void SetResolutionRule( std::function<Qn::DataContainer<Qn::Stats>(std::vector<Qn::DataContainer<Qn::Stats>>)> rule ){
+    void SetResolutionRule( const std::function<Qn::DataContainer<Qn::Stats>(std::vector<Qn::DataContainer<Qn::Stats>>)>& rule ){
         for(auto &r : resolution_)
             r.SetRule(rule);
     }
-    void SetName(std::string name){name_=name;}
+    void SetName(std::string name){name_=std::move(name);}
+    void SaveToFile(TFile* file){
+        for(int i=0; i<number_of_components_; i++)
+        {
+            resolution_.at(i).SaveToFile(file);
+            flow_.at(i).SaveToFile(file);
+        }
+    }
     Container& Resolution(unsigned int idx) { return resolution_.at(idx); }
     Container& Flow(unsigned int idx) { return flow_.at(idx); }
 private:

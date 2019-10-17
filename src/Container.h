@@ -5,6 +5,7 @@
 #ifndef QNDRAWER_CONTAINER_H
 #define QNDRAWER_CONTAINER_H
 
+#include <utility>
 #include <vector>
 #include <string>
 #include <algorithm>
@@ -17,9 +18,9 @@ class Container {
 public:
     Container() = default;
     Container(const Container &otherContainer) = default;
-    Container& operator=(Container& other) = default;
-    Container(std::string name) :
-        name_(name)
+    Container& operator=(const Container& other) = default;
+    explicit Container(std::string name) :
+        name_(std::move(name))
     {
         // none
     }
@@ -38,31 +39,36 @@ public:
     void Compute( std::vector< Qn::DataContainer<Qn::Stats> > containers ){
         if(!rule_)
             std::cout << "empty container function" << std::endl;
-        container_=rule_( containers );
+        container_=rule_( std::move(containers) );
     }
-    void SetName( std::string name ) {name_=name;}
+    void SetName( std::string name ) {name_=std::move(name);}
     void SetRule( std::function<Qn::DataContainer<Qn::Stats>(std::vector<Qn::DataContainer<Qn::Stats>>)> rule ) {
-        rule_=rule;
+        rule_=std::move(rule);
     }
     void Rebin( std::string axis, int bins, float min, float max ){
-        container_=container_.Rebin({axis, bins, min, max});
+        container_=container_.Rebin({std::move(axis), bins, min, max});
     }
     void Projection( std::string axis ){
-        container_=container_.Projection({axis});
+        container_=container_.Projection({std::move(axis)});
     }
-    void SetContainer( Qn::DataContainer<Qn::Stats> container ) { container_=container; }
+    void SetContainer( const Qn::DataContainer<Qn::Stats>& container ) { container_=container; }
     void FillHisto();
     void FillGraph();
+    void SaveToFile(TFile* file){
+        container_.Write(name_.data());
+    };
     friend Container operator+(const Container& term_1, const Container& term_2 ){
         Container result;
-        TList* array = new TList;
+        auto* array = new TList;
         Qn::DataContainer<Qn::Stats> out{(Qn::DataContainer<Qn::Stats>) term_1.container_};
         array->AddLast( (Qn::DataContainer<Qn::Stats>*) &(term_2.container_) );
         out.Merge( (TList*) array );
         result.container_=out;
         return result;
-
     };
+
+    void SaveToFile();
+
 private:
     std::string name_;
     Qn::DataContainer<Qn::Stats> container_;

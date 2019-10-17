@@ -15,7 +15,7 @@
 
 int main( int argv, char** argc )
 {
-    auto file = TFile::Open("/home/mikhail/QnDrawer/Input_Files/PionMinus_Gt80.root");
+    auto file = TFile::Open("/home/mikhail/QnDrawer/Input_Files/PionPlus_Gt80.root");
     CorrelationMananger mananger;
     mananger.SetFile(file);
     Method3Se method_3se;
@@ -27,9 +27,9 @@ int main( int argv, char** argc )
             "Fw2Sp_Fw3Sp"
     };
     std::vector<std::string> u_correlations{
-            "TracksMdcPt_Fw1Sp",
-            "TracksMdcPt_Fw2Sp",
-            "TracksMdcPt_Fw3Sp"
+            "TracksMdcPtFw_Fw1Sp",
+            "TracksMdcPtFw_Fw2Sp",
+            "TracksMdcPtFw_Fw3Sp"
     };
     std::vector<std::string> components{
             "_XX",
@@ -46,14 +46,14 @@ int main( int argv, char** argc )
             corr+=components.at(i);
         method_3se.SetUnCorrelations( i, mananger.GetDataContainerVector(corr_names) );
     }
+    for(unsigned int i=0; i<method_3se.GetNumberOfSe(); i++)
+    {
+        method_3se.Se(i).SetName("Fw_"+std::to_string(i));
+    }
     method_3se.Compute();
-    TFile* file1 = new TFile("out.root", "recreate");
-    file1->cd();
-    method_3se.Se(1).Flow(0).Rebin("Centrality", 2, 20.0, 30.0);
-    method_3se.Se(1).Flow(0).Projection("0_Pt");
-    method_3se.Se(1).Flow(0).GetContainer().SetSetting(Qn::Stats::Settings::CORRELATEDERRORS);
-    method_3se.Se(1).Flow(0).GetContainer().Write();
-    file1->Close();
+    TFile* file_out = new TFile("PiPlus.root", "recreate");
+    method_3se.SaveToFile(file_out);
+    file_out->Close();
 
     return 0;
 }
