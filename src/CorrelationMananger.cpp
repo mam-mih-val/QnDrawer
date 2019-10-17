@@ -18,7 +18,7 @@ Qn::DataContainer<Qn::Stats>& CorrelationMananger::GetDataContainer(std::string 
         return empty;
     }
     heap_.insert( make_pair(name, *ptr) );
-    return GetDataContainer(name);
+    return *ptr;
 }
 
 std::vector<Qn::DataContainer<Qn::Stats>> CorrelationMananger::GetDataContainerVector(std::vector<std::string> names){

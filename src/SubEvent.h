@@ -6,12 +6,18 @@
 #define QNDRAWER_SUBEVENT_H
 
 #include <string>
+#include <array>
 #include "Container.h"
 #include "DataContainer.h"
 #include "Stats.h"
 
 class SubEvent {
 public:
+    enum eComponents{
+        x_=0,
+        y_,
+        number_of_components_
+    };
     SubEvent() = default;
     SubEvent(
         std::string name,
@@ -24,18 +30,27 @@ public:
     }
     ~SubEvent() = default;
     void Init(){
-        flow_.SetRule([]( std::vector<Qn::DataContainer<Qn::Stats>> corr ){ return corr.at(0)/corr.at(1); });
+        auto flow = []( std::vector<Qn::DataContainer<Qn::Stats>> corr ){
+            Qn::DataContainer<Qn::Stats> result;
+            if(corr.size()!=2)
+                std::cout << "errors argument in QnDrawer::SubEvent::ComputeFlow" << std::endl;
+            result = corr.at(0)/corr.at(1);
+            return result;
+        };
+        for(auto &v : flow_)
+            v.SetRule(flow);
     }
     void SetResolutionRule( std::function<Qn::DataContainer<Qn::Stats>(std::vector<Qn::DataContainer<Qn::Stats>>)> rule ){
-        resolution_.SetRule(rule);
+        for(auto &r : resolution_)
+            r.SetRule(rule);
     }
     void SetName(std::string name){name_=name;}
-    Container& Resolution() { return resolution_; }
-    Container& Flow() { return flow_; }
+    Container& Resolution(unsigned int idx) { return resolution_.at(idx); }
+    Container& Flow(unsigned int idx) { return flow_.at(idx); }
 private:
     std::string name_;
-    Container resolution_;
-    Container flow_;
+    std::array<Container, 2> resolution_; // x&y components
+    std::array<Container, 2> flow_; // x&y components
 };
 
 

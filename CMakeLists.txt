@@ -37,14 +37,16 @@ set (HEADERS
 		src/Container.h
 		src/SubEvent.h
 		src/Method.h
-		src/Method3Se.h src/CorrelationMananger.cpp src/CorrelationMananger.h)
+		src/Method3Se.h
+		src/CorrelationMananger.h)
 
 set (SOURCES
-		src/main.cpp
 		src/Container.cpp
 		src/SubEvent.cpp
 		src/Method.cpp
-		src/Method3Se.cpp src/CorrelationMananger.cpp src/CorrelationMananger.h)
+		src/Method3Se.cpp
+		src/CorrelationMananger.cpp
+		src/flow.cpp)
 
 add_executable(QnDrawer ${HEADERS} ${SOURCES} )
 target_link_libraries(QnDrawer Qn::Base ${ROOT_LIBRARIES})

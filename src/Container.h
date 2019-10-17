@@ -35,10 +35,20 @@ public:
             FillGraph();
         return graph_;
     }
-    void Compute( std::vector< Qn::DataContainer<Qn::Stats> > containers ){ container_=rule_( containers ); }
+    void Compute( std::vector< Qn::DataContainer<Qn::Stats> > containers ){
+        if(!rule_)
+            std::cout << "empty container function" << std::endl;
+        container_=rule_( containers );
+    }
     void SetName( std::string name ) {name_=name;}
     void SetRule( std::function<Qn::DataContainer<Qn::Stats>(std::vector<Qn::DataContainer<Qn::Stats>>)> rule ) {
-        rule_=rule_;
+        rule_=rule;
+    }
+    void Rebin( std::string axis, int bins, float min, float max ){
+        container_=container_.Rebin({axis, bins, min, max});
+    }
+    void Projection( std::string axis ){
+        container_=container_.Projection({axis});
     }
     void SetContainer( Qn::DataContainer<Qn::Stats> container ) { container_=container; }
     void FillHisto();
@@ -58,7 +68,7 @@ private:
     Qn::DataContainer<Qn::Stats> container_;
     TH1F* histo_{nullptr};
     TGraphAsymmErrors* graph_{nullptr};
-    std::function<Qn::DataContainer<Qn::Stats>(std::vector<Qn::DataContainer<Qn::Stats>>)> rule_{0};
+    std::function<Qn::DataContainer<Qn::Stats>(std::vector<Qn::DataContainer<Qn::Stats>>)> rule_;
 };
 
 #endif //QNDRAWER_CONTAINER_H

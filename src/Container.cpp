@@ -19,7 +19,7 @@ void Container::FillHisto(){
     // std::cout << "xmin=" << xmin << " xmax=" << xmax << " nbins=" << nbins << endl;
     auto histo_ = new TH1F(histoName.data(), axes.at(0).Name().data(), nbins, xmin, xmax);
     int entries = 0;
-    for( int i=0; i<container_.size(); i++ )
+    for( unsigned int i=0; i<container_.size(); i++ )
     {
         Qn::Stats bin = container_.At(i);
         entries+=bin.GetProfile().Entries();
@@ -30,7 +30,6 @@ void Container::FillHisto(){
             continue;
         histo_->SetBinContent(i+1, mean);
         histo_->SetBinError(i+1, error);
-        // std:: cout << histo->GetBinContent( i+1 ) << std::endl;
     }
     histo_->SetEntries(entries);
     axes.clear();
