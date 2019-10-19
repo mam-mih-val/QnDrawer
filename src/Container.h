@@ -52,8 +52,39 @@ public:
         container_=container_.Projection({std::move(axis)});
     }
     void SetContainer( const Qn::DataContainer<Qn::Stats>& container ) { container_=container; }
-    void FillHisto();
-    void FillGraph();
+    void FillHisto(){
+      container_.SetSetting(Qn::Stats::Settings::CORRELATEDERRORS);
+      std::vector<Qn::Axis> axes = container_.GetAxes();
+      if( axes.size() > 1 )
+      {
+        std::cout << "Error: There are more than 1 axis" << std::endl;
+        return;
+      }
+      int  	nbins = axes.at(0).size();
+      float  	xmin = axes.at(0).GetLowerBinEdge(0);
+      float  	xmax = axes.at(0).GetUpperBinEdge(nbins-1);
+      std::string histoName = name_+"_histo";
+      // std::cout << "xmin=" << xmin << " xmax=" << xmax << " nbins=" << nbins << endl;
+      auto histo_ = new TH1F(histoName.data(), axes.at(0).Name().data(), nbins, xmin, xmax);
+      int entries = 0;
+      for( unsigned int i=0; i<container_.size(); i++ )
+      {
+        Qn::Stats bin = container_.At(i);
+        entries+=bin.GetProfile().Entries();
+        float mean = bin.Mean();
+        float error = bin.Error();
+        std::cout << "bin: " << i << " mean:" << mean << " error:" << error << std::endl;
+        if( mean != mean )
+          continue;
+        histo_->SetBinContent(i+1, mean);
+        histo_->SetBinError(i+1, error);
+      }
+      histo_->SetEntries(entries);
+      axes.clear();
+    }
+    void FillGraph(){
+      graph_ = Qn::DataContainerHelper::ToTGraph(container_);
+    }
     void SaveToFile(TFile* file){
         container_.Write(name_.data());
     };
@@ -66,8 +97,6 @@ public:
         result.container_=out;
         return result;
     };
-
-    void SaveToFile();
 
 private:
     std::string name_;
