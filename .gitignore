@@ -24,6 +24,7 @@
 *.lai
 *.la
 *.a
+*.idea/*
 *.lib
 
 # Executables
@@ -37,3 +38,9 @@ cmake-build-debug/*
 
 #Input Files directory
 Input_Files/*
+
+#Output Files directory
+Output_Files/*
+
+#Configuration Files directory
+Configuration_Files/*

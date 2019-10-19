@@ -13,14 +13,22 @@
 #include "CorrelationMananger.h"
 #include "Method3Se.h"
 
-int main( int argv, char** argc )
+int main( int argc, char** argv )
 {
-    auto file = TFile::Open("/home/mikhail/QnDrawer/Input_Files/PionPlus_Gt80.root");
+    if( argc==1 ){
+        std::cout << "Error: Incorrecet number of arguments, " << argc-1 <<
+        " given, 2 is required" << std::endl;
+        std::cout << "Exit." << std::endl;
+        return 1;
+    }
+    std::string input_file_name=argv[1];
+    std::string output_file_name=argv[2];
+    auto file = TFile::Open(input_file_name.data());
     CorrelationMananger mananger;
     mananger.SetFile(file);
     Method3Se method_3se;
+    method_3se.SetName("3Sub");
     method_3se.Init();
-    method_3se.SetName("3_Sub_Event");
     std::vector<std::string> q_correlations{
             "Fw1Sp_Fw2Sp",
             "Fw3Sp_Fw1Sp",
@@ -46,15 +54,11 @@ int main( int argv, char** argc )
             corr+=components.at(i);
         method_3se.SetUnCorrelations( i, mananger.GetDataContainerVector(corr_names) );
     }
-    for(unsigned int i=0; i<method_3se.GetNumberOfSe(); i++)
-    {
-        method_3se.Se(i).SetName("Fw_"+std::to_string(i));
-    }
     method_3se.Compute();
-    TFile* file_out = new TFile("PiPlus.root", "recreate");
+    auto* file_out = new TFile(output_file_name.data(), "recreate");
     method_3se.SaveToFile(file_out);
     file_out->Close();
-
+    std::cout << "Results saved in " << output_file_name << std::endl;
     return 0;
 }
 

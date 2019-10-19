@@ -38,15 +38,18 @@ set (HEADERS
 		src/SubEvent.h
 		src/Method.h
 		src/Method3Se.h
-		src/CorrelationMananger.h)
+		src/CorrelationMananger.h
+		src/FlowConfiguration.h)
 
 set (SOURCES
 		src/Container.cpp
 		src/SubEvent.cpp
 		src/Method.cpp
 		src/Method3Se.cpp
-		src/CorrelationMananger.cpp
-		src/flow.cpp)
+		src/CorrelationMananger.cpp)
 
-add_executable(QnDrawer ${HEADERS} ${SOURCES} )
+add_executable(QnDrawer src/flow.cpp ${HEADERS} ${SOURCES} )
 target_link_libraries(QnDrawer Qn::Base ${ROOT_LIBRARIES})
+
+add_executable(MakeConfigFile src/ConfigureFlow.cpp ${HEADERS} ${SOURCES} )
+target_link_libraries(MakeConfigFile Qn::Base ${ROOT_LIBRARIES})

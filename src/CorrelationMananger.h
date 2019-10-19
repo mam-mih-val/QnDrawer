@@ -6,6 +6,7 @@
 #define QNDRAWER_CORRELATIONMANANGER_H
 
 #include <string>
+#include <utility>
 #include <vector>
 #include <memory>
 #include <map>
@@ -17,13 +18,35 @@ class CorrelationMananger {
 public:
     CorrelationMananger() = default;
     ~CorrelationMananger(){ heap_.clear(); }
-    void SetFile(std::string fileName) { file_.reset(TFile::Open(fileName.data())); }
-    void SetFile(std::shared_ptr<TFile> file) { file_ = file; }
+    void SetFile(const std::string& fileName) { file_.reset(TFile::Open(fileName.data())); }
+    void SetFile(std::shared_ptr<TFile> file) { file_ = std::move(file); }
     void SetFile(TFile* file) { file_.reset(file); }
-    Qn::DataContainer<Qn::Stats>& GetDataContainer(std::string);
-    std::vector<Qn::DataContainer<Qn::Stats>> GetDataContainerVector(std::vector<std::string>);
-    void SaveToFile(std::string fileName){
-        TFile* file = new TFile( fileName.data(),"recreate" );
+    Qn::DataContainer<Qn::Stats>& GetDataContainer(const std::string& name){
+      Qn::DataContainer<Qn::Stats> empty;
+      Qn::DataContainer<Qn::Stats>* ptr{nullptr};
+      if( heap_.count(name) !=0 )
+        return heap_.at(name);
+      if(!file_)
+        return empty;
+      file_->GetObject( name.data(), ptr );
+      if(!ptr)
+      {
+        std::cout << "No such a data container: " << name << std::endl;
+        return empty;
+      }
+      heap_.insert( make_pair(name, *ptr) );
+      return *ptr;
+    }
+    std::vector<Qn::DataContainer<Qn::Stats>> GetDataContainerVector(const std::vector<std::string>& names){
+      std::vector<Qn::DataContainer<Qn::Stats>> result;
+      result.reserve(names.size());
+      for(const auto& name: names){
+        result.push_back(GetDataContainer(name));
+      }
+      return result;
+    };
+    void SaveToFile(const std::string& fileName){
+        auto* file = new TFile( fileName.data(),"recreate" );
         file->cd();
         for(auto &container : heap_)
         {
