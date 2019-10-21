@@ -44,3 +44,5 @@ Output_Files/*
 
 #Configuration Files directory
 Configuration_Files/*
+
+Painter/*.png

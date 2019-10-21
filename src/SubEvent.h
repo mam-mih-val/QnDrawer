@@ -61,10 +61,25 @@ public:
     }
     Container& Resolution(unsigned int idx) { return resolution_.at(idx); }
     Container& Flow(unsigned int idx) { return flow_.at(idx); }
+    void Rebin(const Qn::Axis& axis){
+      for(auto &flow : flow_)
+        flow.Rebin(axis);
+    }
+    void Projection(const std::string axis){
+      for(auto &flow : flow_)
+        flow.Projection(axis);
+    }
+  const std::string &GetName() const { return name_; }
+  void SaveHistoToFile(TFile* file){
+      for(int i=0; i<2; i++){
+        resolution_.at(i).SaveHistoToFile(file);
+        flow_.at(i).SaveHistoToFile(file);
+      }
+    }
 private:
-    std::string name_;
-    std::array<Container, 2> resolution_; // x&y components
-    std::array<Container, 2> flow_; // x&y components
+  std::string name_;
+  std::array<Container, 2> resolution_; // x&y components
+  std::array<Container, 2> flow_; // x&y components
 };
 
 

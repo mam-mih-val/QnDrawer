@@ -26,7 +26,7 @@ public:
     }
     virtual ~Container() = default;
     Qn::DataContainer<Qn::Stats>& GetContainer() { return container_;}
-    TH1F* GetHistogram(){
+    TH1F *GetHistogram() {
         if(!histo_)
             FillHisto();
         return histo_;
@@ -45,8 +45,8 @@ public:
     void SetRule( std::function<Qn::DataContainer<Qn::Stats>(std::vector<Qn::DataContainer<Qn::Stats>>)> rule ) {
         rule_=std::move(rule);
     }
-    void Rebin( std::string axis, int bins, float min, float max ){
-        container_=container_.Rebin({std::move(axis), bins, min, max});
+    void Rebin(const Qn::Axis& axis ){
+      container_=container_.Rebin(axis);
     }
     void Projection( std::string axis ){
         container_=container_.Projection({std::move(axis)});
@@ -65,7 +65,7 @@ public:
       float  	xmax = axes.at(0).GetUpperBinEdge(nbins-1);
       std::string histoName = name_+"_histo";
       // std::cout << "xmin=" << xmin << " xmax=" << xmax << " nbins=" << nbins << endl;
-      auto histo_ = new TH1F(histoName.data(), axes.at(0).Name().data(), nbins, xmin, xmax);
+      histo_ = new TH1F(histoName.data(), axes.at(0).Name().data(), nbins, xmin, xmax);
       int entries = 0;
       for( unsigned int i=0; i<container_.size(); i++ )
       {
@@ -80,7 +80,6 @@ public:
         histo_->SetBinError(i+1, error);
       }
       histo_->SetEntries(entries);
-      axes.clear();
     }
     void FillGraph(){
       graph_ = Qn::DataContainerHelper::ToTGraph(container_);
@@ -88,6 +87,16 @@ public:
     void SaveToFile(TFile* file){
         container_.Write(name_.data());
     };
+    void SaveHistoToFile(TFile* file){
+      auto histo = GetHistogram();
+      std::string save_name = "histo_"+name_;
+      histo->Write(save_name.data());
+    }
+    void operator+=(const Container& term){
+      Container result;
+      result = *this+term;
+      container_=result.container_;
+    }
     friend Container operator+(const Container& term_1, const Container& term_2 ){
         Container result;
         auto* array = new TList;
