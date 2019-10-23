@@ -73,7 +73,7 @@ public:
         entries+=bin.GetProfile().Entries();
         float mean = bin.Mean();
         float error = bin.Error();
-        std::cout << "bin: " << i << " mean:" << mean << " error:" << error << std::endl;
+        // std::cout << "bin: " << i << " mean:" << mean << " error:" << error << std::endl;
         if( mean != mean )
           continue;
         histo_->SetBinContent(i+1, mean);

@@ -50,6 +50,3 @@ set (SOURCES
 
 add_executable(QnDrawer src/flow.cpp ${HEADERS} ${SOURCES} )
 target_link_libraries(QnDrawer Qn::Base ${ROOT_LIBRARIES})
-
-add_executable(MakeConfigFile src/ConfigureFlow.cpp ${HEADERS} ${SOURCES} )
-target_link_libraries(MakeConfigFile Qn::Base ${ROOT_LIBRARIES})

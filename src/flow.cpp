@@ -12,10 +12,15 @@
 #include "TFile.h"
 #include "CorrelationMananger.h"
 #include "Method3Se.h"
+#include <fstream>
+
+// ./Build_Flow input_file output_file config_file
+
+std::vector<std::string> ReadConfig(std::string config_file_name);
 
 int main( int argc, char** argv )
 {
-  if( argc==1 ){
+  if( argc < 3 ){
     std::cout << "Error: Incorrecet number of arguments, " << argc-1 <<
     " given, 2 is required" << std::endl;
     std::cout << "Exit." << std::endl;
@@ -23,22 +28,29 @@ int main( int argc, char** argv )
   }
   std::string input_file_name=argv[1];
   std::string output_file_name=argv[2];
+  std::string config_file_name=argv[3];
+
+  std::vector<std::string> temp_vectors{ReadConfig(config_file_name)};
+  std::string u_vector=temp_vectors.back();
+  std::vector<std::string> q_vector;
+  for(unsigned int i=0; i<temp_vectors.size()-1; i++){
+    q_vector.push_back(temp_vectors.at(i));
+  }
   auto file = TFile::Open(input_file_name.data());
   CorrelationMananger mananger;
   mananger.SetFile(file);
   Method3Se method_3se;
   method_3se.SetName("3Sub");
-  std::cout << method_3se.GetName() << std::endl;
   method_3se.Init();
   std::vector<std::string> q_correlations{
-    "Fw1Sp_Fw2Sp",
-    "Fw3Sp_Fw1Sp",
-    "Fw2Sp_Fw3Sp"
+    q_vector.at(0)+"_"+q_vector.at(1),
+    q_vector.at(2)+"_"+q_vector.at(0),
+    q_vector.at(1)+"_"+q_vector.at(2)
   };
   std::vector<std::string> u_correlations{
-    "TracksMdcPtFw_Fw1Sp",
-    "TracksMdcPtFw_Fw2Sp",
-    "TracksMdcPtFw_Fw3Sp"
+    u_vector+"_"+q_vector.at(0),
+    u_vector+"_"+q_vector.at(1),
+    u_vector+"_"+q_vector.at(2),
   };
   std::vector<std::string> components{
     "_XX",
@@ -68,3 +80,16 @@ int main( int argc, char** argv )
   return 0;
 }
 
+std::vector<std::string> ReadConfig(std::string config_file_name){
+  std::vector<std::string> temp_vectors;
+  std::ifstream config_file(config_file_name);
+  if(config_file.is_open()){
+    std::string buff_line;
+    while (getline(config_file, buff_line)) {
+      temp_vectors.push_back(buff_line);
+      std::cout << buff_line << std::endl;
+    }
+  }
+  config_file.close();
+  return temp_vectors;
+}
