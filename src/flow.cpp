@@ -16,13 +16,13 @@
 
 // ./Build_Flow input_file output_file config_file
 
-std::vector<std::string> ReadConfig(std::string config_file_name);
+std::vector<std::string> ReadConfig(const std::string& config_file_name);
 
 int main( int argc, char** argv )
 {
   if( argc < 3 ){
     std::cout << "Error: Incorrecet number of arguments, " << argc-1 <<
-    " given, 2 is required" << std::endl;
+    " given, 3 is required" << std::endl;
     std::cout << "Exit." << std::endl;
     return 1;
   }
@@ -80,7 +80,7 @@ int main( int argc, char** argv )
   return 0;
 }
 
-std::vector<std::string> ReadConfig(std::string config_file_name){
+std::vector<std::string> ReadConfig(const std::string& config_file_name){
   std::vector<std::string> temp_vectors;
   std::ifstream config_file(config_file_name);
   if(config_file.is_open()){

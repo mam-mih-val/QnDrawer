@@ -22,17 +22,16 @@ public:
     void SetFile(std::shared_ptr<TFile> file) { file_ = std::move(file); }
     void SetFile(TFile* file) { file_.reset(file); }
     Qn::DataContainer<Qn::Stats>& GetDataContainer(const std::string& name){
-      Qn::DataContainer<Qn::Stats> empty;
       Qn::DataContainer<Qn::Stats>* ptr{nullptr};
       if( heap_.count(name) !=0 )
         return heap_.at(name);
       if(!file_)
-        return empty;
+        return *ptr;
       file_->GetObject( name.data(), ptr );
       if(!ptr)
       {
         std::cout << "No such a data container: " << name << std::endl;
-        return empty;
+        return *ptr;
       }
       heap_.insert( make_pair(name, *ptr) );
       return *ptr;
