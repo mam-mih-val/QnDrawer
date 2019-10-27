@@ -10,6 +10,7 @@
 #include <string>
 #include <iostream>
 #include "TFile.h"
+#include "FlowConfiguration.h"
 #include "CorrelationMananger.h"
 #include "Method3Se.h"
 #include <fstream>
