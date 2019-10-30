@@ -113,6 +113,7 @@ private:
     TH1F* histo_{nullptr};
     TGraphAsymmErrors* graph_{nullptr};
     std::function<Qn::DataContainer<Qn::Stats>(std::vector<Qn::DataContainer<Qn::Stats>>)> rule_;
+    ClassDef(Container,1)
 };
 
 #endif //QNDRAWER_CONTAINER_H

@@ -1,7 +1,6 @@
 //
 // Created by mikhail on 18.10.2019.
 //
-
 #ifndef QNDRAWER_FLOWCONFIGURATION_H
 #define QNDRAWER_FLOWCONFIGURATION_H
 
@@ -44,6 +43,7 @@ private:
   std::vector<std::string> components_names_;
   std::string projection_axis_name_;
   std::vector<Qn::Axis> rebin_axis_;
+  ClassDef(FlowConfiguration,1)
 };
 
 

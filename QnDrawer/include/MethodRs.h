@@ -34,7 +34,7 @@ public:
       }
     }
   }
-
+  ClassDef(MethodRs, 1)
 };
 
 #endif // QNDRAWER_METHODRS_H
