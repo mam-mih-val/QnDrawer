@@ -75,6 +75,7 @@ protected:
   Container averaged_;
   std::array<std::vector<Qn::DataContainer<Qn::Stats>>,2> qn_correlations_; // Qn1Qn2, Qn1Qn3, Qn2Qn3
   std::array<std::vector<Qn::DataContainer<Qn::Stats>>,2> un_correlations_;
+  ClassDef(Method, 1);
 };
 
 

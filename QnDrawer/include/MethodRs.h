@@ -33,6 +33,7 @@ public:
       }
     }
   }
+ClassDefOverride(MethodRs, 1)
 };
 
 #endif // QNDRAWER_METHODRS_H

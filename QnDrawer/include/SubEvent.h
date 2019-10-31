@@ -29,7 +29,7 @@ public:
         SetResolutionRule(rule);
         Init();
     }
-    ~SubEvent() = default;
+    virtual ~SubEvent() = default;
     void Init(){
         auto flow = []( std::vector<Qn::DataContainer<Qn::Stats>> corr ){
             Qn::DataContainer<Qn::Stats> result;
@@ -80,6 +80,7 @@ private:
   std::string name_;
   std::array<Container, 2> resolution_; // x&y components
   std::array<Container, 2> flow_; // x&y components
+  ClassDef(SubEvent, 1)
 };
 
 

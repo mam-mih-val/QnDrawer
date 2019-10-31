@@ -107,12 +107,12 @@ public:
     };
 
 private:
-    std::string name_;
-    Qn::DataContainer<Qn::Stats> container_;
-    TH1F* histo_{nullptr};
-    TGraphAsymmErrors* graph_{nullptr};
-    std::function<Qn::DataContainer<Qn::Stats>(std::vector<Qn::DataContainer<Qn::Stats>>)> rule_;
-    ClassDef(Container, 1)
+  std::string name_;
+  Qn::DataContainer<Qn::Stats> container_;
+  TH1F* histo_{nullptr};
+  TGraphAsymmErrors* graph_{nullptr};
+  std::function<Qn::DataContainer<Qn::Stats>(std::vector<Qn::DataContainer<Qn::Stats>>)> rule_;
+  ClassDef(Container, 1)
 };
 
 #endif //QNDRAWER_CONTAINER_H

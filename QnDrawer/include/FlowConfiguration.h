@@ -9,10 +9,10 @@
 #include <string>
 #include <Axis.h>
 
-class FlowConfiguration : public TNamed {
+class FlowConfiguration : public TObject {
 public:
   FlowConfiguration() = default;
-  ~FlowConfiguration() override {}
+  ~FlowConfiguration() override = default;
   const std::vector<std::string> &GetQnQnNames() const { return qn_qn_names_; }
   void SetQnQnNames(const std::vector<std::string> &qnQnNames) {
     qn_qn_names_ = qnQnNames;
@@ -43,7 +43,7 @@ private:
   std::vector<std::string> components_names_;
   std::string projection_axis_name_;
   std::vector<Qn::Axis> rebin_axis_;
-  ClassDef(FlowConfiguration, 1)
+  ClassDefOverride(FlowConfiguration, 1)
 };
 
 #endif //QNDRAWER_FLOWCONFIGURATION_H

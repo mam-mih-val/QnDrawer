@@ -30,4 +30,5 @@ int main(int argv, char** argc){
   configuration.SetRebinAxis({{"Centrality", 2, 20, 30}});
   file->cd();
   configuration.Write("config");
+  std::cout << "Configuration written in " << file_name << std::endl;
 }

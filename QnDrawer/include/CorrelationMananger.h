@@ -18,7 +18,7 @@
 class CorrelationMananger {
 public:
   CorrelationMananger() = default;
-  ~CorrelationMananger(){ heap_.clear(); }
+  virtual ~CorrelationMananger(){ heap_.clear(); }
   void SetFile(const std::string& fileName) { file_.reset(TFile::Open(fileName.data())); }
   void SetFile(std::shared_ptr<TFile> file) { file_ = std::move(file); }
   void SetFile(TFile* file) { file_.reset(file); }
@@ -57,7 +57,7 @@ public:
 protected:
   std::map<std::string, Qn::DataContainer<Qn::Stats> > heap_;
   std::shared_ptr<TFile> file_;
-
+  //ClassDef(CorrelationMananger, 1)
 };
 
 
