@@ -57,7 +57,7 @@ public:
 protected:
   std::map<std::string, Qn::DataContainer<Qn::Stats> > heap_;
   std::shared_ptr<TFile> file_;
-  ClassDef(CorrelationMananger, 1)
+
 };
 
 

@@ -1,7 +1,6 @@
 //
 // Created by mikhail on 26.10.2019.
 //
-
 #ifndef QNDRAWER_METHODRS_H
 #define QNDRAWER_METHODRS_H
 
@@ -34,7 +33,6 @@ public:
       }
     }
   }
-  ClassDef(MethodRs, 1)
 };
 
 #endif // QNDRAWER_METHODRS_H

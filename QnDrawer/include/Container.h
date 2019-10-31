@@ -1,7 +1,6 @@
 //
 // Created by mikhail on 13.10.2019.
 //
-
 #ifndef QNDRAWER_CONTAINER_H
 #define QNDRAWER_CONTAINER_H
 
@@ -11,7 +10,7 @@
 #include <algorithm>
 #include "TH1F.h"
 #include "TGraphAsymmErrors.h"
-#include "DataContainer.h"
+#include <DataContainer.h>
 #include "Stats.h"
 
 class Container {
@@ -113,7 +112,7 @@ private:
     TH1F* histo_{nullptr};
     TGraphAsymmErrors* graph_{nullptr};
     std::function<Qn::DataContainer<Qn::Stats>(std::vector<Qn::DataContainer<Qn::Stats>>)> rule_;
-    ClassDef(Container,1)
+    ClassDef(Container, 1)
 };
 
 #endif //QNDRAWER_CONTAINER_H

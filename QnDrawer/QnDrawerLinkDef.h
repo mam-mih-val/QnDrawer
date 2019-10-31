@@ -1,11 +1,12 @@
 //
 // Created by mikhail on 30.10.2019.
 //
-#ifdef __CINT__
+#if defined(__ROOTCLING__) || defined(__MAKECINT__)
 
-#pragma link off all globals;
-#pragma link off all classes;
-#pragma link off all functions;
+#pragma link off all class;
+#pragma link off all function;
+#pragma link off all global;
+#pragma link off all typedef;
 
 #pragma link C++ class Container+;
 #pragma link C++ class CorrelationManager+;
@@ -15,4 +16,4 @@
 #pragma link C++ class MethodRs+;
 #pragma link C++ class SubEvent+;
 
-#endif // __CINT__
+#endif

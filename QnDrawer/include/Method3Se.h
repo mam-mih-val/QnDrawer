@@ -51,7 +51,6 @@ public:
                 sub_events_.at(i).Flow(comp).Compute( {un_correlations_.at(comp).at(i), sub_events_.at(i).Resolution(comp).GetContainer()} );
         }
     }
-    ClassDef(Method3Se,1)
 };
 
 #endif //QNDRAWER_METHOD3SE_H

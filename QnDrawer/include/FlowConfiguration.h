@@ -9,7 +9,7 @@
 #include <string>
 #include <Axis.h>
 
-class FlowConfiguration : public TObject {
+class FlowConfiguration : public TNamed {
 public:
   FlowConfiguration() = default;
   ~FlowConfiguration() override {}
@@ -43,8 +43,7 @@ private:
   std::vector<std::string> components_names_;
   std::string projection_axis_name_;
   std::vector<Qn::Axis> rebin_axis_;
-  ClassDef(FlowConfiguration,1)
+  ClassDef(FlowConfiguration, 1)
 };
-
 
 #endif //QNDRAWER_FLOWCONFIGURATION_H

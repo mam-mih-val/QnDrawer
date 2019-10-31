@@ -80,7 +80,6 @@ private:
   std::string name_;
   std::array<Container, 2> resolution_; // x&y components
   std::array<Container, 2> flow_; // x&y components
-  ClassDef(SubEvent,1)
 };
 
 

@@ -47,15 +47,23 @@ set(SOURCES
 		QnDrawer/CorrelationMananger.cpp
 		QnDrawer/MethodRs.cpp)
 
+set(PCM_FILE_NAME libQnDrawer)
 add_library(QnDrawer SHARED ${SOURCES} )
 if(ROOT_FOUND)
-	ROOT_GENERATE_DICTIONARY( G__QnDrawer ${HEADERS} LINKDEF QnDrawer/QnDrawerLinkDef.h )
-	target_link_libraries(QnDrawer Qn::Base ${ROOT_LIBRARIES})
+	ROOT_GENERATE_DICTIONARY( G__QnDrawer ${HEADERS}
+			LINKDEF
+				QnDrawer/QnDrawerLinkDef.h
+			OPTIONS
+			-s ${PCM_FILE_NAME}
+			-I${CMAKE_SOURCE_DIR}
+			-I${Qn_INCLUDE_DIR}
+			)
+	target_link_libraries(QnDrawer PRIVATE Qn::Base ${ROOT_LIBRARIES})
 endif(ROOT_FOUND)
 
 
-add_executable(Flow src/flow.cpp)
-target_link_libraries(Flow QnDrawer Qn::Base ${ROOT_LIBRARIES})
+add_executable(Flow src/flow.cpp G__QnDrawer.cxx)
+target_link_libraries(Flow PUBLIC QnDrawer Qn::Base ${ROOT_LIBRARIES})
 
-add_executable(Configure src/ConfigureFlow.cpp)
-target_link_libraries(Configure QnDrawer Qn::Base ${ROOT_LIBRARIES})
+add_executable(Configure src/ConfigureFlow.cpp G__QnDrawer.cxx)
+target_link_libraries(Configure PUBLIC QnDrawer Qn::Base ${ROOT_LIBRARIES})
