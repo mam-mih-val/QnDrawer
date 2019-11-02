@@ -2,15 +2,10 @@
 // Created by mikhail on 17.10.2019.
 //
 
-//
-// Created by mikhail on 13.10.2019.
-//
-
 #include <vector>
 #include <string>
 #include <iostream>
 #include "TFile.h"
-#include "FlowConfiguration.h"
 #include "CorrelationMananger.h"
 #include "Method3Se.h"
 #include <fstream>
@@ -40,6 +35,7 @@ int main( int argc, char** argv )
   auto file = TFile::Open(input_file_name.data());
   CorrelationMananger mananger;
   mananger.SetFile(file);
+  mananger.SetConfigFile("test.root");
   Method3Se method_3se;
   method_3se.SetName("3Sub");
   method_3se.Init();

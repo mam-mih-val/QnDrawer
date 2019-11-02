@@ -29,6 +29,7 @@ int main(int argv, char** argc){
   configuration.SetProjectionAxisName("0_Pt");
   configuration.SetRebinAxis({{"Centrality", 2, 20, 30}});
   file->cd();
-  configuration.Write("config");
+  configuration.Write("3Se");
   std::cout << "Configuration written in " << file_name << std::endl;
+  file->Close();
 }

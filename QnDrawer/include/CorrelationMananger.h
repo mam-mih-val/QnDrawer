@@ -1,11 +1,11 @@
 //
 // Created by mikhail on 15.10.2019.
 //
-
 #ifndef QNDRAWER_CORRELATIONMANANGER_H
 #define QNDRAWER_CORRELATIONMANANGER_H
 
 #include "DataContainer.h"
+#include "FlowConfiguration.h"
 #include "Method.h"
 #include "Stats.h"
 #include "TFile.h"
@@ -14,6 +14,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <algorithm>
 
 class CorrelationMananger {
 public:
@@ -45,6 +46,31 @@ public:
     }
     return result;
   };
+  void SetConfigFile(const std::string& file_name){
+    config_file_.reset( TFile::Open(file_name.data()) );
+    std::cout << "Configuration file is set: " << file_name << std::endl;
+  }
+  std::vector<Qn::DataContainer<Qn::Stats>> GetQnQnContainers(const std::string& config_name, unsigned int component){
+    FlowConfiguration* config;
+    config_file_->GetObject(config_name.data(), config);
+    std::cout << "Reading " << config_name << " configuration" << std::endl;
+    std::vector<std::string> qn_qn_names{ config->GetQnQnNames() };
+    std::vector<std::string> components_names{ config->GetComponentsNames() };
+    std::for_each( qn_qn_names.begin(), qn_qn_names.end(), [components_names, component]( std::string &str ){
+      str+=components_names.at(component);
+    } );
+    return  GetDataContainerVector(qn_qn_names);
+  }
+  std::vector<Qn::DataContainer<Qn::Stats>> GetUnQnContainers(const std::string& config_name, unsigned int component){
+    FlowConfiguration* config;
+    config_file_->GetObject(config_name.data(), config);
+    std::vector<std::string> un_qn_names{ config->GetUnQnNames() };
+    std::vector<std::string> components_names{ config->GetComponentsNames() };
+    std::for_each( un_qn_names.begin(), un_qn_names.end(), [components_names, component]( std::string &str ){
+      str+=components_names.at(component);
+    } );
+    return  GetDataContainerVector(un_qn_names);
+  }
   void SaveToFile(const std::string& fileName){
     auto* file = new TFile( fileName.data(),"recreate" );
     file->cd();
@@ -53,10 +79,10 @@ public:
         container.second.Write(container.first.data());
     }
   }
-
 protected:
   std::map<std::string, Qn::DataContainer<Qn::Stats> > heap_;
   std::shared_ptr<TFile> file_;
+  std::shared_ptr<TFile> config_file_;
   //ClassDef(CorrelationMananger, 1)
 };
 
