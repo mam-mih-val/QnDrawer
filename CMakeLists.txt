@@ -37,7 +37,8 @@ set(HEADERS
 		QnDrawer/include/Method3Se.h
 		QnDrawer/include/CorrelationMananger.h
 		QnDrawer/include/FlowConfiguration.h
-		QnDrawer/include/MethodRs.h)
+		QnDrawer/include/MethodRs.h
+		QnDrawer/include/FlowBuilder.h)
 
 set(SOURCES
 		QnDrawer/Container.cpp
@@ -45,7 +46,8 @@ set(SOURCES
 		QnDrawer/Method.cpp
 		QnDrawer/Method3Se.cpp
 		QnDrawer/CorrelationMananger.cpp
-		QnDrawer/MethodRs.cpp)
+		QnDrawer/MethodRs.cpp
+		QnDrawer/FlowBuilder.cpp)
 
 set(PCM_FILE_NAME libQnDrawer)
 add_library(QnDrawer SHARED ${SOURCES} )

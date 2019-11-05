@@ -18,9 +18,9 @@ int main(int argv, char** argc){
     "Fw2Sp_Fw3Sp"
   });
   configuration.SetUnQnNames({
-    "TracksMdcPtFw_Fw1Sp",
-    "TracksMdcPtFw_Fw2Sp",
-    "TracksMdcPtFw_Fw3Sp"
+    "TracksMdcPtMr_Fw1Sp",
+    "TracksMdcPtMr_Fw2Sp",
+    "TracksMdcPtMr_Fw3Sp"
   });
   configuration.SetComponentsNames({
     "_XX",

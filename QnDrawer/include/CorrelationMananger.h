@@ -71,6 +71,16 @@ public:
     } );
     return  GetDataContainerVector(un_qn_names);
   }
+  const std::vector<Qn::Axis> &GetRebinAxis(const std::string& config_name) const{
+    FlowConfiguration* config;
+    config_file_->GetObject(config_name.data(), config);
+    return config->GetRebinAxis();
+  }
+  const std::string &GetProjectionAxisName(const std::string& config_name) const{
+    FlowConfiguration* config;
+    config_file_->GetObject(config_name.data(), config);
+    return config->GetProjectionAxisName();
+  }
   void SaveToFile(const std::string& fileName){
     auto* file = new TFile( fileName.data(),"recreate" );
     file->cd();
