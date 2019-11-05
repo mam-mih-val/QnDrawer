@@ -93,7 +93,7 @@ protected:
   std::map<std::string, Qn::DataContainer<Qn::Stats> > heap_;
   std::shared_ptr<TFile> file_;
   std::shared_ptr<TFile> config_file_;
-  //ClassDef(CorrelationMananger, 1)
+  ClassDef(CorrelationMananger, 1)
 };
 
 

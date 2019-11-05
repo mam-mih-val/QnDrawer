@@ -20,6 +20,8 @@ public:
   virtual ~FlowBuilder() = default;
   void SetInputName(const std::string& file_name){manager_.SetFile(file_name);}
   inline void SetConfigFileName( const std::string& file_name ){ manager_.SetConfigFile(file_name); }
+  const std::string &GetName() const { return name_; }
+  void SetName(const std::string &name) { name_ = name; }
   inline void SetMethod3SeName(std::string name){
     method_3se_.SetName(std::move(name));
   }void SetMethodRndName(std::string name){
@@ -52,7 +54,7 @@ public:
     method_rnd_.Projection(manager_.GetProjectionAxisName(method_rnd_.GetName()));
   }
   void SaveToFile(const std::string& file_name){
-    auto file = TFile::Open(file_name.data());
+    auto file = TFile::Open(file_name.data(), "recreate");
     method_rnd_.SaveToFile(file);
     method_3se_.SaveToFile(file);
     file->Close();
@@ -63,7 +65,6 @@ protected:
   CorrelationMananger manager_;
   Method3Se           method_3se_;
   MethodRs            method_rnd_;
-  ClassDef(FlowBuilder, 1)
 };
 
 #endif // QNDRAWER_FLOWBUILDER_H

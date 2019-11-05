@@ -46,8 +46,9 @@ set(SOURCES
 		QnDrawer/Method.cpp
 		QnDrawer/Method3Se.cpp
 		QnDrawer/CorrelationMananger.cpp
+		QnDrawer/FlowConfiguration.cpp
 		QnDrawer/MethodRs.cpp
-		QnDrawer/FlowBuilder.cpp)
+		QnDrawer/FlowBuilder.cpp )
 
 set(PCM_FILE_NAME libQnDrawer)
 add_library(QnDrawer SHARED ${SOURCES} )

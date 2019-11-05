@@ -30,6 +30,24 @@ int main(int argv, char** argc){
   configuration.SetRebinAxis({{"Centrality", 2, 20, 30}});
   file->cd();
   configuration.Write("3Se");
+
+  FlowConfiguration configuration_rnd;
+  configuration_rnd.SetQnQnNames({
+    "Rs1Sp_Rs2Sp",
+    "Rs1Sp_Rs2Sp"
+  });
+  configuration_rnd.SetUnQnNames({
+    "TracksMdcPtMr_Rs1Sp",
+    "TracksMdcPtMr_Rs2Sp"
+  });
+  configuration_rnd.SetComponentsNames({
+    "_XX",
+    "_YY"
+  });
+  configuration_rnd.SetProjectionAxisName("0_Pt");
+  configuration_rnd.SetRebinAxis({{"Centrality", 2, 20, 30}});
+  file->cd();
+  configuration_rnd.Write("RndSub");
   std::cout << "Configuration written in " << file_name << std::endl;
   file->Close();
 }
