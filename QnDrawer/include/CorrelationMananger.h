@@ -89,11 +89,29 @@ public:
         container.second.Write(container.first.data());
     }
   }
+  Method MakeMethod( const std::string& config_name ){
+    FlowConfiguration* config;
+    config_file_->GetObject(config_name.data(), config);
+    Method method(config_name);
+    method.SetNumberOfSe(config->GetNumberOfSe());
+    method.SetResolutionRule([](std::vector<Qn::DataContainer<Qn::Stats>> corr){
+      Qn::DataContainer<Qn::Stats> result;
+      result = Sqrt(corr.at(0)*corr.at(1)/(corr.at(2))*0.5);
+      return result;
+    });
+    method.SetResolutionIndicesMatrix(config->GetResolutionIndicesMatrix());
+    for(int i=0; i<2; i++)
+    {
+      method.SetQnQnCorrelations( GetQnQnContainers(config_name, i), i );
+      method.SetUnQnCorrelations( GetUnQnContainers(config_name, i), i );
+    }
+    return method;
+  }
 protected:
   std::map<std::string, Qn::DataContainer<Qn::Stats> > heap_;
   std::shared_ptr<TFile> file_;
   std::shared_ptr<TFile> config_file_;
-  ClassDef(CorrelationMananger, 1)
+  // ClassDef(CorrelationMananger, 1)
 };
 
 

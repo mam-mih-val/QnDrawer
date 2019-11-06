@@ -5,9 +5,6 @@
 #include <vector>
 #include <string>
 #include <iostream>
-#include "TFile.h"
-#include "CorrelationMananger.h"
-#include "Method3Se.h"
 #include "FlowBuilder.h"
 
 // ./Build_Flow input_file output_file config_file
@@ -28,10 +25,8 @@ int main( int argc, char** argv )
   builder.SetName("FlowBuilder");
   builder.SetInputName(input_file_name);
   builder.SetConfigFileName(config_file_name);
-  builder.SetMethod3SeName("3Se");
-  builder.SetMethodRndName("RndSub");
-  builder.Init();
-  builder.ComputeFlow();
+  builder.AddMethod("3Se");
+  builder.Compute();
   builder.SaveToFile(output_file_name);
   return 0;
 }

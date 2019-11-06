@@ -31,23 +31,15 @@ include_directories(
 )
 
 set(HEADERS
-		QnDrawer/include/Container.h
-		QnDrawer/include/SubEvent.h
 		QnDrawer/include/Method.h
-		QnDrawer/include/Method3Se.h
 		QnDrawer/include/CorrelationMananger.h
 		QnDrawer/include/FlowConfiguration.h
-		QnDrawer/include/MethodRs.h
 		QnDrawer/include/FlowBuilder.h)
 
 set(SOURCES
-		QnDrawer/Container.cpp
-		QnDrawer/SubEvent.cpp
 		QnDrawer/Method.cpp
-		QnDrawer/Method3Se.cpp
 		QnDrawer/CorrelationMananger.cpp
 		QnDrawer/FlowConfiguration.cpp
-		QnDrawer/MethodRs.cpp
 		QnDrawer/FlowBuilder.cpp )
 
 set(PCM_FILE_NAME libQnDrawer)

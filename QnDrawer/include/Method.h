@@ -13,68 +13,95 @@
 
 class Method {
 public:
-    Method() = default;
-    virtual ~Method() = default;
-    std::string GetName(){return name_;}
-    virtual void Init(){};
-    virtual void Compute(){};
-    void SetQnCorrelations(uint idx, std::vector<Qn::DataContainer<Qn::Stats>> qn_correlations){
-        qn_correlations_.at(idx)=std::move(qn_correlations);
+  enum kComponents{
+    X=0,
+    Y,
+    NUM_OF_COMPONENTS
+  };
+  Method() = default;
+  explicit Method(const std::string &name){name_=name;};
+  virtual ~Method() = default;
+  Method(std::string name, ushort numberOfSe)
+      : name_(std::move(name)), number_of_se_(numberOfSe) {}
+  const std::string &GetName() const { return name_; }
+  void SetName(const std::string &name) { name_ = name; }
+  void SetNumberOfSe(ushort numberOfSe) { number_of_se_ = numberOfSe; }
+  ushort GetNumberOfSe() const { return number_of_se_; }
+  const std::array<std::vector<Qn::DataContainer<Qn::Stats>>, NUM_OF_COMPONENTS> &
+  GetResolution() const {
+    return resolution_;
+  }
+  const std::array<std::vector<Qn::DataContainer<Qn::Stats>>, NUM_OF_COMPONENTS> &
+  GetFlow() const {
+    return flow_;
+  }
+  void SetResolutionRule(
+      const std::function<Qn::DataContainer<Qn::Stats>(
+          std::vector<Qn::DataContainer<Qn::Stats>>)> &resolutionRule) {
+    resolution_rule_ = resolutionRule;
+  }
+  void SetResolutionIndicesMatrix(
+      const std::vector<std::vector<ushort>> &resolutionIndicesMatrix) {
+    resolution_indices_matrix_ = resolutionIndicesMatrix;
+  }
+  void SetQnQnCorrelations(const std::vector<Qn::DataContainer<Qn::Stats>> &qnQnCorrelations, ushort component) {
+    qn_qn_correlations.at(component) = qnQnCorrelations;
+  }
+  void SetUnQnCorrelations(const std::vector<Qn::DataContainer<Qn::Stats>> &unQnCorrelations, ushort component) {
+    un_qn_correlations.at(component) = unQnCorrelations;
+  }
+  void Compute(){
+    if(!resolution_rule_){
+      std::cout << "Empty resolution rule" << std::endl;
+      return;
     }
-    void SetUnCorrelations(uint idx, std::vector<Qn::DataContainer<Qn::Stats>> un_correlations){
-        un_correlations_.at(idx)=std::move(un_correlations);
-    }
-    void SetName(std::string name) {
-        name_=std::move(name);
-    }
-    SubEvent& Se(int idx) {return sub_events_.at(idx);}
-    unsigned int GetNumberOfSe() { return sub_events_.size(); }
-    void SaveToFile(TFile* file){
-        for(auto se : sub_events_){
-            se.SaveToFile(file);
-        }
-    }
-    void Rebin(Qn::Axis axis){
-      for(auto& se:sub_events_){
-        se.Rebin(axis);
+    for(int i=0; i<2; i++){
+      resolution_.at(i).clear();
+      flow_.at(i).clear();}
+    for( ushort k=0; k<NUM_OF_COMPONENTS; k++ ){
+      for(ushort i=0; i<number_of_se_; i++){
+        std::vector<ushort> idx{ resolution_indices_matrix_.at(i) };
+        std::vector<Qn::DataContainer<Qn::Stats>> values;
+        for(unsigned short j : idx)
+          values.push_back( qn_qn_correlations.at(k).at(j) );
+        resolution_.at(k).emplace_back( resolution_rule_(values) );
+        flow_.at(k).emplace_back( un_qn_correlations.at(k).at(i)/resolution_.at(k).back() );
       }
-    };
-    void Projection(std::string axis){
-      for(auto& se:sub_events_){
-        se.Projection(axis);
-      }
-    }
-    void SaveHistoToFile(TFile* file){
-      for(auto &se:sub_events_){
-        se.SaveHistoToFile(file);
-      }
-    }
-  void Average(){
-    averaged_.SetName("averaged_"+name_);
-    for( unsigned int i=0; i<sub_events_.size(); i++ ){
-      averaged_=sub_events_.at(i).Flow(0)+sub_events_.at(i).Flow(1);
-      diff_sub_events_.push_back(sub_events_.at(i).Flow(0)+sub_events_.at(i).Flow(1));
-      diff_sub_events_.back().SetName( "averaged_"+sub_events_.at(i).GetName() );
     }
   }
-
-  Container& GetAveraged(){ return averaged_; }
-  void SaveAveragedHistoToFile(TFile* file){
-      averaged_.SaveHistoToFile(file);
-      for(auto se : diff_sub_events_)
-        se.SaveHistoToFile((file));
+  void Rebin( const Qn::Axis& axis ){
+    for( const auto& vec : flow_ )
+      for(const auto& container : vec)
+        container.Rebin(axis);
   }
-  const Container &GetAverageSe(unsigned short idx ) const {
-    return diff_sub_events_.at(idx);
+  void Projection( const std::string& axis_name ){
+    for( const auto& vec : flow_ )
+      for(const auto& container : vec)
+        container.Projection({axis_name});
+  }
+  void SaveToFile(TFile* file){
+    file->cd();
+    std::vector<std::string> comp_name{"_X", "_Y"};
+    for(ushort i=0; i<NUM_OF_COMPONENTS; i++){
+      for( ushort j=0; j<number_of_se_; j++ ){
+        std::string save_name{
+          "resolution_"+name_+"+"+std::to_string(j)+comp_name.at(i)
+        };
+        resolution_.at(i).at(j).Write(save_name.data());
+        save_name="flow_"+name_+"+"+std::to_string(j)+comp_name.at(i);
+        flow_.at(i).at(j).Write(save_name.data());
+      }
+    }
   }
 protected:
   std::string name_;
-  std::vector<SubEvent> sub_events_;
-  std::vector<Container> diff_sub_events_;
-  std::vector<Container> diff_components_;
-  Container averaged_;
-  std::array<std::vector<Qn::DataContainer<Qn::Stats>>,2> qn_correlations_; // Qn1Qn2, Qn1Qn3, Qn2Qn3
-  std::array<std::vector<Qn::DataContainer<Qn::Stats>>,2> un_correlations_;
+  ushort number_of_se_;
+  std::function<Qn::DataContainer<Qn::Stats>(std::vector<Qn::DataContainer<Qn::Stats>>)> resolution_rule_;
+  std::vector<std::vector<ushort>> resolution_indices_matrix_;
+  std::array<std::vector<Qn::DataContainer<Qn::Stats>>, NUM_OF_COMPONENTS> resolution_;
+  std::array<std::vector<Qn::DataContainer<Qn::Stats>>, NUM_OF_COMPONENTS> flow_;
+  std::array<std::vector<Qn::DataContainer<Qn::Stats>>, NUM_OF_COMPONENTS> qn_qn_correlations;
+  std::array<std::vector<Qn::DataContainer<Qn::Stats>>, NUM_OF_COMPONENTS> un_qn_correlations;
   ClassDef(Method, 1);
 };
 

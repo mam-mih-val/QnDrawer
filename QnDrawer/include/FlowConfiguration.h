@@ -5,9 +5,11 @@
 #define QNDRAWER_FLOWCONFIGURATION_H
 
 #include "TObject.h"
-#include <vector>
-#include <string>
 #include <Axis.h>
+#include <DataContainer.h>
+#include <functional>
+#include <string>
+#include <vector>
 
 class FlowConfiguration : public TObject {
 public:
@@ -37,10 +39,34 @@ public:
   void SetRebinAxis(const std::vector<Qn::Axis> &rebinAxis) {
     rebin_axis_ = rebinAxis;
   }
+  const std::function<
+      Qn::DataContainer<Qn::Stats>(std::vector<Qn::DataContainer<Qn::Stats>>)> &
+  GetResolutionRule() const {
+    return resolution_rule_;
+  }
+  void SetResolutionRule(
+      const std::function<Qn::DataContainer<Qn::Stats>(
+          std::vector<Qn::DataContainer<Qn::Stats>>)> &resolutionRule) {
+    resolution_rule_ = resolutionRule;
+  }
+  const std::vector<std::vector<ushort>> &GetResolutionIndicesMatrix() const {
+    return resolution_indices_matrix_;
+  }
+  void SetResolutionIndicesMatrix(
+      const std::vector<std::vector<ushort>> &resolutionIndicesMatrix) {
+    resolution_indices_matrix_ = resolutionIndicesMatrix;
+  }
+  ushort GetNumberOfSe() const { return number_of_se_; }
+  void SetNumberOfSe(ushort numberOfSe) { number_of_se_ = numberOfSe; }
+
 private:
+  ushort number_of_se_;
   std::vector<std::string> qn_qn_names_;
   std::vector<std::string> un_qn_names_;
   std::vector<std::string> components_names_;
+  std::function<Qn::DataContainer<Qn::Stats>(std::vector<Qn::DataContainer<Qn::Stats>>)> resolution_rule_;
+  std::vector<std::vector<ushort>> resolution_indices_matrix_;
+
   std::string projection_axis_name_;
   std::vector<Qn::Axis> rebin_axis_;
   ClassDefOverride(FlowConfiguration, 1)

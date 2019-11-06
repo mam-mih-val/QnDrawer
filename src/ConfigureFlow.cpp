@@ -12,10 +12,11 @@ int main(int argv, char** argc){
   std::string file_name{argc[1]};
   TFile* file = TFile::Open(file_name.data(), "recreate");
   FlowConfiguration configuration;
+  configuration.SetNumberOfSe(3);
   configuration.SetQnQnNames({
-    "Fw1Sp_Fw2Sp",
-    "Fw3Sp_Fw1Sp",
-    "Fw2Sp_Fw3Sp"
+    "Fw1Sp_Fw2Sp", // 0
+    "Fw3Sp_Fw1Sp", // 1
+    "Fw2Sp_Fw3Sp"  // 2
   });
   configuration.SetUnQnNames({
     "TracksMdcPtMr_Fw1Sp",
@@ -28,26 +29,18 @@ int main(int argv, char** argc){
   });
   configuration.SetProjectionAxisName("0_Pt");
   configuration.SetRebinAxis({{"Centrality", 2, 20, 30}});
+  configuration.SetResolutionRule([](std::vector<Qn::DataContainer<Qn::Stats>> corr){
+    Qn::DataContainer<Qn::Stats> result;
+    result = Sqrt(corr.at(0)*corr.at(1)/(corr.at(2))*0.5);
+    return result;
+  });
+  configuration.SetResolutionIndicesMatrix({
+    {0, 1, 2},
+    {0, 2, 1},
+    {1, 2, 0}
+  });
   file->cd();
   configuration.Write("3Se");
-
-  FlowConfiguration configuration_rnd;
-  configuration_rnd.SetQnQnNames({
-    "Rs1Sp_Rs2Sp",
-    "Rs1Sp_Rs2Sp"
-  });
-  configuration_rnd.SetUnQnNames({
-    "TracksMdcPtMr_Rs1Sp",
-    "TracksMdcPtMr_Rs2Sp"
-  });
-  configuration_rnd.SetComponentsNames({
-    "_XX",
-    "_YY"
-  });
-  configuration_rnd.SetProjectionAxisName("0_Pt");
-  configuration_rnd.SetRebinAxis({{"Centrality", 2, 20, 30}});
-  file->cd();
-  configuration_rnd.Write("RndSub");
   std::cout << "Configuration written in " << file_name << std::endl;
   file->Close();
 }

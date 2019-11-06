@@ -8,8 +8,6 @@
 #include <utility>
 
 #include "CorrelationMananger.h"
-#include "Method3Se.h"
-#include "MethodRs.h"
 #include <Axis.h>
 #include <vector>
 #include <string>
@@ -22,49 +20,27 @@ public:
   inline void SetConfigFileName( const std::string& file_name ){ manager_.SetConfigFile(file_name); }
   const std::string &GetName() const { return name_; }
   void SetName(const std::string &name) { name_ = name; }
-  inline void SetMethod3SeName(std::string name){
-    method_3se_.SetName(std::move(name));
-  }void SetMethodRndName(std::string name){
-    method_rnd_.SetName(std::move(name));
+  void AddMethod(const std::string& method_name){
+    methods_.emplace_back( manager_.MakeMethod(method_name) );
   }
-  void Init(){
-    method_3se_.Init();
-    method_rnd_.Init();
-    for(unsigned int i=0; i<2; i++)
-    {
-      method_3se_.SetQnCorrelations( i, manager_.GetQnQnContainers(method_3se_.GetName(), i) );
-      method_3se_.SetUnCorrelations( i, manager_.GetUnQnContainers(method_3se_.GetName(), i) );
-
-      method_rnd_.SetQnCorrelations( i, manager_.GetQnQnContainers(method_rnd_.GetName(), i) );
-      method_rnd_.SetUnCorrelations( i, manager_.GetUnQnContainers(method_rnd_.GetName(), i) );
-    }
+  void Compute(){
+    for(auto &method: methods_)
+      method.Compute();
   }
-  void ComputeFlow(){
-    method_3se_.Compute();
-    method_rnd_.Compute();
-  }
-  void RebinProjection(){
-    std::vector<Qn::Axis> rebin_axis_3se{manager_.GetRebinAxis(method_3se_.GetName())};
-    for(auto axis:rebin_axis_3se)
-      method_3se_.Rebin(axis);
-    std::vector<Qn::Axis> rebin_axis_rnd{manager_.GetRebinAxis(method_rnd_.GetName())};
-    for(auto axis:rebin_axis_rnd)
-      method_rnd_.Rebin(axis);
-    method_3se_.Projection(manager_.GetProjectionAxisName(method_3se_.GetName()));
-    method_rnd_.Projection(manager_.GetProjectionAxisName(method_rnd_.GetName()));
+  void SaveToFile(TFile* file){
+    for(auto &method: methods_)
+      method.SaveToFile(file);
   }
   void SaveToFile(const std::string& file_name){
     auto file = TFile::Open(file_name.data(), "recreate");
-    method_rnd_.SaveToFile(file);
-    method_3se_.SaveToFile(file);
+    for(auto &method: methods_)
+      method.SaveToFile(file);
     file->Close();
-    std::cout << "Results saved to " << file_name << std::endl;
   }
 protected:
   std::string         name_;
   CorrelationMananger manager_;
-  Method3Se           method_3se_;
-  MethodRs            method_rnd_;
+  std::vector<Method> methods_;
 };
 
 #endif // QNDRAWER_FLOWBUILDER_H
