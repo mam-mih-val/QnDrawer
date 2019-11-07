@@ -89,14 +89,15 @@ public:
         container.second.Write(container.first.data());
     }
   }
-  Method MakeMethod( const std::string& config_name ){
+  Method Make3SeMethod( const std::string& config_name ){
     FlowConfiguration* config;
     config_file_->GetObject(config_name.data(), config);
     Method method(config_name);
     method.SetNumberOfSe(config->GetNumberOfSe());
-    method.SetResolutionRule([](std::vector<Qn::DataContainer<Qn::Stats>> corr){
+    method.SetResolutionRule([](std::vector<Qn::DataContainer<Qn::Stats>> correlations){
       Qn::DataContainer<Qn::Stats> result;
-      result = Sqrt(corr.at(0)*corr.at(1)/(corr.at(2))*0.5);
+      result = correlations.at(0) * correlations.at(1) / ( correlations.at(2)*2 );
+      result = Sqrt(result);
       return result;
     });
     method.SetResolutionIndicesMatrix(config->GetResolutionIndicesMatrix());

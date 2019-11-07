@@ -7,6 +7,7 @@
 #include "TObject.h"
 #include <Axis.h>
 #include <DataContainer.h>
+#include <Stats.h>
 #include <functional>
 #include <string>
 #include <vector>

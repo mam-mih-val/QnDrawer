@@ -70,14 +70,21 @@ public:
     }
   }
   void Rebin( const Qn::Axis& axis ){
-    for( const auto& vec : flow_ )
-      for(const auto& container : vec)
+    for( auto& vec : flow_ )
+      for( auto& container : vec)
         container.Rebin(axis);
   }
+  void Rebin( const std::vector<Qn::Axis>& axis_vec ){
+    for(const auto& axis : axis_vec){
+      for( auto& vec : flow_ )
+        for( auto& container : vec)
+          container = container.Rebin(axis);
+    }
+  }
   void Projection( const std::string& axis_name ){
-    for( const auto& vec : flow_ )
-      for(const auto& container : vec)
-        container.Projection({axis_name});
+    for( auto& vec : flow_ )
+      for( auto& container : vec)
+        container = container.Projection({axis_name});
   }
   void SaveToFile(TFile* file){
     file->cd();
@@ -85,10 +92,10 @@ public:
     for(ushort i=0; i<NUM_OF_COMPONENTS; i++){
       for( ushort j=0; j<number_of_se_; j++ ){
         std::string save_name{
-          "resolution_"+name_+"+"+std::to_string(j)+comp_name.at(i)
+          "resolution_"+name_+"_"+std::to_string(j)+comp_name.at(i)
         };
         resolution_.at(i).at(j).Write(save_name.data());
-        save_name="flow_"+name_+"+"+std::to_string(j)+comp_name.at(i);
+        save_name="flow_"+name_+"_"+std::to_string(j)+comp_name.at(i);
         flow_.at(i).at(j).Write(save_name.data());
       }
     }

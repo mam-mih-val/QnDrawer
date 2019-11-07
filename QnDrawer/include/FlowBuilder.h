@@ -21,11 +21,23 @@ public:
   const std::string &GetName() const { return name_; }
   void SetName(const std::string &name) { name_ = name; }
   void AddMethod(const std::string& method_name){
-    methods_.emplace_back( manager_.MakeMethod(method_name) );
+    methods_.emplace_back(manager_.Make3SeMethod(method_name) );
   }
   void Compute(){
     for(auto &method: methods_)
       method.Compute();
+  }
+  void Rebin(){
+    for(auto &method : methods_){
+      auto axis = manager_.GetRebinAxis(method.GetName());
+      method.Rebin(axis);
+    }
+  }
+  void Projection(){
+    for(auto &method : methods_){
+      auto axis_name = manager_.GetProjectionAxisName(method.GetName());
+      method.Projection(axis_name);
+    }
   }
   void SaveToFile(TFile* file){
     for(auto &method: methods_)

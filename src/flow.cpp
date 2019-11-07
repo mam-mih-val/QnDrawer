@@ -27,6 +27,8 @@ int main( int argc, char** argv )
   builder.SetConfigFileName(config_file_name);
   builder.AddMethod("3Se");
   builder.Compute();
+  builder.Rebin();
+  builder.Projection();
   builder.SaveToFile(output_file_name);
   return 0;
 }
