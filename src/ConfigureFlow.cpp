@@ -11,36 +11,71 @@ int main(int argv, char** argc){
   }
   std::string file_name{argc[1]};
   TFile* file = TFile::Open(file_name.data(), "recreate");
-  FlowConfiguration configuration;
-  configuration.SetNumberOfSe(3);
-  configuration.SetQnQnNames({
+  std::vector<FlowConfiguration> configurations;
+  // ******************************** Method of 3 Sub-Events ******************************** //
+  configurations.emplace_back("3Se", 3);
+  configurations.back().SetQnQnNames({
     "Fw1Sp_Fw2Sp", // 0
     "Fw3Sp_Fw1Sp", // 1
     "Fw2Sp_Fw3Sp"  // 2
   });
-  configuration.SetUnQnNames({
+  configurations.back().SetUnQnNames({
     "TracksMdcPtMr_Fw1Sp",
     "TracksMdcPtMr_Fw2Sp",
     "TracksMdcPtMr_Fw3Sp"
   });
-  configuration.SetComponentsNames({
+  configurations.back().SetComponentsNames({
     "_XX",
     "_YY"
   });
-  configuration.SetProjectionAxisName("0_Pt");
-  configuration.SetRebinAxis({{"Centrality", 2, 20, 30}});
-  configuration.SetResolutionRule([](std::vector<Qn::DataContainer<Qn::Stats>> corr){
-    Qn::DataContainer<Qn::Stats> result;
-    result = Sqrt(corr.at(0)*corr.at(1)/(corr.at(2))*0.5);
-    return result;
-  });
-  configuration.SetResolutionIndicesMatrix({
+  configurations.back().SetProjectionAxisName("0_Pt");
+  configurations.back().SetRebinAxis({{"Centrality", 2, 20, 30}});
+  configurations.back().SetResolutionIndicesMatrix({
     {0, 1, 2},
     {0, 2, 1},
     {1, 2, 0}
   });
+  // ******************************** Method of Random Sub-Events ******************************** //
+  configurations.emplace_back("RndSub", 2);
+  configurations.back().SetQnQnNames({
+    "Rs1Sp_Rs2Sp" // 0
+  });
+  configurations.back().SetUnQnNames({
+    "TracksMdcPtMr_Rs1Sp",
+    "TracksMdcPtMr_Rs2Sp",
+  });
+  configurations.back().SetComponentsNames({
+     "_XX",
+     "_YY"
+  });
+  configurations.back().SetProjectionAxisName("0_Pt");
+  configurations.back().SetRebinAxis({{"Centrality", 2, 20, 30}});
+  configurations.back().SetResolutionIndicesMatrix({
+    {0},
+    {0}
+  });
+  // ******************************** Full event resolution ******************************** //
+  configurations.emplace_back("FullEvt", 1);
+  configurations.back().SetQnQnNames({
+    "Rs1Ep_Rs2Ep" // 0
+  });
+  configurations.back().SetUnQnNames({
+    "TracksMdcPtMr_Full"
+  });
+  configurations.back().SetComponentsNames({
+     "_XX",
+     "_YY"
+  });
+  configurations.back().SetProjectionAxisName("0_Pt");
+  configurations.back().SetRebinAxis({{"Centrality", 2, 20, 30}});
+  configurations.back().SetResolutionIndicesMatrix({
+    {0}
+  });
+
+  // ******************************** Saving to File ******************************** //
   file->cd();
-  configuration.Write("3Se");
-  std::cout << "Configuration written in " << file_name << std::endl;
+  for( auto &configuration : configurations )
+    configuration.SaveToFile(file);
+  std::cout << "Configurations written in " << file_name << std::endl;
   file->Close();
 }

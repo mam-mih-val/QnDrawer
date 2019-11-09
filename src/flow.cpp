@@ -3,6 +3,7 @@
 //
 
 #include <vector>
+#include <chrono>
 #include <string>
 #include <iostream>
 #include "FlowBuilder.h"
@@ -11,6 +12,7 @@
 
 int main( int argc, char** argv )
 {
+  auto start = std::chrono::system_clock::now();
   if( argc < 3 ){
     std::cout << "Error: Incorrecet number of arguments, " << argc-1 <<
     " given, 3 is required" << std::endl;
@@ -25,10 +27,28 @@ int main( int argc, char** argv )
   builder.SetName("FlowBuilder");
   builder.SetInputName(input_file_name);
   builder.SetConfigFileName(config_file_name);
-  builder.AddMethod("3Se");
+  builder.AddMethod("3Se", [](std::vector<Qn::DataContainer<Qn::Stats>> corr){
+    Qn::DataContainer<Qn::Stats> result;
+    result = Sqrt(corr.at(0)*corr.at(1)/(corr.at(2))*0.5);
+    return result;
+  });
+  builder.AddMethod("RndSub", [](std::vector<Qn::DataContainer<Qn::Stats>> corr){
+    Qn::DataContainer<Qn::Stats> result;
+    result = Sqrt(corr.front()*0.5);
+    return result;
+  });
+  builder.AddMethod("FullEvt", [](std::vector<Qn::DataContainer<Qn::Stats>> corr){
+    Qn::DataContainer<Qn::Stats> result;
+    result = ResFullEvent( corr.front() );
+    return result;
+  });
+
   builder.Compute();
   builder.Rebin();
   builder.Projection();
   builder.SaveToFile(output_file_name);
+  auto end = std::chrono::system_clock::now();
+  std::chrono::duration<double> elapsed_seconds = end - start;
+  std::cout << "elapsed time: " << elapsed_seconds.count() << " s\n";
   return 0;
 }
