@@ -34,13 +34,14 @@ set(HEADERS
 		QnDrawer/include/Method.h
 		QnDrawer/include/CorrelationMananger.h
 		QnDrawer/include/FlowConfiguration.h
-		QnDrawer/include/FlowBuilder.h)
+		QnDrawer/include/FlowBuilder.h
+		QnDrawer/include/FlowHelper.h)
 
 set(SOURCES
 		QnDrawer/Method.cpp
 		QnDrawer/CorrelationMananger.cpp
 		QnDrawer/FlowConfiguration.cpp
-		QnDrawer/FlowBuilder.cpp )
+		QnDrawer/FlowBuilder.cpp QnDrawer/Comparator.cpp QnDrawer/include/Comparator.h QnDrawer/include/FlowHelper.cpp)
 
 set(PCM_FILE_NAME libQnDrawer)
 add_library(QnDrawer SHARED ${SOURCES} )

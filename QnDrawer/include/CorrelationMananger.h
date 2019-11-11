@@ -9,6 +9,7 @@
 #include "Method.h"
 #include "Stats.h"
 #include "TFile.h"
+#include "FlowHelper.h"
 #include <map>
 #include <memory>
 #include <string>
@@ -16,36 +17,10 @@
 #include <vector>
 #include <algorithm>
 
-class CorrelationMananger {
+class CorrelationMananger : public FlowHelper{
 public:
   CorrelationMananger() = default;
-  virtual ~CorrelationMananger(){ heap_.clear(); }
-  void SetFile(const std::string& fileName) { file_.reset(TFile::Open(fileName.data())); }
-  void SetFile(std::shared_ptr<TFile> file) { file_ = std::move(file); }
-  void SetFile(TFile* file) { file_.reset(file); }
-  Qn::DataContainer<Qn::Stats>& GetDataContainer(const std::string& name){
-    Qn::DataContainer<Qn::Stats>* ptr{nullptr};
-    if( heap_.count(name) !=0 )
-      return heap_.at(name);
-    if(!file_)
-      return *ptr;
-    file_->GetObject( name.data(), ptr );
-    if(!ptr)
-    {
-      std::cout << "No such a data container: " << name << std::endl;
-      return *ptr;
-    }
-    heap_.insert( make_pair(name, *ptr) );
-    return *ptr;
-  }
-  std::vector<Qn::DataContainer<Qn::Stats>> GetDataContainerVector(const std::vector<std::string>& names){
-    std::vector<Qn::DataContainer<Qn::Stats>> result;
-    result.reserve(names.size());
-    for(const auto& name: names){
-      result.push_back(GetDataContainer(name));
-    }
-    return result;
-  };
+  virtual ~CorrelationMananger() = default;
   void SetConfigFile(const std::string& file_name){
     config_file_.reset( TFile::Open(file_name.data()) );
     std::cout << "Configuration file is set: " << file_name << std::endl;
@@ -53,7 +28,7 @@ public:
   std::vector<Qn::DataContainer<Qn::Stats>> GetQnQnContainers(const std::string& config_name, unsigned int component){
     FlowConfiguration* config;
     config_file_->GetObject(config_name.data(), config);
-    std::cout << "Reading " << config_name << " configuration" << std::endl;
+//    std::cout << "Reading " << config_name << " configuration" << std::endl;
     std::vector<std::string> qn_qn_names{ config->GetQnQnNames() };
     std::vector<std::string> components_names{ config->GetComponentsNames() };
     std::for_each( qn_qn_names.begin(), qn_qn_names.end(), [components_names, component]( std::string &str ){
@@ -81,25 +56,11 @@ public:
     config_file_->GetObject(config_name.data(), config);
     return config->GetProjectionAxisName();
   }
-  void SaveToFile(const std::string& fileName){
-    auto* file = new TFile( fileName.data(),"recreate" );
-    file->cd();
-    for(auto &container : heap_)
-    {
-        container.second.Write(container.first.data());
-    }
-  }
-  Method Make3SeMethod( const std::string& config_name ){
+  Method MakeMethod( const std::string& config_name ){
     FlowConfiguration* config;
     config_file_->GetObject(config_name.data(), config);
     Method method(config_name);
     method.SetNumberOfSe(config->GetNumberOfSe());
-    method.SetResolutionRule([](std::vector<Qn::DataContainer<Qn::Stats>> correlations){
-      Qn::DataContainer<Qn::Stats> result;
-      result = correlations.at(0) * correlations.at(1) / ( correlations.at(2)*2 );
-      result = Sqrt(result);
-      return result;
-    });
     method.SetResolutionIndicesMatrix(config->GetResolutionIndicesMatrix());
     for(int i=0; i<2; i++)
     {
@@ -109,10 +70,8 @@ public:
     return method;
   }
 protected:
-  std::map<std::string, Qn::DataContainer<Qn::Stats> > heap_;
-  std::shared_ptr<TFile> file_;
   std::shared_ptr<TFile> config_file_;
-  // ClassDef(CorrelationMananger, 1)
+//  ClassDefOverride(CorrelationMananger, 1)
 };
 
 

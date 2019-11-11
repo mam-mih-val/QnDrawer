@@ -8,12 +8,9 @@
 #pragma link off all global;
 #pragma link off all typedef;
 
-#pragma link C++ class Container+;
 #pragma link C++ class FlowConfiguration+;
+#pragma link C++ class FlowBuilder+;
 #pragma link C++ class Method+;
-#pragma link C++ class Method3Se+;
-#pragma link C++ class MethodRs+;
-#pragma link C++ class SubEvent+;
 #pragma link C++ class CorrelationManager+;
 
 #endif

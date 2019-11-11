@@ -7,7 +7,6 @@
 
 #include <utility>
 
-#include "SubEvent.h"
 #include "DataContainer.h"
 #include "Stats.h"
 
