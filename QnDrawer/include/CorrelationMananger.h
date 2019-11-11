@@ -20,7 +20,7 @@
 class CorrelationMananger : public FlowHelper{
 public:
   CorrelationMananger() = default;
-  virtual ~CorrelationMananger() = default;
+  ~CorrelationMananger() override = default;
   void SetConfigFile(const std::string& file_name){
     config_file_.reset( TFile::Open(file_name.data()) );
     std::cout << "Configuration file is set: " << file_name << std::endl;

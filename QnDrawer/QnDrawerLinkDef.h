@@ -11,6 +11,7 @@
 #pragma link C++ class FlowConfiguration+;
 #pragma link C++ class FlowBuilder+;
 #pragma link C++ class Method+;
+#pragma link C++ class FlowHelper+;
 #pragma link C++ class CorrelationManager+;
 
 #endif

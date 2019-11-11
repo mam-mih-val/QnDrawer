@@ -55,7 +55,7 @@ public:
       container.second.Write(container.first.data());
     }
   }
-  Qn::DataContainer<Qn::Stats> Merge(std::vector<std::string> inputName, std::string outName="merged"){
+  Qn::DataContainer<Qn::Stats> Merge(std::vector<std::string> inputName, const std::string& outName="merged"){
     auto* array = new TList;
     Qn::DataContainer<Qn::Stats> out{GetDataContainer(inputName.at(0))};
     inputName.erase( inputName.begin() );
@@ -70,7 +70,7 @@ public:
 protected:
   std::map<std::string, Qn::DataContainer<Qn::Stats> > heap_;
   std::shared_ptr<TFile> file_;
-//  ClassDef(FlowHelper,1)
+ ClassDef(FlowHelper,1)
 };
 
 #endif // QNDRAWER_FLOWHELPER_H
