@@ -19,9 +19,8 @@ class FlowHelper {
 public:
   FlowHelper() = default;
   explicit FlowHelper(std::shared_ptr<TFile> file) : file_(std::move(file)) {}
-  explicit FlowHelper(std::string file_name){
-    file_.reset( TFile::Open(file_name.data()) );
-  }
+  explicit FlowHelper(const std::string& file_name){ file_.reset( TFile::Open(file_name.data()) ); }
+  explicit FlowHelper(TFile* file){ file_.reset( file ); }
   virtual ~FlowHelper() = default;
   void SetFile(const std::string& fileName) { file_.reset(TFile::Open(fileName.data())); }
   void SetFile(std::shared_ptr<TFile> file) { file_ = std::move(file); }

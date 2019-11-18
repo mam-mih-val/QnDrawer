@@ -39,6 +39,10 @@ public:
           std::vector<Qn::DataContainer<Qn::Stats>>)> &resolutionRule) {
     resolution_rule_ = resolutionRule;
   }
+  void SetFlowRule(const std::function<Qn::DataContainer<Qn::Stats>(
+                       std::vector<Qn::DataContainer<Qn::Stats>>)> &flowRule) {
+    flow_rule_ = flowRule;
+  }
   void SetResolutionIndicesMatrix(
       const std::vector<std::vector<ushort>> &resolutionIndicesMatrix) {
     resolution_indices_matrix_ = resolutionIndicesMatrix;
@@ -54,6 +58,10 @@ public:
       std::cout << "Empty resolution rule" << std::endl;
       return;
     }
+    if(!flow_rule_){
+      std::cout<< "Empty resolution rule" << std::endl;
+      return;
+    }
     for(int i=0; i<2; i++){
       resolution_.at(i).clear();
       flow_.at(i).clear();}
@@ -64,7 +72,7 @@ public:
         for(unsigned short j : idx)
           values.push_back( qn_qn_correlations.at(k).at(j) );
         resolution_.at(k).emplace_back( resolution_rule_(values) );
-        flow_.at(k).emplace_back( un_qn_correlations.at(k).at(i)/resolution_.at(k).back() );
+        flow_.at(k).emplace_back( flow_rule_( {un_qn_correlations.at(k).at(i),resolution_.at(k).back()} ) );
       }
     }
   }
@@ -85,6 +93,22 @@ public:
       for( auto& container : vec)
         container = container.Projection({axis_name});
   }
+  void SaveGraphsToFile(TFile* file){
+    file->cd();
+    std::vector<std::string> comp_name{"_X", "_Y"};
+    for(ushort i=0; i<NUM_OF_COMPONENTS; i++){
+      for( ushort j=0; j<number_of_se_; j++ ){
+        std::string save_name{
+            "resolution_"+name_+"_"+std::to_string(j)+comp_name.at(i)
+        };
+        auto graph = Qn::DataContainerHelper::ToTGraph(resolution_.at(i).at(j));
+        graph->Write(save_name.data());
+        save_name="flow_"+name_+"_"+std::to_string(j)+comp_name.at(i);
+        graph = Qn::DataContainerHelper::ToTGraph(flow_.at(i).at(j));
+        graph->Write(save_name.data());
+      }
+    }
+  }
   void SaveToFile(TFile* file){
     file->cd();
     std::vector<std::string> comp_name{"_X", "_Y"};
@@ -103,6 +127,13 @@ protected:
   std::string name_;
   ushort number_of_se_;
   std::function<Qn::DataContainer<Qn::Stats>(std::vector<Qn::DataContainer<Qn::Stats>>)> resolution_rule_;
+  std::function<Qn::DataContainer<Qn::Stats>(std::vector<Qn::DataContainer<Qn::Stats>>)> flow_rule_{
+    []( std::vector<Qn::DataContainer<Qn::Stats>> corr){
+      Qn::DataContainer<Qn::Stats> result;
+      result = corr.at(0)/corr.at(1);
+      return result;
+    }
+  };
   std::vector<std::vector<ushort>> resolution_indices_matrix_;
   std::array<std::vector<Qn::DataContainer<Qn::Stats>>, NUM_OF_COMPONENTS> resolution_;
   std::array<std::vector<Qn::DataContainer<Qn::Stats>>, NUM_OF_COMPONENTS> flow_;

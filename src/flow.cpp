@@ -37,16 +37,21 @@ int main( int argc, char** argv )
     result = Sqrt(corr.front()*0.5);
     return result;
   });
-  builder.AddMethod("FullEvt", [](std::vector<Qn::DataContainer<Qn::Stats>> corr){
+  builder.AddMethod("FullEvt",[](std::vector<Qn::DataContainer<Qn::Stats>> corr){
     Qn::DataContainer<Qn::Stats> result;
-    result = ResFullEvent( corr.front() );
+    result = ResFullEvent(corr.at(0));
     return result;
+  },
+    [](std::vector<Qn::DataContainer<Qn::Stats>> corr){
+      auto result = corr.at(0)/corr.at(1) * 2;
+      return result;
   });
 
   builder.Compute();
   builder.Rebin();
   builder.Projection();
-  builder.SaveToFile(output_file_name);
+  //builder.SaveToFile(output_file_name);
+  builder.SaveGraphsToFile(output_file_name);
   auto end = std::chrono::system_clock::now();
   std::chrono::duration<double> elapsed_seconds = end - start;
   std::cout << "elapsed time: " << elapsed_seconds.count() << " s\n";

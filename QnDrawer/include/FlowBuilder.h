@@ -25,6 +25,13 @@ public:
     methods_.emplace_back(manager_.MakeMethod(method_name) );
     methods_.back().SetResolutionRule(resolutionRule);
   }
+  void AddMethod(const std::string& method_name,
+    const std::function<Qn::DataContainer<Qn::Stats>(std::vector<Qn::DataContainer<Qn::Stats>>)>&  resolutionRule,
+    const std::function<Qn::DataContainer<Qn::Stats>(std::vector<Qn::DataContainer<Qn::Stats>>)>&  flowRule){
+    methods_.emplace_back(manager_.MakeMethod(method_name) );
+    methods_.back().SetResolutionRule(resolutionRule);
+    methods_.back().SetFlowRule(flowRule);
+  }
   void Compute(){
     for(auto &method: methods_)
     {
@@ -52,6 +59,13 @@ public:
     auto file = TFile::Open(file_name.data(), "recreate");
     for(auto &method: methods_)
       method.SaveToFile(file);
+    file->Close();
+    std::cout << "Built flow wrote to " << file_name << std::endl;
+  }
+  void SaveGraphsToFile(const std::string& file_name){
+    auto file = TFile::Open(file_name.data(), "recreate");
+    for(auto &method: methods_)
+      method.SaveGraphsToFile(file);
     file->Close();
     std::cout << "Built flow wrote to " << file_name << std::endl;
   }
