@@ -10,6 +10,7 @@
 
 // ./Build_Flow input_file output_file config_file
 
+
 int main( int argc, char** argv )
 {
   auto start = std::chrono::system_clock::now();
@@ -27,31 +28,81 @@ int main( int argc, char** argv )
   builder.SetName("FlowBuilder");
   builder.SetInputName(input_file_name);
   builder.SetConfigFileName(config_file_name);
-  builder.AddMethod("3Se", [](std::vector<Qn::DataContainer<Qn::Stats>> corr){
-    Qn::DataContainer<Qn::Stats> result;
-    result = Sqrt(corr.at(0)*corr.at(1)/(corr.at(2))*0.5);
-    return result;
-  });
-  builder.AddMethod("RndSub", [](std::vector<Qn::DataContainer<Qn::Stats>> corr){
-    Qn::DataContainer<Qn::Stats> result;
-    result = Sqrt(corr.front()*0.5);
-    return result;
-  });
-  builder.AddMethod("FullEvt",[](std::vector<Qn::DataContainer<Qn::Stats>> corr){
-    Qn::DataContainer<Qn::Stats> result;
-    result = ResFullEvent(corr.at(0));
-    return result;
-  },
-    [](std::vector<Qn::DataContainer<Qn::Stats>> corr){
-      auto result = corr.at(0)/corr.at(1) * 2;
-      return result;
-  });
+  std::vector<std::string> axis_names{"Pt", "Ycm"};
+  std::vector<std::string> sub_events{"Fw1", "Fw2", "Fw3"};
+  std::vector<std::string> components{"_XX", "_YY"};
+  std::vector<std::string> methods{"_Sp", "_Ep"};
 
+  // ******************************** Method of 3 Sub-Events ******************************** //
+  for( auto se : sub_events ){
+    for(auto method : methods){
+      for( auto axis : axis_names ){
+        for( auto component : components ){
+          builder.AddMethod("TracksMdc"+axis+"_"+se+component+method, [](std::vector<Qn::DataContainer<Qn::Stats>> corr){
+            Qn::DataContainer<Qn::Stats> result;
+            result = Sqrt(corr.at(0)*corr.at(1)/(corr.at(2))*0.5);
+            return result;
+          });
+        }
+      }
+    }
+  }
+// ******************************** Method of 3 Sub-Events, Second Harmonic ******************************** //
+  sub_events = { "Fw1_Fw2", "Fw3_Fw1", "Fw2_Fw3" };
+  std::vector<std::string> un_qn_components = {"_XXX", "_XYY", "_YXY", "_YYX"};
+  for( auto se : sub_events ){
+    for(auto method : methods){
+      for( auto axis : axis_names ){
+        for( int i=0; i<un_qn_components.size(); i++ ){
+          builder.AddMethod( "TracksMdc"+axis+"_"+se+un_qn_components.at(i)+method,
+          [](std::vector<Qn::DataContainer<Qn::Stats>> corr){
+            Qn::DataContainer<Qn::Stats> result;
+            Qn::DataContainer<Qn::Stats> R1 = Sqrt(corr.at(0)*corr.at(1)/corr.at(2) * 2);
+            Qn::DataContainer<Qn::Stats> R2 = Sqrt(corr.at(3)*corr.at(4)/corr.at(5) * 2);
+            result = R1*R2;
+            return result;
+          },[]( std::vector<Qn::DataContainer<Qn::Stats>> corr ){
+            Qn::DataContainer<Qn::Stats> result;
+            result = corr.at(0) / corr.at(1) * 4;
+            return result;
+          });
+        }
+      }
+    }
+  }
+// ******************************** Random Sub-Event method ******************************** //
+  sub_events = { "Rs1", "Rs2" };
+  components = {"_XX", "_YY"};
+  for( auto se : sub_events ){
+    for(auto method : methods){
+      for( auto axis : axis_names ){
+        for( auto comp : components ){
+          builder.AddMethod( "TracksMdc"+axis+"_"+se+comp+method, [](std::vector<Qn::DataContainer<Qn::Stats>> corr){
+            Qn::DataContainer<Qn::Stats> result;
+            result = Sqrt(corr.at(0)*0.5);
+            return result;
+          });
+        }
+      }
+    }
+  }
+  for( auto axis : axis_names ) {
+    for (auto comp : components) {
+      builder.AddMethod("TracksMdc" + axis + "_Full" + comp + "_Ep",[](std::vector<Qn::DataContainer<Qn::Stats>> corr){
+        Qn::DataContainer<Qn::Stats> result;
+        result = ResFullEvent(corr.at(0));
+        return result;
+      },[](std::vector<Qn::DataContainer<Qn::Stats>> corr) {
+        auto result = corr.at(0) / corr.at(1) * 2;
+        return result;
+      });
+    }
+  }
   builder.Compute();
   builder.Rebin();
   builder.Projection();
-  //builder.SaveToFile(output_file_name);
-  builder.SaveGraphsToFile(output_file_name);
+  builder.SaveToFile(output_file_name);
+//  builder.SaveGraphsToFile(output_file_name);
   auto end = std::chrono::system_clock::now();
   std::chrono::duration<double> elapsed_seconds = end - start;
   std::cout << "elapsed time: " << elapsed_seconds.count() << " s\n";

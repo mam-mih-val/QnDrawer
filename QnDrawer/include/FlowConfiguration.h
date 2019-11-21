@@ -16,8 +16,8 @@
 class FlowConfiguration : public TObject {
 public:
   FlowConfiguration() = default;
-  FlowConfiguration(std::string name, ushort numberOfSe)
-      : name_(std::move(name)), number_of_se_(numberOfSe) {}
+  FlowConfiguration(std::string name)
+      : name_(std::move(name)) {}
   ~FlowConfiguration() override = default;
   const std::vector<std::string> &GetQnQnNames() const { return qn_qn_names_; }
   void SetQnQnNames(const std::vector<std::string> &qnQnNames) {

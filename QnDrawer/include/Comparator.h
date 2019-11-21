@@ -6,7 +6,6 @@
 #define QNDRAWER_COMPARATOR_H
 
 #include "FlowHelper.h"
-#include "SetStyle.h"
 #include <DataContainer.h>
 #include <Stats.h>
 #include <TCanvas.h>

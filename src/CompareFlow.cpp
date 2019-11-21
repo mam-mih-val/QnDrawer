@@ -3,47 +3,58 @@
 //
 
 #include <Comparator.h>
+#include <vector>
 #include <TFile.h>
 
 TGraphErrors* MakeBkGraph();
 TH1F* MakeOgHisto();
 
 int main( int n_args, char** args ){
-  auto file = TFile::Open( "../Output_Files/ProtonOldCent_80_120.root" );
-  std::vector<std::string> names_3se{
-    "flow_3Se_0_X",
-    "flow_3Se_0_Y",
-    "flow_3Se_1_X",
-    "flow_3Se_1_Y",
-    "flow_3Se_2_X",
-    "flow_3Se_2_Y"
-  };
-  std::vector<std::string> names_rnd{
-    "flow_RndSub_0_X",
-    "flow_RndSub_0_Y",
-    "flow_RndSub_1_X",
-    "flow_RndSub_1_Y"
-  };
-  std::vector<std::string> names_full{
-    "flow_FullEvt_0_X",
-    "flow_FullEvt_0_Y"
-  };
-  Comparator comparator;
-  comparator.AddFile(file, "old");
-  comparator.AddGraph( MakeBkGraph(), "Behruz Kardan QM2018");
-  comparator.AddTh1( MakeOgHisto() );
-  comparator.MergeAndPutOnCanvas("old", names_3se, "3 sub-event");
-  comparator.MergeAndPutOnCanvas("old", names_rnd, "Rnd sub-event");
-  comparator.MergeAndPutOnCanvas("old", names_full, "Rnd extrapolation");
-  comparator.SetCanvas(new TCanvas("canv", "", 1200, 1000));
-  comparator.Draw();
-  comparator.GetCanvas()->Print("canv_flow.png");
+  std::string input_file_name=args[1];
+  auto file = TFile::Open( input_file_name.data() );
+
+  std::vector<std::string> axis_names{"Pt", "Ycm"};
+  std::vector<std::string> sub_events{"Fw1", "Fw2", "Fw3"};
+  std::vector<std::string> components{"_XX", "_YY"};
+  std::vector<std::string> methods{"_Sp", "_Ep"};
+  std::vector<std::string> three_sub;
+  std::vector<std::string> rand_sub;
+  std::vector<std::string> extrapolate;
+
+  // ******************************** Method of 3 Sub-Events ******************************** //
+  for( auto se : sub_events ){
+    for( auto component : components ){
+      three_sub.push_back("flow_TracksMdcPt_"+se+component+"_Sp");
+    }
+  }
+  // ******************************** Random Sub-Event method ******************************** //
+  sub_events = { "Rs1", "Rs2" };
+  components = {"_XX", "_YY"};
+  for( auto se : sub_events ){
+    for( auto comp : components ){
+      rand_sub.push_back( "flow_TracksMdcPt_"+se+comp+"_Sp");
+    }
+  }
+  for (auto comp : components) {
+    extrapolate.push_back("flow_TracksMdcPt_Full" + comp + "_Ep");
+  }
+  std::vector<Comparator> comparators;
+  comparators.emplace_back();
+  comparators.back().AddFile(file, "old");
+  comparators.back().MergeAndPutOnCanvas("old", three_sub, "Three SE");
+  comparators.back().MergeAndPutOnCanvas("old", rand_sub, "Random SE");
+  comparators.back().MergeAndPutOnCanvas("old", extrapolate, "Extrapolation");
+  comparators.back().AddGraph( MakeBkGraph(), "Behruz Kardan HADES CM2019");
+  comparators.back().AddTh1( MakeOgHisto() );
+  comparators.back().SetCanvas(new TCanvas("canv", "", 1200, 1000));
+  comparators.back().Draw();
+  comparators.back().GetCanvas()->Print("canv_flow.png");
   return 0;
 }
 
 TGraphErrors* MakeBkGraph(){
-  Double_t BK_fx1001[35] = {0.2815451,0.3297382,0.3809376,0.4291514,0.4803508,0.5315502,0.5827703,0.6309841,0.6791979,0.7304283,0.7816794,0.8299242,0.8811752,0.9324263,0.9806401,1.028885,1.080146,1.131418,1.179652,1.227856,1.279179,1.330348,1.378603,1.42691,1.47813,1.529453,1.580714,1.628908,1.680159,1.731244,1.779696,1.827786,1.879026,1.929978,1.978605};
-  Double_t BK_fy1001[35] = {-0.08407534,-0.09246575,-0.1020548,-0.1080479,-0.117637,-0.127226,-0.1344178,-0.140411,-0.1464041,-0.1523973,-0.1559931,-0.1583904,-0.1619863,-0.1655822,-0.1715753,-0.1739726,-0.1763699,-0.1775685,-0.1811644,-0.1883562,-0.1835616,-0.1967466,-0.1979452,-0.1931507,-0.2003425,-0.1955479,-0.1979452,-0.2063356,-0.2099315,-0.2327055,-0.2111301,-0.2315069,-0.2363014,-0.2746575,-0.2327055};
+  Double_t BK_fx1001[35] = {0.1741150442477875,0.22389380530973452,0.2736725663716814,0.3254424778761061,0.3752212389380531,0.4249999999999999,0.4747787610619469,0.5245575221238938,0.5763274336283184,0.6241150442477876,0.6738938053097345,0.7236725663716814,0.7754424778761062,0.8252212389380531,0.875,0.9247787610619471,0.9745575221238938,1.0243362831858407,1.0761061946902655,1.1238938053097347,1.1736725663716814,1.2234513274336283,1.2752212389380533,1.3250000000000002,1.374778761061947,1.4245575221238937,1.4743362831858409,1.5241150442477878,1.5738938053097347,1.6256637168141592,1.6734513274336287,1.7252212389380532,1.775,1.824778761061947,1.8745575221238941};
+  Double_t BK_fy1001[35] = {-0.040000000000000036,-0.05529411764705883,-0.07176470588235295,-0.08588235294117641,-0.09647058823529409,-0.10705882352941176,-0.1164705882352941,-0.12470588235294111,-0.13294117647058823,-0.13882352941176468,-0.1435294117647059,-0.14823529411764702,-0.1517647058823529,-0.15647058823529414,-0.1588235294117647,-0.1623529411764706,-0.16588235294117648,-0.16941176470588237,-0.17176470588235293,-0.17294117647058826,-0.17647058823529416,-0.1776470588235295,-0.18117647058823527,-0.18352941176470594,-0.18470588235294105,-0.18823529411764706,-0.1894117647058824,-0.19529411764705873,-0.19882352941176473,-0.20235294117647062,-0.20823529411764707,-0.21058823529411763,-0.21882352941176475,-0.21529411764705886,-0.22941176470588243};
   Double_t BK_fex1001[35] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
   Double_t BK_fey1001[35] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.00479452,0.007191781,0.008390411,0.009589041,0.01078767,0.01318493,0.01438356,0.01797945,0.01917808,0.0239726,0.03116438};
 

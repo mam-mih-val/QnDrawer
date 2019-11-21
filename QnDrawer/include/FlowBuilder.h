@@ -8,10 +8,11 @@
 #include <utility>
 
 #include "CorrelationMananger.h"
+#include "Method.h"
 #include <Axis.h>
-#include <vector>
-#include <string>
 #include <iostream>
+#include <string>
+#include <vector>
 class FlowBuilder {
 public:
   FlowBuilder() = default;
@@ -64,7 +65,7 @@ public:
   }
   void SaveGraphsToFile(const std::string& file_name){
     auto file = TFile::Open(file_name.data(), "recreate");
-    for(auto &method: methods_)
+    for(auto &method : methods_)
       method.SaveGraphsToFile(file);
     file->Close();
     std::cout << "Built flow wrote to " << file_name << std::endl;
