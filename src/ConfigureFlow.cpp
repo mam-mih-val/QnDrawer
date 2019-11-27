@@ -67,6 +67,40 @@ int main(int argv, char** argc){
     second_resolution = { second_resolution.at(2), second_resolution.at(0), second_resolution.at(1) };
   }
 
+  // ******************************** Method of 3 Sub-Events, Third Harmonic ******************************** //
+  sub_events = { "Fw1_Fw2_Fw3" };
+  std::vector<std::string> resolution_first { "Fw3_Fw1", "Fw1_Fw2", "Fw2_Fw3" };
+  std::vector<std::string> resolution_second{ "Fw1_Fw2", "Fw2_Fw3", "Fw3_Fw1" };
+  std::vector<std::string> resolution_third { "Fw2_Fw3", "Fw3_Fw1", "Fw1_Fw2" };
+  un_qn_components = {"_XXXX", "_XYYX", "_XYXY", "_XXYY", "_YYXX", "_YXYX", "_YXXY", "_YYYY"};
+  std::vector<std::string> components_first = {"_XX", "_YY", "_YY", "_XX", "_YY", "_XX", "_XX", "_YY"};
+  std::vector<std::string> components_second= {"_XX", "_YY", "_XX", "_YY", "_XX", "_YY", "_XX", "_YY"};
+  std::vector<std::string> components_third = {"_XX", "_XX", "_YY", "_YY", "_XX", "_XX", "_YY", "_YY"};
+  for( auto se : sub_events ){
+    for( auto method : methods ){
+      for( auto axis : axis_names ){
+        for( int i=0; i<un_qn_components.size(); i++ ){
+          auto correlations_1 = resolution_first;
+          auto correlations_2 = resolution_second;
+          auto correlations_3 = resolution_third;
+          configurations.emplace_back( "TracksMdc"+axis+"_"+se+un_qn_components.at(i)+method );
+          std::for_each( correlations_1.begin(), correlations_1.end(), [components_first, i, method]( std::string& str ){ str+=components_first.at(i)+method; } );
+          std::for_each( correlations_2.begin(), correlations_2.end(), [components_second, i, method](std::string& str ){ str+=components_second.at(i)+method; } );
+          std::for_each( correlations_3.begin(), correlations_3.end(), [components_third, i, method]( std::string& str ){ str+=components_third.at(i)+method; } );
+          correlations_1.insert(correlations_1.end(), correlations_2.begin(), correlations_2.end());
+          correlations_1.insert(correlations_1.end(), correlations_3.begin(), correlations_3.end());
+          configurations.back().SetQnQnNames( correlations_1 );
+          configurations.back().SetUnQnNames( {"TracksMdc"+axis+"_"+se+un_qn_components.at(i)+method} );
+          configurations.back().SetProjectionAxisName("0_"+axis);
+          configurations.back().SetRebinAxis({{"Centrality", 2, 20, 30}});
+        }
+      }
+    }
+    resolution_first = { first_resolution.at(2), first_resolution.at(0), first_resolution.at(1) };
+    resolution_second = { second_resolution.at(2), second_resolution.at(0), second_resolution.at(1) };
+    resolution_third = { second_resolution.at(2), second_resolution.at(0), second_resolution.at(1) };
+  }
+
   // ******************************** Random Sub-Event method ******************************** //
   sub_events = { "Rs1", "Rs2" };
   qn_qn_correlations = { "Rs1_Rs2"};

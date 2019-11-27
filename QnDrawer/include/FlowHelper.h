@@ -48,6 +48,18 @@ public:
     }
     return result;
   };
+  Qn::DataContainer<Qn::Stats> MakeComputations(
+      std::vector<std::string> varNames,
+      std::function<Qn::DataContainer<Qn::Stats>(std::vector<Qn::DataContainer<Qn::Stats>>)> lambda,
+      std::string resultName
+  )
+  {
+    auto arg = GetDataContainerVector(varNames);
+    Qn::DataContainer<Qn::Stats>* ptr{0};
+    auto result = lambda(arg);
+    heap_.insert(make_pair(resultName, result));
+    return result;
+  }
 
   void SaveToFile(const std::string& fileName){
     auto* file = new TFile( fileName.data(),"recreate" );
@@ -67,6 +79,20 @@ public:
     out.Merge( (TList*) array );
     heap_.insert(make_pair(outName, out));
     return out;
+  }
+  Qn::DataContainer<Qn::Stats> Ratio( std::vector<std::string> corr, std::string resultName ){
+    auto ratio = []( std::vector<Qn::DataContainer<Qn::Stats>> corr ){
+      Qn::DataContainer<Qn::Stats> result_;
+      if( corr.size() != 2 )
+      {
+        std::cout << "Arguments amount error" << std::endl;
+        return result_;
+      }
+      result_ = corr.at(0)/corr.at(1);
+      result_.SetSetting(Qn::Stats::Settings::CORRELATEDERRORS);
+      return result_;
+    };
+    return MakeComputations(corr, ratio, resultName);
   }
 
 protected:

@@ -40,7 +40,11 @@ int main( int argc, char** argv )
         for( auto component : components ){
           builder.AddMethod("TracksMdc"+axis+"_"+se+component+method, [](std::vector<Qn::DataContainer<Qn::Stats>> corr){
             Qn::DataContainer<Qn::Stats> result;
-            result = Sqrt(corr.at(0)*corr.at(1)/(corr.at(2))*0.5);
+            result = Sqrt(corr.at(0)*corr.at(1)/(corr.at(2))*2);
+            return result;
+          },[](std::vector<Qn::DataContainer<Qn::Stats>> corr){
+            Qn::DataContainer<Qn::Stats> result;
+            result = corr.at(0)*2/corr.at(1);
             return result;
           });
         }
@@ -63,13 +67,39 @@ int main( int argc, char** argv )
             return result;
           },[]( std::vector<Qn::DataContainer<Qn::Stats>> corr ){
             Qn::DataContainer<Qn::Stats> result;
-            result = corr.at(0) / corr.at(1) * 4;
+            result = corr.at(0) * 4 / corr.at(1);
             return result;
           });
         }
       }
     }
   }
+  // ******************************** Method of 3 Sub-Events, Third Harmonic ******************************** //
+  sub_events = { "Fw1_Fw2_Fw3" };
+  un_qn_components = {"_XXXX", "_XYYX", "_XYXY", "_XXYY", "_YYXX", "_YXYX", "_YXXY", "_YYYY"};
+  for( auto se : sub_events ){
+    for( auto method : methods ){
+      for( auto axis : axis_names ){
+        for( int i=0; i<un_qn_components.size(); i++ ){
+          builder.AddMethod( "TracksMdc"+axis+"_"+se+un_qn_components.at(i)+method,
+            []( std::vector<Qn::DataContainer<Qn::Stats>> corr ){
+              Qn::DataContainer<Qn::Stats> result;
+              Qn::DataContainer<Qn::Stats> R1 = Sqrt(corr.at(0)*corr.at(1)/corr.at(2) * 2);
+              Qn::DataContainer<Qn::Stats> R2 = Sqrt(corr.at(3)*corr.at(4)/corr.at(5) * 2);
+              Qn::DataContainer<Qn::Stats> R3 = Sqrt(corr.at(6)*corr.at(7)/corr.at(8) * 2);
+              result = R1*R2*R3;
+              return result;
+          },
+           []( std::vector<Qn::DataContainer<Qn::Stats>> corr ){
+             Qn::DataContainer<Qn::Stats> result;
+             result = corr.at(0) * 8 / corr.at(1);
+             return result;
+          });
+        }
+      }
+    }
+  }
+
 // ******************************** Random Sub-Event method ******************************** //
   sub_events = { "Rs1", "Rs2" };
   components = {"_XX", "_YY"};
@@ -93,7 +123,7 @@ int main( int argc, char** argv )
         result = ResFullEvent(corr.at(0));
         return result;
       },[](std::vector<Qn::DataContainer<Qn::Stats>> corr) {
-        auto result = corr.at(0) / corr.at(1) * 2;
+        auto result = corr.at(0) * 2 / corr.at(1) ;
         return result;
       });
     }

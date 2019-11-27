@@ -36,7 +36,8 @@ set(HEADERS
 		QnDrawer/include/FlowBuilder.h
 		QnDrawer/include/FlowHelper.h
 		QnDrawer/include/Comparator.h
-		QnDrawer/include/Method.h)
+		QnDrawer/include/Method.h
+		QnDrawer/include/Systematics.h)
 
 set(SOURCES
 		QnDrawer/CorrelationMananger.cpp
@@ -44,7 +45,8 @@ set(SOURCES
 		QnDrawer/FlowBuilder.cpp
 		QnDrawer/Comparator.cpp
 		QnDrawer/Method.cpp
-		QnDrawer/FlowHelper.cpp)
+		QnDrawer/FlowHelper.cpp
+		QnDrawer/Systematics.cpp)
 
 set(PCM_FILE_NAME libQnDrawer)
 add_library(QnDrawer SHARED ${SOURCES} )
@@ -72,3 +74,6 @@ target_link_libraries(CompareFlow PUBLIC QnDrawer Qn::Base ${ROOT_LIBRARIES})
 
 add_executable(CompareResolution src/CompareResolution.cpp G__QnDrawer.cxx)
 target_link_libraries(CompareResolution PUBLIC QnDrawer Qn::Base ${ROOT_LIBRARIES})
+
+add_executable(Systematics src/BuildSystematics.cpp G__QnDrawer.cxx)
+target_link_libraries(Systematics PUBLIC QnDrawer Qn::Base ${ROOT_LIBRARIES})

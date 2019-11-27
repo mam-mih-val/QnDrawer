@@ -7,10 +7,17 @@
 #include <TFile.h>
 
 TGraphErrors* MakeBkGraph();
+TGraphErrors* MakeBkGraphV2();
+TGraphErrors* MakeBkGraphV3();
 TH1F* MakeOgHisto();
+Comparator Compare3Se(TFile* file);
+Comparator CompareRs(TFile* file);
+Comparator CompareElliptic(TFile* file);
+Comparator CompareTriangular(TFile* file);
 
 int main( int n_args, char** args ){
   std::string input_file_name=args[1];
+  std::string output_file_name=args[2];
   auto file = TFile::Open( input_file_name.data() );
 
   std::vector<std::string> axis_names{"Pt", "Ycm"};
@@ -39,17 +46,127 @@ int main( int n_args, char** args ){
     extrapolate.push_back("flow_TracksMdcPt_Full" + comp + "_Ep");
   }
   std::vector<Comparator> comparators;
-  comparators.emplace_back();
-  comparators.back().AddFile(file, "old");
-  comparators.back().MergeAndPutOnCanvas("old", three_sub, "Three SE");
-  comparators.back().MergeAndPutOnCanvas("old", rand_sub, "Random SE");
-  comparators.back().MergeAndPutOnCanvas("old", extrapolate, "Extrapolation");
-  comparators.back().AddGraph( MakeBkGraph(), "Behruz Kardan HADES CM2019");
-  comparators.back().AddTh1( MakeOgHisto() );
-  comparators.back().SetCanvas(new TCanvas("canv", "", 1200, 1000));
-  comparators.back().Draw();
-  comparators.back().GetCanvas()->Print("canv_flow.png");
+  comparators.push_back( Compare3Se(file) );
+  comparators.push_back( CompareRs(file) );
+  comparators.push_back( CompareElliptic(file) );
+  comparators.push_back( CompareTriangular(file) );
+  std::vector<std::vector<float>> canv_edges{
+    {-0.4, 0.1},
+    {-0.4, 0.1},
+    {-0.4, 0.1},
+    {0.0, 0.1}
+  };
+  int i=0;
+  for(auto comparator: comparators){
+    std::string canvas_name = "canv"+std::to_string(i);
+    comparator.SetCanvas(new TCanvas(canvas_name.data(), "", 1100, 1000));
+    comparator.Draw();
+    comparator.GetGraphs()->SetMinimum(canv_edges.at(i).at(0));
+    comparator.GetGraphs()->SetMaximum(canv_edges.at(i).at(1));
+    std::string save_name = output_file_name+std::to_string(i)+".png";
+    comparator.GetCanvas()->Print(save_name.data());
+    i++;
+  }
+  file->Close();
   return 0;
+}
+
+Comparator Compare3Se(TFile* file){
+  Comparator comparator("Three Sub");
+  comparator.AddFile(file, "old");
+  std::vector<std::string> axis_names{"Pt", "Ycm"};
+  std::vector<std::string> sub_events{"Fw1", "Fw2", "Fw3"};
+  std::vector<std::string> components{"_XX", "_YY"};
+  std::vector<std::string> methods{"_Sp", "_Ep"};
+  std::vector<std::string> three_sub;
+  // ******************************** Method of 3 Sub-Events ******************************** //
+  for( auto se : sub_events ){
+    for( auto component : components ){
+      three_sub.push_back("flow_TracksMdcPt_"+se+component+"_Sp");
+    }
+  }
+  comparator.MergeAndPutOnCanvas("old", three_sub, "Three SE");
+  comparator.PutOnCanvas("old", three_sub, three_sub);
+  comparator.AddGraph( MakeBkGraph(), "Behruz Kardan HADES CM2019");
+  return comparator;
+}
+Comparator CompareRs(TFile* file){
+  Comparator comparator("Three Sub");
+  comparator.AddFile(file, "old");
+  std::vector<std::string> rand_sub;
+  std::vector<std::string> extrapolate;
+  // ******************************** Random Sub-Event method ******************************** //
+  std::vector<std::string> sub_events{ "Rs1", "Rs2" };
+  std::vector<std::string> components{"_XX", "_YY"};
+  for( auto se : sub_events ){
+    for( auto comp : components ){
+      rand_sub.push_back( "flow_TracksMdcPt_"+se+comp+"_Sp");
+    }
+  }
+  for (auto comp : components) {
+    extrapolate.push_back("flow_TracksMdcPt_Full" + comp + "_Ep");
+  }
+  comparator.MergeAndPutOnCanvas("old", extrapolate, "Rnd Sub Extrapolation");
+  comparator.PutOnCanvas("old", rand_sub, rand_sub);
+  comparator.PutOnCanvas("old", extrapolate, extrapolate);
+  comparator.AddGraph( MakeBkGraph(), "Behruz Kardan HADES CM2019");
+  return comparator;
+}
+
+Comparator CompareElliptic(TFile* file){
+  Comparator comparator("v2");
+  comparator.AddFile(file, "old");
+  std::vector<std::string> elliptic;
+  // ******************************** Random Sub-Event method ******************************** //
+  std::vector<std::string> sub_events = { "Fw1_Fw2", "Fw3_Fw1", "Fw2_Fw3" };
+  std::vector<std::string> un_qn_components = {"_XXX", "_XYY", "_YXY", "_YYX"};
+  for( auto se : sub_events ){
+    for( int i=0; i<un_qn_components.size(); i++ ){
+      elliptic.push_back( "flow_TracksMdcPt_"+se+un_qn_components.at(i)+"_Sp" );
+    }
+  }
+  comparator.MergeAndPutOnCanvas("old", elliptic, "Default");
+  comparator.AddGraph( MakeBkGraphV2(), "Behruz Kardan HADES CM2019");
+  return comparator;
+}
+
+Comparator CompareTriangular(TFile* file){
+  Comparator comparator("v3");
+  comparator.AddFile(file, "old");
+  std::vector<std::string> triangular;
+  // ******************************** Random Sub-Event method ******************************** //
+  std::vector<std::string> sub_events = { "Fw1_Fw2_Fw3" };
+  std::vector<std::string> un_qn_components = {"_XXXX", "_XYYX", "_XYXY", "_XXYY", "_YYXX", "_YXYX", "_YXXY", "_YYYY"};
+  for( auto se : sub_events ){
+    for( int i=0; i<un_qn_components.size(); i++ ){
+      triangular.push_back( "flow_TracksMdcPt_"+se+un_qn_components.at(i)+"_Sp" );
+    }
+  }
+  comparator.MergeAndPutOnCanvas("old", triangular, "Default");
+  comparator.AddGraph( MakeBkGraphV3(), "Behruz Kardan HADES CM2019");
+  return comparator;
+}
+
+TGraphErrors* MakeBkGraphV2(){
+  Double_t BK_fx1001[35] = {0.17666636089962234,0.2254350926057191,0.27623022590625196,0.3270478747800563,0.37578658572179097,0.4245328018546162,0.4753054195818775,0.5260555217358673,0.5747717171043305,0.6255068088761395,0.6762343954568577,0.7249355804431399,0.7756706722149489,0.8263982587956671,0.8750994437819495,0.925834535553758,0.9765771325166577,1.0252933278851206,1.074009523253584,1.1247821409808452,1.175547253517016,1.2263348816264585,1.2750886029503743,1.3258762310598164,1.3746299523837322,1.4254476012575368,1.4741938173903617,1.5250489922196189,1.5758441255201516,1.6246578883727911,1.6754530216733248,1.724266784525964,1.775166990501764,1.8258870718913915,1.8748134126103893};
+  Double_t BK_fy1001[35] = {-0.013581060233328113,-0.017989109133817627,-0.023134334581418836,-0.026065528657321313,-0.033425619386742544,-0.04004769965893079,-0.047406956478230844,-0.05698024466922952,-0.0665543667703496,-0.07760367587581413,-0.08939099543851164,-0.10044113845409747,-0.11149044755956211,-0.12327776712225952,-0.13432791013784545,-0.14537721924330999,-0.15568851789154176,-0.1652626399926615,-0.17483676209378157,-0.18219601891308163,-0.19029328618961455,-0.19617652209444875,-0.202060591909404,-0.2079438278142382,-0.21382789762919358,-0.21675909170509605,-0.2233811719772843,-0.22262231376702218,-0.2277675392146235,-0.22774752537171555,-0.23289275081931665,-0.2328727369764087,-0.22768581602274912,-0.24021114604267962,-0.22912097534127768};
+  Double_t BK_fex1001[35] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+  Double_t BK_fey1001[35] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.00479452,0.007191781,0.008390411,0.009589041,0.01078767,0.01318493,0.01438356,0.01797945,0.01917808,0.0239726,0.03116438};
+
+  auto *gre = new TGraphErrors(35, BK_fx1001, BK_fy1001, BK_fex1001, BK_fey1001);
+  gre->SetMarkerStyle(20);
+  return gre;
+}
+
+TGraphErrors* MakeBkGraphV3(){
+  Double_t BK_fx1001[35] = {0.17418498504278107,0.2229181426170404,0.27359548977218234,0.3223346202791018,0.37302689976589426,0.42371619278635647,0.4724493503606159,0.5231386433810781,0.5738219634688804,0.6245022970903524,0.6732264952656215,0.7239068288870936,0.7745811895759054,0.8233053877511742,0.8739767619736563,0.924645149729808,0.9733723343714074,1.024040722127559,1.0747091098837107,1.12344226745797,1.1741046822814614,1.224796961768254,1.2735092140782025,1.3222274393208115,1.3748549489894963,1.423600052429076,1.474283372516878,1.5229986112931568,1.5736580396503184,1.622400156623568,1.6730356932500887,1.723730959203211,1.7743903875603728,1.823090694005001,1.8739352832746274};
+  Double_t BK_fy1001[35] = {-0.00245022970903519,-0.000306278713629371,0.00245022970903519,0.003981623277182267,0.005206738131699862,0.006738131699846883,0.008882082695252647,0.010413476263399724,0.012557427258805487,0.015007656967840732,0.018070444104134775,0.02052067381317002,0.023583460949464063,0.02664624808575805,0.03001531393568152,0.033690658499234305,0.03644716692189895,0.04012251148545179,0.0437978560490046,0.04594180704441045,0.05022970903522203,0.051454823889739654,0.05574272588055132,0.05941807044410416,0.06217457886676875,0.063093415007657,0.06523736600306279,0.06921898928024503,0.0738131699846861,0.07503828483920366,0.08208269525267997,0.08300153139356817,0.0875957120980092,0.09310872894333846,0.0787136294027565};
+  Double_t BK_fex1001[35] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+  Double_t BK_fey1001[35] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0.00479452,0.007191781,0.008390411,0.009589041,0.01078767,0.01318493,0.01438356,0.01797945,0.01917808,0.0239726,0.03116438};
+
+  auto *gre = new TGraphErrors(35, BK_fx1001, BK_fy1001, BK_fex1001, BK_fey1001);
+  gre->SetMarkerStyle(20);
+  return gre;
 }
 
 TGraphErrors* MakeBkGraph(){

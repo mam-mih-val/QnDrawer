@@ -18,7 +18,7 @@
 class Comparator {
 public:
   Comparator() = default;
-  explicit Comparator(std::vector<std::string> name) : name_(std::move(name)) {}
+  explicit Comparator(std::string name) : name_(std::move(name)) {}
   ~Comparator() = default;
   void AddGraph(TGraph* graph, const std::string& graph_title="graph"){
     if(!graphs_)
@@ -50,6 +50,7 @@ public:
     auto graph = Qn::DataContainerHelper::ToTGraph( container );
     AddGraph(graph, graph_title);
   }
+
   void Draw(){
     SetStyle();
     canvas_->cd();
@@ -99,7 +100,7 @@ private:
     gStyle->SetMarkerSize(2);
     gStyle->SetLineWidth(4);
   }
-  std::vector<std::string> name_;
+  std::string name_;
   std::map<std::string, FlowHelper> flow_helpers_;
   TMultiGraph* graphs_{nullptr};
   THStack* histos_{nullptr};
