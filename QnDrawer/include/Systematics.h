@@ -53,6 +53,7 @@ public:
     }
   }
   FlowHelper &GetFlowHelper() { return flow_helper_; }
+  void SetFlowHelper(FlowHelper &flowHelper) { flow_helper_ = flowHelper; }
   const std::string &GetName() const { return name_; }
   const Qn::DataContainer<Qn::Stats> &GetAveraged() const { return averaged_; }
   const std::vector<Qn::DataContainer<Qn::Stats>> &GetSubEvents() const {
@@ -66,12 +67,6 @@ public:
   }
   const std::vector<Qn::DataContainer<Qn::Stats>> &GetRatioComponents() const {
     return ratio_components_;
-  }
-  std::vector<TMultiGraph*> DrawSubEvents(std::string title=";pt, [GeV/c]; v_{1}"){
-    std::vector<TMultiGraph*> vec;
-    auto stack = new TMultiGraph("sub_events", title.data());
-    auto ratio = new TMultiGraph("ratio", title.data());
-    return vec;
   }
   void SetName(const std::string &name) { name_ = name; }
   void SetRebinProjection(
@@ -147,6 +142,61 @@ public:
       graph->Write(save_name.data());
       i++;
     }
+  }
+  void DrawSystematics(TCanvas* canvas,
+    std::vector<Qn::DataContainer<Qn::Stats>> results,
+    std::vector<Qn::DataContainer<Qn::Stats>> ratios,
+    std::vector<std::string> results_names)
+  {
+    std::string pad_name = name_+"_result";
+    auto result_pad = new TPad(pad_name.data(), "result", 0.0, 0.35, 1.0, 1.0);
+    auto result_stack = new TMultiGraph( "result", "" );
+    pad_name = name_+"_ratio";
+    auto ratio_pad = new TPad(pad_name.data(), "ratio", 0.0, 0.0, 1.0, .35);
+    auto ratio_stack = new TMultiGraph( "ratio", "" );
+    TGraphAsymmErrors *graph;
+    averaged_.SetSetting(Qn::Stats::Settings::CORRELATEDERRORS);
+    graph = Qn::DataContainerHelper::ToTGraph( averaged_ );
+    graph->SetTitle( "averaged" );
+    result_stack->Add(graph);
+    auto averaged_ratio = flow_helper_.Ratio({"averaged", "averaged"}, "ref_ratio");
+    averaged_ratio.SetSetting(Qn::Stats::Settings::CORRELATEDERRORS);
+    graph = Qn::DataContainerHelper::ToTGraph( averaged_ratio );
+    ratio_stack->Add(graph);
+    for(int i=0; i<results.size(); i++){
+      results.at(i).SetSetting(Qn::Stats::Settings::CORRELATEDERRORS);
+      graph = Qn::DataContainerHelper::ToTGraph( results.at(i) );
+      graph->SetTitle( results_names.at(i).data() );
+      result_stack->Add(graph);
+      ratios.at(i).SetSetting(Qn::Stats::Settings::CORRELATEDERRORS);
+      graph = Qn::DataContainerHelper::ToTGraph( ratios.at(i) );
+      ratio_stack->Add(graph);
+    }
+    result_pad->cd();
+    result_pad->SetBottomMargin(0);
+    result_stack->Draw("AP+PMC+PLC");
+    result_pad->BuildLegend();
+    result_stack->GetHistogram()->SetLabelSize(0.043, "Y");
+    result_stack->GetHistogram()->SetMinimum(-0.29);
+    result_stack->GetHistogram()->SetMaximum(0.0);
+    ratio_pad->cd();
+    ratio_pad->SetTopMargin(0);
+    ratio_pad->SetBottomMargin(0.25);
+    ratio_stack->Draw("AP+PMC+PLC");
+    ratio_stack->GetHistogram()->SetLabelSize(0.08, "X");
+    ratio_stack->GetHistogram()->SetLabelSize(0.08, "Y");
+    ratio_stack->GetHistogram()->SetMinimum(0.81);
+    ratio_stack->GetHistogram()->SetMaximum(1.19);
+    canvas->cd();
+    result_pad->Draw();
+    ratio_pad->Draw();
+    canvas->Draw();
+  }
+  void DrawSubEvents(TCanvas* canvas){
+    DrawSystematics(canvas, sub_events_, ratio_sub_events_, sub_events_names_);
+  }
+  void DrawComponents(TCanvas* canvas){
+    DrawSystematics(canvas, components_, ratio_components_, components_names_);
   }
 private:
   std::string name_;

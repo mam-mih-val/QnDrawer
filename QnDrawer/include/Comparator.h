@@ -50,7 +50,18 @@ public:
     auto graph = Qn::DataContainerHelper::ToTGraph( container );
     AddGraph(graph, graph_title);
   }
-
+  void PutOnCanvas( Qn::DataContainer<Qn::Stats>& container, const std::string& title ){
+    TGraphAsymmErrors* graph{nullptr};;
+    container.SetSetting(Qn::Stats::Settings::CORRELATEDERRORS);
+    graph = Qn::DataContainerHelper::ToTGraph( container );
+    graph->SetTitle(title.data());
+    graphs_->Add(graph);
+  }
+  void PutOnCanvas( std::vector<Qn::DataContainer<Qn::Stats>>& containers, std::vector<std::string> titles ){
+    for(int i=0; i<containers.size(); i++){
+      PutOnCanvas(containers.at(i), titles.at(i));
+    }
+  }
   void Draw(){
     SetStyle();
     canvas_->cd();

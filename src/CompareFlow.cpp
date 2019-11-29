@@ -49,7 +49,7 @@ int main( int n_args, char** args ){
   comparators.push_back( Compare3Se(file) );
   comparators.push_back( CompareRs(file) );
   comparators.push_back( CompareElliptic(file) );
-  comparators.push_back( CompareTriangular(file) );
+//  comparators.push_back( CompareTriangular(file) );
   std::vector<std::vector<float>> canv_edges{
     {-0.4, 0.1},
     {-0.4, 0.1},
@@ -63,7 +63,7 @@ int main( int n_args, char** args ){
     comparator.Draw();
     comparator.GetGraphs()->SetMinimum(canv_edges.at(i).at(0));
     comparator.GetGraphs()->SetMaximum(canv_edges.at(i).at(1));
-    std::string save_name = output_file_name+std::to_string(i)+".png";
+    std::string save_name = output_file_name+std::to_string(i)+".cxx";
     comparator.GetCanvas()->Print(save_name.data());
     i++;
   }

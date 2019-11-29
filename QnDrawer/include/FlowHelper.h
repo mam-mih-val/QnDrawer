@@ -18,13 +18,11 @@
 class FlowHelper {
 public:
   FlowHelper() = default;
-  explicit FlowHelper(std::shared_ptr<TFile> file) : file_(std::move(file)) {}
-  explicit FlowHelper(const std::string& file_name){ file_.reset( TFile::Open(file_name.data()) ); }
-  explicit FlowHelper(TFile* file){ file_.reset( file ); }
+  explicit FlowHelper(const std::string& file_name){ file_ = TFile::Open(file_name.data()); }
+  explicit FlowHelper(TFile* file){ file_ = file; }
   virtual ~FlowHelper() = default;
-  void SetFile(const std::string& fileName) { file_.reset(TFile::Open(fileName.data())); }
-  void SetFile(std::shared_ptr<TFile> file) { file_ = std::move(file); }
-  void SetFile(TFile* file) { file_.reset(file); }
+  void SetFile(const std::string& fileName) { file_ = TFile::Open(fileName.data()); }
+  void SetFile(TFile* file) { file_ = file; }
   Qn::DataContainer<Qn::Stats>& GetDataContainer(const std::string& name){
     Qn::DataContainer<Qn::Stats>* ptr{nullptr};
     if( heap_.count(name) !=0 )
@@ -97,7 +95,7 @@ public:
 
 protected:
   std::map<std::string, Qn::DataContainer<Qn::Stats> > heap_;
-  std::shared_ptr<TFile> file_;
+  TFile* file_{nullptr};
  ClassDef(FlowHelper,1)
 };
 
