@@ -6,7 +6,7 @@
 #include <vector>
 #include <TFile.h>
 
-TGraphErrors* MakeBkGraph();
+TGraphErrors*MakeBkGraphV1();
 TGraphErrors* MakeBkGraphV2();
 TGraphErrors* MakeBkGraphV3();
 TH1F* MakeOgHisto();
@@ -63,7 +63,7 @@ int main( int n_args, char** args ){
     comparator.Draw();
     comparator.GetGraphs()->SetMinimum(canv_edges.at(i).at(0));
     comparator.GetGraphs()->SetMaximum(canv_edges.at(i).at(1));
-    std::string save_name = output_file_name+std::to_string(i)+".cxx";
+    std::string save_name = output_file_name+std::to_string(i)+".png";
     comparator.GetCanvas()->Print(save_name.data());
     i++;
   }
@@ -87,7 +87,7 @@ Comparator Compare3Se(TFile* file){
   }
   comparator.MergeAndPutOnCanvas("old", three_sub, "Three SE");
   comparator.PutOnCanvas("old", three_sub, three_sub);
-  comparator.AddGraph( MakeBkGraph(), "Behruz Kardan HADES CM2019");
+  comparator.AddGraph(MakeBkGraphV1(), "Behruz Kardan HADES CM2019");
   return comparator;
 }
 Comparator CompareRs(TFile* file){
@@ -109,7 +109,7 @@ Comparator CompareRs(TFile* file){
   comparator.MergeAndPutOnCanvas("old", extrapolate, "Rnd Sub Extrapolation");
   comparator.PutOnCanvas("old", rand_sub, rand_sub);
   comparator.PutOnCanvas("old", extrapolate, extrapolate);
-  comparator.AddGraph( MakeBkGraph(), "Behruz Kardan HADES CM2019");
+  comparator.AddGraph(MakeBkGraphV1(), "Behruz Kardan HADES CM2019");
   return comparator;
 }
 
@@ -169,7 +169,7 @@ TGraphErrors* MakeBkGraphV3(){
   return gre;
 }
 
-TGraphErrors* MakeBkGraph(){
+TGraphErrors*MakeBkGraphV1(){
   Double_t BK_fx1001[35] = {0.1741150442477875,0.22389380530973452,0.2736725663716814,0.3254424778761061,0.3752212389380531,0.4249999999999999,0.4747787610619469,0.5245575221238938,0.5763274336283184,0.6241150442477876,0.6738938053097345,0.7236725663716814,0.7754424778761062,0.8252212389380531,0.875,0.9247787610619471,0.9745575221238938,1.0243362831858407,1.0761061946902655,1.1238938053097347,1.1736725663716814,1.2234513274336283,1.2752212389380533,1.3250000000000002,1.374778761061947,1.4245575221238937,1.4743362831858409,1.5241150442477878,1.5738938053097347,1.6256637168141592,1.6734513274336287,1.7252212389380532,1.775,1.824778761061947,1.8745575221238941};
   Double_t BK_fy1001[35] = {-0.040000000000000036,-0.05529411764705883,-0.07176470588235295,-0.08588235294117641,-0.09647058823529409,-0.10705882352941176,-0.1164705882352941,-0.12470588235294111,-0.13294117647058823,-0.13882352941176468,-0.1435294117647059,-0.14823529411764702,-0.1517647058823529,-0.15647058823529414,-0.1588235294117647,-0.1623529411764706,-0.16588235294117648,-0.16941176470588237,-0.17176470588235293,-0.17294117647058826,-0.17647058823529416,-0.1776470588235295,-0.18117647058823527,-0.18352941176470594,-0.18470588235294105,-0.18823529411764706,-0.1894117647058824,-0.19529411764705873,-0.19882352941176473,-0.20235294117647062,-0.20823529411764707,-0.21058823529411763,-0.21882352941176475,-0.21529411764705886,-0.22941176470588243};
   Double_t BK_fex1001[35] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};

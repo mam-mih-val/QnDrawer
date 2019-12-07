@@ -4,7 +4,7 @@
 #include <Comparator.h>
 #include <TFile.h>
 
-TGraphErrors* MakeBkGraph();
+TGraphErrors*MakeBkGraphV1();
 TH1F* MakeOgHisto();
 
 int main( int n_args, char** args ){
@@ -23,7 +23,7 @@ int main( int n_args, char** args ){
   };
   Comparator comparator;
   comparator.AddFile(file, "old");
-  comparator.AddGraph( MakeBkGraph(), "Behruz Kardan QM2018");
+  comparator.AddGraph(MakeBkGraphV1(), "Behruz Kardan QM2018");
   comparator.AddTh1( MakeOgHisto() );
   comparator.MergeAndPutOnCanvas("old", names_3se, "3 sub-event");
   comparator.MergeAndPutOnCanvas("old", names_full, "Rnd extrapolation");
@@ -33,7 +33,7 @@ int main( int n_args, char** args ){
   return 0;
 }
 
-TGraphErrors* MakeBkGraph(){
+TGraphErrors*MakeBkGraphV1(){
   Double_t R_BK_fx1001[4] = {5,15,25,35};
   Double_t R_BK_fy1001[4] = {0.608403,0.815295,0.859224,0.850258};
   Double_t R_BK_fex1001[4] = {0,0,0,0};

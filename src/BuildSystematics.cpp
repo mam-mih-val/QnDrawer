@@ -9,7 +9,7 @@ int main(int n_args, char** args){
   std::string file_out_name = args[2];
   auto file_in = TFile::Open(file_in_name.data());
   std::vector<Systematics> systematics;
-  std::vector<std::string> systematics_names{ "Tree_Sub", "Rnd_Sub", "Elliptic"};
+  std::vector<std::string> systematics_names{ "Tree_Sub", "Rnd_Sub", "Elliptic", "Triangular"};
   std::string prefix{"flow_TracksMdcPt_"};
   std::vector<std::vector<std::string>> sub_events_names{
       {"Fw1_", "Fw2_", "Fw3_"},
@@ -35,9 +35,9 @@ int main(int n_args, char** args){
     systematics.back().GetFlowHelper().SetFile(file_in);
     systematics.back().Init(prefix, sub_events_names.at(i), components_names.at(i));
     std::string canvas_name{systematics_names.at(i)+"_comp"};
-    canvases.push_back( new TCanvas(canvas_name.data(), "", 1100, 1000) );
-    systematics.back().DrawComponents(canvases.back());
-    canvas_name = file_out_name+"_"+systematics_names.at(i)+".png";
+    canvases.push_back( new TCanvas(canvas_name.data(), "", 600, 1000) );
+    systematics.back().DrawSubEvents(canvases.back());
+    canvas_name = file_out_name+"_"+systematics_names.at(i)+"_sub_evt.png";
     canvases.back()->Print(canvas_name.data());
     systematics.back().SaveToFile(file_out);
   }
