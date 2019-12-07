@@ -35,6 +35,7 @@
 #build directory
 build/*
 cmake-build-debug/*
+Scripts/*
 
 #Input Files directory
 Input_Files/*
@@ -45,6 +46,5 @@ Output_Files/*
 #Configuration Files directory
 Configuration_Files/*
 
-Scripts/*
 
 Painter/*.png
