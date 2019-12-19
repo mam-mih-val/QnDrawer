@@ -38,6 +38,24 @@ int main(int argv, char** argc){
     qn_qn_correlations = { qn_qn_correlations.at(2), qn_qn_correlations.at(0), qn_qn_correlations.at(1) };
   }
 
+  // ******************************** Method of 3 Sub-Events in MDC ******************************** //
+  sub_events = { "Full"};
+  std::vector<std::string> resolution_1{ "Full_Mdc1", "Mdc2_Full", "Mdc1_Mdc2"};
+  components = {"_XX", "_YY"};
+    for(auto method : methods){
+      for( auto axis : axis_names ){
+        for( auto component : components ){
+          auto correlations = resolution_1;
+          configurations.emplace_back( "TracksMdc"+axis+"_Full_3mdc"+component+method );
+          std::for_each( correlations.begin(), correlations.end(), [component, method]( std::string& str ){ str+=component+method; } );
+          configurations.back().SetQnQnNames( correlations );
+          configurations.back().SetUnQnNames( {"TracksMdc"+axis+"_Full"+component+method} );
+          configurations.back().SetProjectionAxisName("0_"+axis);
+          configurations.back().SetRebinAxis({{"Centrality", 2, 20, 30}});
+        }
+      }
+    }
+
   // ******************************** Method of 3 Sub-Events, Second Harmonic ******************************** //
 
   sub_events = { "Fw1_Fw2", "Fw3_Fw1", "Fw2_Fw3" };

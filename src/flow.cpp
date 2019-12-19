@@ -33,6 +33,23 @@ int main( int argc, char** argv )
   std::vector<std::string> components{"_XX", "_YY"};
   std::vector<std::string> methods{"_Sp", "_Ep"};
 
+  // ******************************** Method of 3 Sub-Events in MDC ******************************** //
+
+    for(auto method : methods){
+      for( auto axis : axis_names ){
+        for( auto component : components ){
+          builder.AddMethod("TracksMdc"+axis+"_Full_3mdc"+component+method, [](std::vector<Qn::DataContainer<Qn::Stats>> corr){
+            Qn::DataContainer<Qn::Stats> result;
+            result = Sqrt(corr.at(0)*corr.at(1)/(corr.at(2))*2);
+            return result;
+          },[](std::vector<Qn::DataContainer<Qn::Stats>> corr){
+            Qn::DataContainer<Qn::Stats> result;
+            result = corr.at(0)*2/corr.at(1);
+            return result;
+          });
+        }
+      }
+    }
   // ******************************** Method of 3 Sub-Events ******************************** //
   for( auto se : sub_events ){
     for(auto method : methods){

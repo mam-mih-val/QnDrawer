@@ -9,19 +9,23 @@ int main(int n_args, char** args){
   std::string file_out_name = args[2];
   auto file_in = TFile::Open(file_in_name.data());
   std::vector<Systematics> systematics;
-  std::vector<std::string> systematics_names{ "Tree_Sub", "Rnd_Sub", "Elliptic", "Triangular"};
+  std::vector<std::string> systematics_names{ "Three_Sub", "Extrapolation" ,"Rnd_Sub", "Elliptic", "Triangular", "Mdc"};
   std::string prefix{"flow_TracksMdcPt_"};
   std::vector<std::vector<std::string>> sub_events_names{
       {"Fw1_", "Fw2_", "Fw3_"},
-      {"Rs1_", "Rs2_", "Full_"},
+      {"Full_"},
+      {"Rs1_", "Rs2_"},
       {"Fw1_Fw2_", "Fw2_Fw3_", "Fw3_Fw1_"},
-      {"Fw1_Fw2_Fw3_"}
+      {"Fw1_Fw2_Fw3_"},
+      {"Full_3mdc_"}
   };
   std::vector<std::vector<std::string>> components_names{
       {"XX_Sp", "YY_Sp"},
       {"XX_Ep", "YY_Ep"},
+      {"XX_Ep", "YY_Ep"},
       {"XXX_Sp", "XYY_Sp", "YXY_Sp", "YYX_Sp"},
-      {"XXXX_Sp", "XYYX_Sp", "XYXY_Sp", "XXYY_Sp", "YYXX_Sp", "YXYX_Sp", "YXXY_Sp", "YYYY_Sp"}
+      {"XXXX_Sp", "XYYX_Sp", "XYXY_Sp", "XXYY_Sp", "YYXX_Sp", "YXYX_Sp", "YXXY_Sp", "YYYY_Sp"},
+      {"XX_Ep", "YY_Ep"}
   };
   std::vector<TCanvas*> canvases;
   auto file_name = file_out_name+".root";
