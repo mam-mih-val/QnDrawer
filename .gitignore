@@ -49,5 +49,5 @@ Output_Files/*
 Configuration_Files/*
 
 
-Painter/*.png
-/Scripts/
+Painter/*.*
+Scripts/*.*
