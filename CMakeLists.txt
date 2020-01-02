@@ -37,7 +37,8 @@ set(HEADERS
 		QnDrawer/include/FlowHelper.h
 		QnDrawer/include/Comparator.h
 		QnDrawer/include/Method.h
-		QnDrawer/include/Systematics.h)
+		QnDrawer/include/Systematics.h
+		QnDrawer/include/Observed.h)
 
 set(SOURCES
 		QnDrawer/CorrelationMananger.cpp
@@ -46,7 +47,8 @@ set(SOURCES
 		QnDrawer/Comparator.cpp
 		QnDrawer/Method.cpp
 		QnDrawer/FlowHelper.cpp
-		QnDrawer/Systematics.cpp)
+		QnDrawer/Systematics.cpp
+		QnDrawer/Observed.cpp)
 
 set(PCM_FILE_NAME libQnDrawer)
 add_library(QnDrawer SHARED ${SOURCES} )

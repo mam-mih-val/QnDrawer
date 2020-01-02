@@ -30,8 +30,8 @@ int main(int argv, char** argc){
           std::for_each( correlations.begin(), correlations.end(), [component, method]( std::string& str ){ str+=component+method; } );
           configurations.back().SetQnQnNames( correlations );
           configurations.back().SetUnQnNames( {"TracksMdc"+axis+"_"+se+component+method} );
-          configurations.back().SetProjectionAxisName("0_"+axis);
-          configurations.back().SetRebinAxis({{"Centrality", 2, 20, 30}});
+          configurations.back().SetProjectionAxisName("Centrality");
+//          configurations.back().SetRebinAxis({{"Centrality", 2, 20, 30}});
         }
       }
     }
@@ -50,8 +50,8 @@ int main(int argv, char** argc){
           std::for_each( correlations.begin(), correlations.end(), [component, method]( std::string& str ){ str+=component+method; } );
           configurations.back().SetQnQnNames( correlations );
           configurations.back().SetUnQnNames( {"TracksMdc"+axis+"_Full"+component+method} );
-          configurations.back().SetProjectionAxisName("0_"+axis);
-          configurations.back().SetRebinAxis({{"Centrality", 2, 20, 30}});
+          configurations.back().SetProjectionAxisName("Centrality");
+//          configurations.back().SetRebinAxis({{"Centrality", 2, 20, 30}});
         }
       }
     }
@@ -76,8 +76,8 @@ int main(int argv, char** argc){
           correlations_1.insert(correlations_1.end(), correlations_2.begin(), correlations_2.end());
           configurations.back().SetQnQnNames( correlations_1 );
           configurations.back().SetUnQnNames( {"TracksMdc"+axis+"_"+se+un_qn_components.at(i)+method} );
-          configurations.back().SetProjectionAxisName("0_"+axis);
-          configurations.back().SetRebinAxis({{"Centrality", 2, 20, 30}});
+          configurations.back().SetProjectionAxisName("Centrality");
+//          configurations.back().SetRebinAxis({{"Centrality", 2, 20, 30}});
         }
       }
     }
@@ -109,8 +109,8 @@ int main(int argv, char** argc){
           correlations_1.insert(correlations_1.end(), correlations_3.begin(), correlations_3.end());
           configurations.back().SetQnQnNames( correlations_1 );
           configurations.back().SetUnQnNames( {"TracksMdc"+axis+"_"+se+un_qn_components.at(i)+method} );
-          configurations.back().SetProjectionAxisName("0_"+axis);
-          configurations.back().SetRebinAxis({{"Centrality", 2, 20, 30}});
+          configurations.back().SetProjectionAxisName("Centrality");
+//          configurations.back().SetRebinAxis({{"Centrality", 2, 20, 30}});
         }
       }
     }
@@ -132,8 +132,8 @@ int main(int argv, char** argc){
           std::for_each( correlations.begin(), correlations.end(), [comp, method]( std::string& str ){ str+=comp+method; } );
           configurations.back().SetQnQnNames( correlations );
           configurations.back().SetUnQnNames( {"TracksMdc"+axis+"_"+se+comp+method} );
-          configurations.back().SetProjectionAxisName("0_"+axis);
-          configurations.back().SetRebinAxis({{"Centrality", 2, 20, 30}});
+          configurations.back().SetProjectionAxisName("Centrality");
+//          configurations.back().SetRebinAxis({{"Centrality", 2, 20, 30}});
         }
       }
     }
@@ -147,8 +147,8 @@ int main(int argv, char** argc){
       configurations.back().SetQnQnNames(correlations);
       configurations.back().SetUnQnNames(
           {"TracksMdc" + axis + "_Full" + comp + "_Ep"});
-      configurations.back().SetProjectionAxisName("0_" + axis);
-      configurations.back().SetRebinAxis({{"Centrality", 2, 20, 30}});
+      configurations.back().SetProjectionAxisName("Centrality");
+//      configurations.back().SetRebinAxis({{"Centrality", 2, 20, 30}});
     }
   }
   file->cd();

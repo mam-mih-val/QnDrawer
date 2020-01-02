@@ -148,8 +148,8 @@ int main( int argc, char** argv )
   builder.Compute();
   builder.Rebin();
   builder.Projection();
-  builder.SaveToFile(output_file_name);
 //  builder.SaveGraphsToFile(output_file_name);
+  builder.SaveToFile(output_file_name);
   auto end = std::chrono::system_clock::now();
   std::chrono::duration<double> elapsed_seconds = end - start;
   std::cout << "elapsed time: " << elapsed_seconds.count() << " s\n";

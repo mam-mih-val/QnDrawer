@@ -25,7 +25,7 @@ int main(int n_args, char** args){
       {"XX_Ep", "YY_Ep"},
       {"XXX_Sp", "XYY_Sp", "YXY_Sp", "YYX_Sp"},
       {"XXXX_Sp", "XYYX_Sp", "XYXY_Sp", "XXYY_Sp", "YYXX_Sp", "YXYX_Sp", "YXXY_Sp", "YYYY_Sp"},
-      {"XX_Ep", "YY_Ep"}
+      {"XX_Sp", "YY_Sp"}
   };
   std::vector<TCanvas*> canvases;
   auto file_name = file_out_name+".root";
