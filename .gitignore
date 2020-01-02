@@ -48,6 +48,8 @@ Output_Files/*
 #Configuration Files directory
 Configuration_Files/*
 
-
+#Small scrits and pictures
+Painter/*
 Painter/*.*
+Scripts/*
 Scripts/*.*
