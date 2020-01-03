@@ -103,6 +103,9 @@ public:
       i++;
     }
   }
+  void SetCompareGraph(TGraphErrors *compareGraph) {
+    compare_graph_ = compareGraph;
+  }
   void SaveGraphsToFile(TFile* file){
     file->cd();
     TGraphAsymmErrors* graph{nullptr};
@@ -158,6 +161,8 @@ public:
     averaged_.SetSetting(Qn::Stats::Settings::CORRELATEDERRORS);
     graph = Qn::DataContainerHelper::ToTGraph( averaged_ );
     graph->SetTitle( "averaged" );
+    if(compare_graph_)
+      result_stack->Add(compare_graph_);
     result_stack->Add(graph);
     auto averaged_ratio = flow_helper_.Ratio({"averaged", "averaged"}, "ref_ratio");
     averaged_ratio.SetSetting(Qn::Stats::Settings::CORRELATEDERRORS);
@@ -210,6 +215,7 @@ private:
   std::vector<Qn::DataContainer<Qn::Stats>> ratio_components_;
   std::vector<std::string> sub_events_names_;
   std::vector<std::string> components_names_;
+  TGraphErrors* compare_graph_{nullptr};
 };
 
 #endif // QNDRAWER_SYSTEMATICS_H
