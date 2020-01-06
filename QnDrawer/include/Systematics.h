@@ -8,6 +8,7 @@
 #include "FlowHelper.h"
 #include <DataContainer.h>
 #include <Stats.h>
+#include <TF1.h>
 #include <TMultiGraph.h>
 #include <utility>
 #include <vector>
@@ -52,6 +53,16 @@ public:
       ratio_components_.push_back( flow_helper_.Ratio({ "averaged", component }, "ratio_"+component) );
     }
   }
+  void RebuildRatios(){
+    ratio_sub_events_.clear();
+    for(auto sub_event : sub_events_){
+      ratio_sub_events_.push_back( sub_event / averaged_ );
+    }
+    ratio_components_.clear();
+    for(auto component : components_){
+      ratio_components_.push_back( component / averaged_ );
+    }
+  }
   FlowHelper &GetFlowHelper() { return flow_helper_; }
   void SetFlowHelper(FlowHelper &flowHelper) { flow_helper_ = flowHelper; }
   const std::string &GetName() const { return name_; }
@@ -73,6 +84,10 @@ public:
       const std::function<Qn::DataContainer<Qn::Stats>(
           std::vector<Qn::DataContainer<Qn::Stats>>)> &rebinProjection) {
     rebin_projection_ = rebinProjection;
+  }
+  void SetDefault(const Qn::DataContainer<Qn::Stats> &averaged) {
+    averaged_ = averaged;
+    RebuildRatios();
   }
   void SaveToFile(TFile* file){
     file->cd();
@@ -103,8 +118,14 @@ public:
       i++;
     }
   }
-  void SetCompareGraph(TGraphErrors *compareGraph) {
+  void SetCompareGraph(TGraph *compareGraph) {
     compare_graph_ = compareGraph;
+  }
+  void SetSubEventsNames(const std::vector<std::string> &subEventsNames) {
+    sub_events_names_ = subEventsNames;
+  }
+  void SetComponentsNames(const std::vector<std::string> &componentsNames) {
+    components_names_ = componentsNames;
   }
   void SaveGraphsToFile(TFile* file){
     file->cd();
@@ -157,12 +178,11 @@ public:
     pad_name = name_+"_ratio";
     auto ratio_pad = new TPad(pad_name.data(), "ratio", 0.0, 0.0, 1.0, .35);
     auto ratio_stack = new TMultiGraph( "ratio", "" );
+    auto line = new TF1("line", "1", 0, 50);
     TGraphAsymmErrors *graph;
     averaged_.SetSetting(Qn::Stats::Settings::CORRELATEDERRORS);
     graph = Qn::DataContainerHelper::ToTGraph( averaged_ );
-    graph->SetTitle( "averaged" );
-    if(compare_graph_)
-      result_stack->Add(compare_graph_);
+    graph->SetTitle( "Default" );
     result_stack->Add(graph);
     auto averaged_ratio = flow_helper_.Ratio({"averaged", "averaged"}, "ref_ratio");
     averaged_ratio.SetSetting(Qn::Stats::Settings::CORRELATEDERRORS);
@@ -177,17 +197,26 @@ public:
       graph = Qn::DataContainerHelper::ToTGraph( ratios.at(i) );
       ratio_stack->Add(graph);
     }
+
     result_pad->cd();
     result_pad->SetBottomMargin(0);
     result_stack->Draw("AP+PMC+PLC");
+    if(compare_graph_){
+      compare_graph_->SetMarkerColor(kBlack);
+      compare_graph_->SetLineColor(kBlack);
+      compare_graph_->Draw("same");
+    }
     result_pad->BuildLegend();
     result_stack->GetHistogram()->SetLabelSize(0.043, "Y");
-    result_stack->GetHistogram()->SetMinimum(-0.29);
-    result_stack->GetHistogram()->SetMaximum(0.0);
+    if( result_plot_range_.at(0) != result_plot_range_.at(1) ) {
+      result_stack->GetHistogram()->SetMinimum(result_plot_range_.at(0));
+      result_stack->GetHistogram()->SetMaximum(result_plot_range_.at(1));
+    }
     ratio_pad->cd();
     ratio_pad->SetTopMargin(0);
     ratio_pad->SetBottomMargin(0.25);
     ratio_stack->Draw("AP+PMC+PLC");
+    line->Draw("same");
     ratio_stack->GetHistogram()->SetLabelSize(0.08, "X");
     ratio_stack->GetHistogram()->SetLabelSize(0.08, "Y");
     ratio_stack->GetHistogram()->SetMinimum(0.81);
@@ -203,6 +232,19 @@ public:
   void DrawComponents(TCanvas* canvas){
     DrawSystematics(canvas, components_, ratio_components_, components_names_);
   }
+  void SetResultPlotRange(const std::vector<float> &resultPlotRange) {
+    result_plot_range_ = resultPlotRange;
+  }
+  void SetRatioPlotRange(const std::vector<float> &ratioPlotRange) {
+    ratio_plot_range_ = ratioPlotRange;
+  }
+  void SetSubEventsTitles(const std::vector<std::string> &subEventsTitles) {
+    sub_events_titles_ = subEventsTitles;
+  }
+  void SetComponentsTitles(const std::vector<std::string> &componentsTitles) {
+    components_titles_ = componentsTitles;
+  }
+
 private:
   std::string name_;
   FlowHelper flow_helper_;
@@ -210,12 +252,16 @@ private:
       [](std::vector<Qn::DataContainer<Qn::Stats>> container){ return container.at(0); };
   Qn::DataContainer<Qn::Stats> averaged_;
   std::vector<Qn::DataContainer<Qn::Stats>> sub_events_;
+  std::vector<std::string> sub_events_titles_;
   std::vector<Qn::DataContainer<Qn::Stats>> components_;
+  std::vector<std::string> components_titles_;
   std::vector<Qn::DataContainer<Qn::Stats>> ratio_sub_events_;
   std::vector<Qn::DataContainer<Qn::Stats>> ratio_components_;
   std::vector<std::string> sub_events_names_;
   std::vector<std::string> components_names_;
-  TGraphErrors* compare_graph_{nullptr};
+  TGraph* compare_graph_{nullptr};
+  std::vector<float> result_plot_range_{0.0, 0.0};
+  std::vector<float> ratio_plot_range_{0.0, 0.0};
 };
 
 #endif // QNDRAWER_SYSTEMATICS_H

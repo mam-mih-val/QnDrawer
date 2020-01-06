@@ -65,7 +65,7 @@ if(ROOT_FOUND)
 endif(ROOT_FOUND)
 
 
-add_executable(Flow src/flow.cpp G__QnDrawer.cxx)
+add_executable(Flow src/BuildFlow.cpp G__QnDrawer.cxx)
 target_link_libraries(Flow PUBLIC QnDrawer Qn::Base ${ROOT_LIBRARIES})
 
 add_executable(Configure src/ConfigureFlow.cpp G__QnDrawer.cxx)

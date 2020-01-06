@@ -33,6 +33,7 @@ int main( int argc, char** argv )
 
   // ******************************** Method of 3 Sub-Events in MDC+FW ******************************** //
   for( auto component : components ){
+    // ******************************** FW First Sub-Event ******************************** //
     builder.AddMethod( "TracksMdcPt_Fw1_MdcFw_MdcBw_"+component+"_Sp", [](std::vector<Qn::DataContainer<Qn::Stats>> corr){
       Qn::DataContainer<Qn::Stats> result;
       result = Sqrt(corr.at(0)*corr.at(1)/(corr.at(2))*2);
@@ -83,7 +84,7 @@ int main( int argc, char** argv )
       return result;
     } );
   }
-
+  // ******************************** FW Second Sub-Event ******************************** //
   for( auto component : components ){
     builder.AddMethod( "TracksMdcPt_Fw2_MdcFw_MdcBw_"+component+"_Sp", [](std::vector<Qn::DataContainer<Qn::Stats>> corr){
       Qn::DataContainer<Qn::Stats> result;
@@ -135,6 +136,7 @@ int main( int argc, char** argv )
       return result;
     } );
   }
+  // ******************************** FW Third Sub-Event ******************************** //
   for( auto component : components ){
     builder.AddMethod( "TracksMdcPt_Fw3_MdcFw_MdcBw_"+component+"_Sp", [](std::vector<Qn::DataContainer<Qn::Stats>> corr){
       Qn::DataContainer<Qn::Stats> result;
@@ -183,6 +185,147 @@ int main( int argc, char** argv )
     },[](std::vector<Qn::DataContainer<Qn::Stats>> corr){
       Qn::DataContainer<Qn::Stats> result;
       result = corr.at(0)*2/corr.at(1);
+      return result;
+    } );
+    // ******************************** Method of 3 Sub-Events in FW ******************************** //
+    builder.AddMethod( "TracksMdcPt_Fw1_Fw2_Fw3_"+component+"_Sp", [](std::vector<Qn::DataContainer<Qn::Stats>> corr){
+      Qn::DataContainer<Qn::Stats> result;
+      result = Sqrt(corr.at(0)*corr.at(1)/(corr.at(2))*2);
+      return result;
+    },[](std::vector<Qn::DataContainer<Qn::Stats>> corr){
+      Qn::DataContainer<Qn::Stats> result;
+      result = corr.at(0)*2/corr.at(1);
+      return result;
+    } );
+
+    builder.AddMethod( "TracksMdcPt_Fw2_Fw1_Fw3_"+component+"_Sp", [](std::vector<Qn::DataContainer<Qn::Stats>> corr){
+      Qn::DataContainer<Qn::Stats> result;
+      result = Sqrt(corr.at(0)*corr.at(1)/(corr.at(2))*2);
+      return result;
+    },[](std::vector<Qn::DataContainer<Qn::Stats>> corr){
+      Qn::DataContainer<Qn::Stats> result;
+      result = corr.at(0)*2/corr.at(1);
+      return result;
+    } );
+
+    builder.AddMethod( "TracksMdcPt_Fw3_Fw1_Fw2_"+component+"_Sp", [](std::vector<Qn::DataContainer<Qn::Stats>> corr){
+      Qn::DataContainer<Qn::Stats> result;
+      result = Sqrt(corr.at(0)*corr.at(1)/(corr.at(2))*2);
+      return result;
+    },[](std::vector<Qn::DataContainer<Qn::Stats>> corr){
+      Qn::DataContainer<Qn::Stats> result;
+      result = corr.at(0)*2/corr.at(1);
+      return result;
+    } );
+
+    // ******************************** MDC Forward Rapidity ******************************** //
+    builder.AddMethod( "TracksMdcPt_MdcFw_MdcBw_Fw1_"+component+"_Sp", [](std::vector<Qn::DataContainer<Qn::Stats>> corr){
+      Qn::DataContainer<Qn::Stats> result;
+      result = Sqrt(corr.at(0)*corr.at(1)/(corr.at(2))*2);
+      return result;
+    },[](std::vector<Qn::DataContainer<Qn::Stats>> corr){
+      Qn::DataContainer<Qn::Stats> result;
+      result = corr.at(0)*2/corr.at(1);
+      return result;
+    } );
+    builder.AddMethod( "TracksMdcPt_MdcFw_MdcBw_Fw2_"+component+"_Sp", [](std::vector<Qn::DataContainer<Qn::Stats>> corr){
+      Qn::DataContainer<Qn::Stats> result;
+      result = Sqrt(corr.at(0)*corr.at(1)/(corr.at(2))*2);
+      return result;
+    },[](std::vector<Qn::DataContainer<Qn::Stats>> corr){
+      Qn::DataContainer<Qn::Stats> result;
+      result = corr.at(0)*2/corr.at(1);
+      return result;
+    } );
+    builder.AddMethod( "TracksMdcPt_MdcFw_MdcBw_Fw3_"+component+"_Sp", [](std::vector<Qn::DataContainer<Qn::Stats>> corr){
+      Qn::DataContainer<Qn::Stats> result;
+      result = Sqrt(corr.at(0)*corr.at(1)/(corr.at(2))*2);
+      return result;
+    },[](std::vector<Qn::DataContainer<Qn::Stats>> corr){
+      Qn::DataContainer<Qn::Stats> result;
+      result = corr.at(0)*2/corr.at(1);
+      return result;
+    } );
+    builder.AddMethod( "TracksMdcPt_MdcFw_Fw1_Fw2_"+component+"_Sp", [](std::vector<Qn::DataContainer<Qn::Stats>> corr){
+      Qn::DataContainer<Qn::Stats> result;
+      result = Sqrt(corr.at(0)*corr.at(1)/(corr.at(2))*2);
+      return result;
+    },[](std::vector<Qn::DataContainer<Qn::Stats>> corr){
+      Qn::DataContainer<Qn::Stats> result;
+      result = corr.at(0)*2/corr.at(1);
+      return result;
+    } );
+    builder.AddMethod( "TracksMdcPt_MdcFw_Fw1_Fw3_"+component+"_Sp", [](std::vector<Qn::DataContainer<Qn::Stats>> corr){
+      Qn::DataContainer<Qn::Stats> result;
+      result = Sqrt(corr.at(0)*corr.at(1)/(corr.at(2))*2);
+      return result;
+    },[](std::vector<Qn::DataContainer<Qn::Stats>> corr){
+      Qn::DataContainer<Qn::Stats> result;
+      result = corr.at(0)*2/corr.at(1);
+      return result;
+    } );
+    builder.AddMethod( "TracksMdcPt_MdcFw_Fw2_Fw3_"+component+"_Sp", [](std::vector<Qn::DataContainer<Qn::Stats>> corr){
+      Qn::DataContainer<Qn::Stats> result;
+      result = Sqrt(corr.at(0)*corr.at(1)/(corr.at(2))*2);
+      return result;
+    },[](std::vector<Qn::DataContainer<Qn::Stats>> corr){
+      Qn::DataContainer<Qn::Stats> result;
+      result = corr.at(0)*2/corr.at(1);
+      return result;
+    } );
+    // ******************************** MDC Backward Rapidity ******************************** //
+    builder.AddMethod( "TracksMdcPt_MdcBw_MdcFw_Fw1_"+component+"_Sp", [](std::vector<Qn::DataContainer<Qn::Stats>> corr){
+      Qn::DataContainer<Qn::Stats> result;
+      result = Sqrt(corr.at(0)*corr.at(1)/(corr.at(2))*2);
+      return result;
+    },[](std::vector<Qn::DataContainer<Qn::Stats>> corr){
+      Qn::DataContainer<Qn::Stats> result;
+      result = corr.at(0)*-2/corr.at(1);
+      return result;
+    } );
+    builder.AddMethod( "TracksMdcPt_MdcBw_MdcFw_Fw2_"+component+"_Sp", [](std::vector<Qn::DataContainer<Qn::Stats>> corr){
+      Qn::DataContainer<Qn::Stats> result;
+      result = Sqrt(corr.at(0)*corr.at(1)/(corr.at(2))*2);
+      return result;
+    },[](std::vector<Qn::DataContainer<Qn::Stats>> corr){
+      Qn::DataContainer<Qn::Stats> result;
+      result = corr.at(0)*-2/corr.at(1);
+      return result;
+    } );
+    builder.AddMethod( "TracksMdcPt_MdcBw_MdcFw_Fw3_"+component+"_Sp", [](std::vector<Qn::DataContainer<Qn::Stats>> corr){
+      Qn::DataContainer<Qn::Stats> result;
+      result = Sqrt(corr.at(0)*corr.at(1)/(corr.at(2))*2);
+      return result;
+    },[](std::vector<Qn::DataContainer<Qn::Stats>> corr){
+      Qn::DataContainer<Qn::Stats> result;
+      result = corr.at(0)*-2/corr.at(1);
+      return result;
+    } );
+    builder.AddMethod( "TracksMdcPt_MdcBw_Fw1_Fw2_"+component+"_Sp", [](std::vector<Qn::DataContainer<Qn::Stats>> corr){
+      Qn::DataContainer<Qn::Stats> result;
+      result = Sqrt(corr.at(0)*corr.at(1)/(corr.at(2))*2);
+      return result;
+    },[](std::vector<Qn::DataContainer<Qn::Stats>> corr){
+      Qn::DataContainer<Qn::Stats> result;
+      result = corr.at(0)*-2/corr.at(1);
+      return result;
+    } );
+    builder.AddMethod( "TracksMdcPt_MdcBw_Fw1_Fw3_"+component+"_Sp", [](std::vector<Qn::DataContainer<Qn::Stats>> corr){
+      Qn::DataContainer<Qn::Stats> result;
+      result = Sqrt(corr.at(0)*corr.at(1)/(corr.at(2))*2);
+      return result;
+    },[](std::vector<Qn::DataContainer<Qn::Stats>> corr){
+      Qn::DataContainer<Qn::Stats> result;
+      result = corr.at(0)*-2/corr.at(1);
+      return result;
+    } );
+    builder.AddMethod( "TracksMdcPt_MdcBw_Fw2_Fw3_"+component+"_Sp", [](std::vector<Qn::DataContainer<Qn::Stats>> corr){
+      Qn::DataContainer<Qn::Stats> result;
+      result = Sqrt(corr.at(0)*corr.at(1)/(corr.at(2))*2);
+      return result;
+    },[](std::vector<Qn::DataContainer<Qn::Stats>> corr){
+      Qn::DataContainer<Qn::Stats> result;
+      result = corr.at(0)*-2/corr.at(1);
       return result;
     } );
   }
