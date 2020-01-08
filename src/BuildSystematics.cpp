@@ -54,7 +54,7 @@ int main(int n_args, char** args){
     systematics.back().SetDefault( reference );
     systematics.back().SetSubEventsNames(sub_events_titles.at(i));
     systematics.back().DrawSubEvents(canvases.back());
-    canvas_name = file_out_name+"_"+systematics_names.at(i)+"_sub_evt.png";
+    canvas_name = file_out_name+"_"+systematics_names.at(i)+"_sub_evt.pdf";
     canvases.back()->Print(canvas_name.data());
     systematics.back().SaveToFile(file_out);
   }
