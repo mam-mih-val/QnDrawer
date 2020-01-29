@@ -9,7 +9,7 @@ int main(int n_args, char** args){
   std::string file_out_name = args[2];
   auto file_in = TFile::Open(file_in_name.data());
   std::vector<Systematics> systematics;
-  std::vector<std::string> systematics_names{ "Fw1", "Fw2", "Fw3", "MdcFw", "MdcBw" };
+  std::vector<std::string> systematics_names{ "FWs1", "FWs2", "FWs3", "MDCf", "MDCb" };
   std::string prefix{"flow_TracksMdcPt_"};
   std::vector<std::vector<std::string>> sub_events_names{
       {"Fw1_MdcFw_MdcBw_", "Fw1_MdcFw_Fw2_", "Fw1_MdcFw_Fw3_", "Fw1_MdcBw_Fw2_", "Fw1_MdcBw_Fw3_", "Fw1_Fw2_Fw3_"},
@@ -39,22 +39,39 @@ int main(int n_args, char** args){
   std::vector<TCanvas*> canvases;
   auto file_name = file_out_name+".root";
   auto file_out = TFile::Open(file_name.data(), "recreate");
-  for( int i=0; i<systematics_names.size(); i++ ){
+  for( size_t i=0; i<systematics_names.size(); i++ ){
     systematics.emplace_back(systematics_names.at(i));
     systematics.back().SetRebinProjection([](std::vector<Qn::DataContainer<Qn::Stats>> container){
 //      container.back() = container.back().Rebin({"0_Pt", 32, 0.2, 1.8});
       return container.back();
     });
-    systematics.back().SetResultPlotRange({-0.17, -0.051});
-    systematics.back().SetRatioPlotRange({0.81, 1.19});
+    systematics.back().SetResultPlotRange({-0.159, -0.061});
+    systematics.back().SetRatioPlotRange({0.51, 1.49});
     systematics.back().GetFlowHelper().SetFile(file_in);
     systematics.back().Init(prefix, sub_events_names.at(i), components_names.at(i));
     std::string canvas_name{systematics_names.at(i)+"_comp"};
     canvases.push_back( new TCanvas(canvas_name.data(), "", 600, 1000) );
     systematics.back().SetDefault( reference );
     systematics.back().SetSubEventsNames(sub_events_titles.at(i));
+    systematics.back().SetMarkerStyles({
+      kFullSquare,
+      kFullTriangleUp,
+      kFullTriangleDown,
+      kOpenTriangleUp,
+      kOpenTriangleDown,
+      kFullCross
+    });
+    systematics.back().SetMarkerColors({
+      kBlue+1,
+      kRed+1,
+      kGreen+1,
+      kRed+1,
+      kGreen+1,
+      kMagenta+1
+    });
+    systematics.back().SetAxisTitles("centrality", "v_{1}");
     systematics.back().DrawSubEvents(canvases.back());
-    canvas_name = file_out_name+"_"+systematics_names.at(i)+"_sub_evt.pdf";
+    canvas_name = file_out_name+"_"+systematics_names.at(i)+"_sub_evt.png";
     canvases.back()->Print(canvas_name.data());
     systematics.back().SaveToFile(file_out);
   }

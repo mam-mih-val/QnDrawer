@@ -11,7 +11,8 @@
 class Observed {
 
 private:
-  std::vector<Systematics> systematics;
+  std::string name_;
+  std::vector<Qn::DataContainer<Qn::Stats>> components_;
 
 };
 

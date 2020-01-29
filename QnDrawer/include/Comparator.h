@@ -40,7 +40,7 @@ public:
     AddGraph(graph, graph_title);
   }
   void PutOnCanvas( const std::string& file_name_, const std::vector<std::string>& container_names, const std::vector<std::string>& container_titles ){
-    for( int i=0; i<container_names.size(); i++ ){
+    for( size_t i=0; i<container_names.size(); i++ ){
       PutOnCanvas(file_name_, container_names.at(i), container_titles.at(i));
     }
   }
@@ -58,7 +58,7 @@ public:
     graphs_->Add(graph);
   }
   void PutOnCanvas( std::vector<Qn::DataContainer<Qn::Stats>>& containers, std::vector<std::string> titles ){
-    for(int i=0; i<containers.size(); i++){
+    for(size_t i=0; i<containers.size(); i++){
       PutOnCanvas(containers.at(i), titles.at(i));
     }
   }

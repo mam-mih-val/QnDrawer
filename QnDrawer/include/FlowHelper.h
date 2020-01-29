@@ -53,7 +53,6 @@ public:
   )
   {
     auto arg = GetDataContainerVector(varNames);
-    Qn::DataContainer<Qn::Stats>* ptr{0};
     auto result = lambda(arg);
     heap_.insert(make_pair(resultName, result));
     return result;
