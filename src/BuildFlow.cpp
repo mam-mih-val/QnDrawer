@@ -399,7 +399,29 @@ int main( int argc, char** argv )
       }
     }
   }
-
+  components = {"_XXXX", "_XYYX", "_XYXY", "_XXYY", "_YYXX", "_YXYX", "_YXXY", "_YYYY"};
+  for( auto component : components ) {
+    for (size_t i = 0; i < first_names.size(); ++i) {
+      for (size_t j = 0; j < second_names.size(); ++j) {
+        for( size_t k = 0; k < third_names.size(); ++k ){
+          builder.AddMethod(first_names.at(i) + "_" +
+                                      second_names.at(j) + "_" +
+                                      third_names.at(k) + component +
+                                      "_Sp",
+                            [](std::vector<Qn::DataContainer<Qn::Stats>> corr){
+                              Qn::DataContainer<Qn::Stats> result;
+                              result = Sqrt(corr.at(0)*corr.at(1)/corr.at(2) * corr.at(3)*corr.at(4)/corr.at(5) * corr.at(6)*corr.at(7)/corr.at(8) ) * 2*sqrt(2);
+                              return result;
+                            },
+                            [](std::vector<Qn::DataContainer<Qn::Stats>> corr){
+                Qn::DataContainer<Qn::Stats> result;
+                result = corr.at(0)*8/corr.at(1);
+                return result;
+          });
+        }
+      }
+    }
+  }
   builder.Compute();
 //  builder.Rebin();
   builder.Projection();

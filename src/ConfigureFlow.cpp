@@ -273,6 +273,50 @@ int main(int argv, char** argc){
       }
     }
   }
+  resolution_components = {
+    {"_XXXX", "_XX", "_XX", "_XX"},
+    {"_XYYX", "_YY", "_YY", "_XX"},
+    {"_XYXY", "_YY", "_XX", "_YY"},
+    {"_XXYY", "_XX", "_YY", "_XX"},
+    {"_YYXX", "_YY", "_XX", "_XX"},
+    {"_YXYX", "_XX", "_YY", "_XX"},
+    {"_YXXY", "_XX", "_XX", "_YY"},
+    {"_YYYY", "_YY", "_YY", "_YY"}
+  };
+  for( auto component : resolution_components ) {
+    for (size_t i = 0; i < first_resolutions.size(); ++i) {
+      for (size_t j = 0; j < second_resolutions.size(); ++j) {
+        for( size_t k = 0; k < third_resolutions.size(); ++k ){
+        configurations.emplace_back(first_names.at(i) + "_" +
+                                    second_names.at(j) + "_" + third_names.at(k) + component.at(0) +
+                                    "_Sp");
+        std::vector<std::string> resolution;
+        std::vector<std::string> first_resolution = first_resolutions.at(i);
+        std::for_each(
+            first_resolution.begin(), first_resolution.end(),
+            [component](std::string &str) { str += component.at(1) + "_Sp"; });
+        std::vector<std::string> second_resolution = second_resolutions.at(j);
+        std::for_each(
+            second_resolution.begin(), second_resolution.end(),
+            [component](std::string &str) { str += component.at(2) + "_Sp"; });
+        std::vector<std::string> third_resolution = third_resolutions.at(k);
+        std::for_each(
+            third_resolution.begin(), third_resolution.end(),
+            [component](std::string &str) { str += component.at(3) + "_Sp"; });
+        resolution.insert(resolution.end(), first_resolution.begin(),
+                          first_resolution.end());
+        resolution.insert(resolution.end(), second_resolution.begin(),
+                          second_resolution.end());
+        resolution.insert(resolution.end(), third_resolution.begin(),
+                          third_resolution.end());
+        configurations.back().SetQnQnNames(resolution);
+        configurations.back().SetUnQnNames(
+            {"TracksMdcPt_Fw1_Fw2_Fw3" + component.at(0) + "_Sp"});
+        configurations.back().SetProjectionAxisName("Centrality");
+        }
+      }
+    }
+  }
   file->cd();
   for( auto &configuration : configurations )
     configuration.SaveToFile(file);
