@@ -42,6 +42,8 @@ public:
     std::vector<Qn::DataContainer<Qn::Stats>> values{un_qn_correlations};
     values.push_back(resolution_);
     flow_ = flow_rule_( values );
+    qn_qn_correlations.clear();
+    un_qn_correlations.clear();
   }
   void Rebin( const Qn::Axis& axis ){
     flow_.Rebin(axis);

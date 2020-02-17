@@ -35,7 +35,7 @@ public:
       std::cout << "No such a data container: " << name << std::endl;
       return *ptr;
     }
-    heap_.insert( make_pair(name, *ptr) );
+//    heap_.insert( make_pair(name, *ptr) );
     return *ptr;
   }
   std::vector<Qn::DataContainer<Qn::Stats>> GetDataContainerVector(const std::vector<std::string>& names){

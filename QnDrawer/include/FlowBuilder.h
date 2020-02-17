@@ -26,12 +26,26 @@ public:
     methods_.emplace_back(manager_.MakeMethod(method_name) );
     methods_.back().SetResolutionRule(resolutionRule);
   }
-  void AddMethod(const std::string& method_name,
+  void ComputeMethodFast(const std::string& method_name,
     const std::function<Qn::DataContainer<Qn::Stats>(std::vector<Qn::DataContainer<Qn::Stats>>)>&  resolutionRule,
     const std::function<Qn::DataContainer<Qn::Stats>(std::vector<Qn::DataContainer<Qn::Stats>>)>&  flowRule){
     methods_.emplace_back(manager_.MakeMethod(method_name) );
     methods_.back().SetResolutionRule(resolutionRule);
     methods_.back().SetFlowRule(flowRule);
+    std::cout << "Flow estimation with " << methods_.back().GetName() << std::endl;
+    methods_.back().Compute();
+  }
+  void ComputeMethodRamSaving(const std::string& method_name,
+    const std::function<Qn::DataContainer<Qn::Stats>(std::vector<Qn::DataContainer<Qn::Stats>>)>&  resolutionRule,
+    const std::function<Qn::DataContainer<Qn::Stats>(std::vector<Qn::DataContainer<Qn::Stats>>)>&  flowRule,
+    TFile* file_out){
+    methods_.emplace_back(manager_.MakeMethod(method_name) );
+    methods_.back().SetResolutionRule(resolutionRule);
+    methods_.back().SetFlowRule(flowRule);
+    std::cout << "Flow estimation with " << methods_.back().GetName() << std::endl;
+    methods_.back().Compute();
+    methods_.back().SaveToFile(file_out);
+    methods_.pop_back();
   }
   void Compute(){
     for(auto &method: methods_)
