@@ -28,45 +28,69 @@ int main(int argv, char **argc) {
   std::vector<std::string> backward_names{"MDCb(MDCf,Fws1)", "MDCb(MDCf,FWs2)",
                                           "MDCb(MDCf,FWs3)", "MDCb(FWs1,FWs2)",
                                           "MDCb(FWs1,FWs3)", "MDCb(FWs2,FWs3)"};
+  std::map<std::string, std::string> correlations_names{
+    std::make_pair("<MDCf,MDCb>","TracksMdc_TracksMdc"),
+    std::make_pair("<MDCf,FWs1>","TracksMdc_Fw1"),
+    std::make_pair("<MDCf,FWs2>","TracksMdc_Fw2"),
+    std::make_pair("<MDCf,FWs3>","TracksMdc_Fw3"),
+    std::make_pair("<MDCb,FWs1>","TracksMdc_Fw1"),
+    std::make_pair("<MDCb,FWs2>","TracksMdc_Fw2"),
+    std::make_pair("<MDCb,FWs3>","TracksMdc_Fw3"),
+    std::make_pair("<FWs1,FWs2>","Fw1_Fw2"),
+    std::make_pair("<FWs1,FWs3>","Fw1_Fw3"),
+    std::make_pair("<FWs2,FWs3>","Fw2_Fw3")
+  };
+  std::map<std::string, std::vector<Qn::Axis>> rebin_axis{
+    std::make_pair<std::string, std::vector<Qn::Axis>>( "<MDCf,MDCb>", { {"0_Ycm", 1, -0.5, -0.3}, {"1_Ycm", 1, 0.3, 0.5} }),
+    std::make_pair<std::string, std::vector<Qn::Axis>>( "<MDCf,FWs1>", { {"0_Ycm", 1, 0.3, 0.5} }),
+    std::make_pair<std::string, std::vector<Qn::Axis>>( "<MDCf,FWs2>", { {"0_Ycm", 1, 0.3, 0.5} }),
+    std::make_pair<std::string, std::vector<Qn::Axis>>( "<MDCf,FWs3>", { {"0_Ycm", 1, 0.3, 0.5} }),
+    std::make_pair<std::string, std::vector<Qn::Axis>>( "<MDCb,FWs1>", { {"0_Ycm", 1, -0.5, -0.3} }),
+    std::make_pair<std::string, std::vector<Qn::Axis>>( "<MDCb,FWs2>", { {"0_Ycm", 1, -0.5, -0.3} }),
+    std::make_pair<std::string, std::vector<Qn::Axis>>( "<MDCb,FWs3>", { {"0_Ycm", 1, -0.5, -0.3} }),
+    std::make_pair<std::string, std::vector<Qn::Axis>>( "<FWs1,FWs2>", {}),
+    std::make_pair<std::string, std::vector<Qn::Axis>>( "<FWs1,FWs3>", {}),
+    std::make_pair<std::string, std::vector<Qn::Axis>>( "<FWs2,FWs3>", {})
+  };
   std::vector<std::vector<std::string>> first_resolutions{
-      {"TracksMdc_Fw1", "TracksMdc_Fw1", "TracksMdc_TracksMdc"}, // FWs1(MDCf, MDCb)
-      {"TracksMdc_Fw1", "Fw1_Fw2", "TracksMdc_Fw2"},     // FWs1(MDCf, FWs2)
-      {"TracksMdc_Fw1", "Fw1_Fw3", "TracksMdc_Fw3"},     // FWs1(MDCf, FWs3)
-      {"TracksMdc_Fw1", "Fw1_Fw2", "TracksMdc_Fw2"},     // FWs1(MDCb, FWs2)
-      {"TracksMdc_Fw1", "Fw1_Fw3", "TracksMdc_Fw3"},     // FWs1(MDCb, FWs3)
-      {"Fw1_Fw2", "Fw1_Fw3", "Fw2_Fw3"}          // FWs1(FWs2, FWs3)
+      {"<MDCf,FWs1>", "<MDCb,FWs1>", "<MDCf,MDCb>"}, // FWs1(MDCf, MDCb)
+      {"<MDCf,FWs1>", "<FWs1,FWs2>", "<MDCf,FWs2>"},     // FWs1(MDCf, FWs2)
+      {"<MDCf,FWs1>", "<FWs1,FWs3>", "<MDCf,FWs3>"},     // FWs1(MDCf, FWs3)
+      {"<MDCb,FWs1>", "<FWs1,FWs2>", "<MDCb,FWs2>"},     // FWs1(MDCb, FWs2)
+      {"<MDCb,FWs1>", "<FWs1,FWs3>", "<MDCb,FWs3>"},     // FWs1(MDCb, FWs3)
+      {"<FWs1,FWs2>", "<FWs1,FWs3>", "<FWs2,FWs3>"}      // FWs1(FWs2, FWs3)
   };
   std::vector<std::vector<std::string>> second_resolutions{
-      {"TracksMdc_Fw2", "TracksMdc_Fw2", "TracksMdc_TracksMdc"}, // FWs2(MDCf, MDCb)
-      {"TracksMdc_Fw2", "Fw1_Fw2", "TracksMdc_Fw1"},     // FWs2(MDCf, FWs1)
-      {"TracksMdc_Fw2", "Fw2_Fw3", "TracksMdc_Fw3"},     // FWs2(MDCf, FWs3)
-      {"TracksMdc_Fw2", "Fw1_Fw2", "TracksMdc_Fw1"},     // FWs2(MDCb, FWs1)
-      {"TracksMdc_Fw2", "Fw2_Fw3", "TracksMdc_Fw3"},     // FWs2(MDCb, FWs3)
-      {"Fw1_Fw2", "Fw2_Fw3", "Fw1_Fw3"}          // FWs2(FWs1, FWs3)
+      {"<MDCf,FWs2>", "<MDCb,FWs2>", "<MDCf,MDCb>"},     // FWs2(MDCf, MDCb)
+      {"<MDCf,FWs2>", "<FWs1,FWs2>", "<MDCf,FWs1>"},     // FWs2(MDCf, FWs1)
+      {"<MDCf,FWs2>", "<FWs2,FWs3>", "<MDCf,FWs3>"},     // FWs2(MDCf, FWs3)
+      {"<MDCb,FWs2>", "<FWs1,FWs2>", "<MDCb,FWs1>"},     // FWs2(MDCb, FWs1)
+      {"<MDCb,FWs2>", "<FWs2,FWs3>", "<MDCb,FWs3>"},     // FWs2(MDCb, FWs3)
+      {"<FWs1,FWs2>", "<FWs2,FWs3>", "<FWs1,FWs3>"}      // FWs2(FWs1, FWs3)
   };
   std::vector<std::vector<std::string>> third_resolutions{
-      {"TracksMdc_Fw3", "TracksMdc_Fw3", "TracksMdc_TracksMdc"}, // FWs3(MDCf, MDCb)
-      {"TracksMdc_Fw3", "Fw1_Fw3", "TracksMdc_Fw1"},     // FWs3(MDCf, FWs1)
-      {"TracksMdc_Fw3", "Fw2_Fw3", "TracksMdc_Fw2"},     // FWs3(MDCf, FWs2)
-      {"TracksMdc_Fw3", "Fw1_Fw3", "TracksMdc_Fw1"},     // FWs3(MDCb, FWs1)
-      {"TracksMdc_Fw3", "Fw2_Fw3", "TracksMdc_Fw2"},     // FWs3(MDCb, FWs2)
-      {"Fw1_Fw3", "Fw2_Fw3", "Fw1_Fw2"}          // FWs3(FWs1, FWs2)
+      {"<MDCf,FWs3>", "<MDCb,FWs3>", "<MDCf,MDCb>"},     // FWs3(MDCf, MDCb)
+      {"<MDCf,FWs3>", "<FWs1,FWs3>", "<MDCf,FWs1>"},     // FWs3(MDCf, FWs1)
+      {"<MDCf,FWs3>", "<FWs2,FWs3>", "<MDCf,FWs2>"},     // FWs3(MDCf, FWs2)
+      {"<MDCb,FWs3>", "<FWs1,FWs3>", "<MDCb,FWs1>"},     // FWs3(MDCb, FWs1)
+      {"<MDCb,FWs3>", "<FWs2,FWs3>", "<MDCb,FWs2>"},     // FWs3(MDCb, FWs2)
+      {"<FWs1,FWs3>", "<FWs2,FWs3>", "<FWs1,FWs2>"}      // FWs3(FWs1, FWs2)
   };
   std::vector<std::vector<std::string>> forward_resolutions{
-      {"TracksMdc_TracksMdc", "TracksMdc_Fw1", "TracksMdc_Fw1"}, // MDCf(MDCb,FWs1)
-      {"TracksMdc_TracksMdc", "TracksMdc_Fw2", "TracksMdc_Fw2"}, // MDCf(MDCb,FWs2)
-      {"TracksMdc_TracksMdc", "TracksMdc_Fw3", "TracksMdc_Fw3"}, // MDCf(MDCb,FWs3)
-      {"TracksMdc_Fw1", "TracksMdc_Fw2", "Fw1_Fw2"},     // MDCf(FWs1,FWs2)
-      {"TracksMdc_Fw1", "TracksMdc_Fw3", "Fw1_Fw3"},     // MDCf(FWs1,FWs3)
-      {"TracksMdc_Fw2", "TracksMdc_Fw3", "Fw2_Fw3"}      // MDCf(FWs2,FWs3)
+      {"<MDCf,FWs1>", "<MDCf,MDCb>", "<MDCb,FWs1>"},      // MDCf(MDCb,FWs1)
+      {"<MDCf,FWs2>", "<MDCf,MDCb>", "<MDCb,FWs2>"},      // MDCf(MDCb,FWs2)
+      {"<MDCf,FWs3>", "<MDCf,MDCb>", "<MDCb,FWs3>"},      // MDCf(MDCb,FWs3)
+      {"<MDCf,FWs1>", "<MDCf,FWs2>", "<FWs1,FWs2>"},      // MDCf(FWs1,FWs2)
+      {"<MDCf,FWs1>", "<MDCf,FWs3>", "<FWs1,FWs3>"},      // MDCf(FWs1,FWs3)
+      {"<MDCf,FWs2>", "<MDCf,FWs3>", "<FWs2,FWs3>"}       // MDCf(FWs2,FWs3)
   };
   std::vector<std::vector<std::string>> backward_resolutions{
-      {"TracksMdc_TracksMdc", "TracksMdc_Fw1", "TracksMdc_Fw1"}, // MDCb(MDCf,FWs1)
-      {"TracksMdc_TracksMdc", "TracksMdc_Fw2", "TracksMdc_Fw2"}, // MDCb(MDCf,FWs2)
-      {"TracksMdc_TracksMdc", "TracksMdc_Fw3", "TracksMdc_Fw3"}, // MDCb(MDCf,FWs3)
-      {"TracksMdc_Fw1", "TracksMdc_Fw2", "Fw1_Fw2"},     // MDCb(FWs1,FWs2)
-      {"TracksMdc_Fw1", "TracksMdc_Fw3", "Fw1_Fw3"},     // MDCb(FWs1,FWs3)
-      {"TracksMdc_Fw2", "TracksMdc_Fw3", "Fw2_Fw3"}      // MDCb(FWs2,FWs3)
+      {"<MDCb,FWs1>", "<MDCf,MDCb>", "<MDCf,FWs1>"},      // MDCb(MDCf,FWs1)
+      {"<MDCb,FWs2>", "<MDCf,MDCb>", "<MDCf,FWs2>"}, // MDCb(MDCf,FWs2)
+      {"<MDCb,FWs3>", "<MDCf,MDCb>", "<MDCf,FWs3>"}, // MDCb(MDCf,FWs3)
+      {"<MDCb,FWs1>", "<MDCb,FWs2>", "<FWs1,FWs2>"},     // MDCb(FWs1,FWs2)
+      {"<MDCb,FWs1>", "<MDCb,FWs3>", "<FWs1,FWs3>"},     // MDCb(FWs1,FWs3)
+      {"<MDCb,FWs2>", "<MDCb,FWs3>", "<FWs2,FWs3>"}      // MDCb(FWs2,FWs3)
   };
   for(auto component : components){
     configurations.emplace_back("<MDCf,MDCb>(FWs1,FWs3)"+component);
@@ -107,56 +131,76 @@ int main(int argv, char **argc) {
   }
   // ******************************** Method of 3 Sub-Events in MDC+FW
   // ******************************** //
-  for (auto component : components) {
+  for (const auto& component : components) {
     for(size_t i=0; i<first_names.size(); ++i){
       configurations.emplace_back(first_names.at(i) + component +"_Sp");
       std::vector<std::string> resolution = first_resolutions.at(i);
-      std::for_each(
-          resolution.begin(), resolution.end(),
-          [component](std::string &str) { str += component + "_Sp"; });
-      configurations.back().SetQnQnNames(resolution);
-      configurations.back().SetUnQnNames(
-          {"TracksMdc_Fw1" + component + "_Sp"});
+      std::vector<std::string> qn_qn_correlations;
+      std::vector<std::vector<Qn::Axis>> qn_qn_rebin_axis;
+      qn_qn_correlations.reserve(resolution.size());
+      for(const auto& correlation : resolution){
+        qn_qn_correlations.push_back(correlations_names.at(correlation)+component+"_Sp");
+        qn_qn_rebin_axis.push_back(rebin_axis.at(correlation));
+      }
+      configurations.back().SetQnQnNames(qn_qn_correlations);
+      configurations.back().SetQnQnRebinAxis(qn_qn_rebin_axis);
+      configurations.back().SetUnQnNames({"TracksMdc_Fw1" + component + "_Sp"});
     }
     for(size_t i=0; i<second_names.size(); ++i){
       configurations.emplace_back(second_names.at(i) + component +"_Sp");
       std::vector<std::string> resolution = second_resolutions.at(i);
-      std::for_each(
-          resolution.begin(), resolution.end(),
-          [component](std::string &str) { str += component + "_Sp"; });
-      configurations.back().SetQnQnNames(resolution);
-      configurations.back().SetUnQnNames(
-          {"TracksMdc_Fw2" + component + "_Sp"});
+      std::vector<std::string> qn_qn_correlations;
+      std::vector<std::vector<Qn::Axis>> qn_qn_rebin_axis;
+      qn_qn_correlations.reserve(resolution.size());
+      for(const auto& correlation : resolution){
+        qn_qn_correlations.push_back(correlations_names.at(correlation)+component+"_Sp");
+        qn_qn_rebin_axis.push_back(rebin_axis.at(correlation));
+      }
+      configurations.back().SetQnQnNames(qn_qn_correlations);
+      configurations.back().SetQnQnRebinAxis(qn_qn_rebin_axis);
+      configurations.back().SetUnQnNames({"TracksMdc_Fw2" + component + "_Sp"});
     }
     for(size_t i=0; i<third_names.size(); ++i){
       configurations.emplace_back(third_names.at(i) + component +"_Sp");
       std::vector<std::string> resolution = third_resolutions.at(i);
-      std::for_each(
-          resolution.begin(), resolution.end(),
-          [component](std::string &str) { str += component + "_Sp"; });
-      configurations.back().SetQnQnNames(resolution);
-      configurations.back().SetUnQnNames(
-          {"TracksMdc_Fw3" + component + "_Sp"});
+      std::vector<std::string> qn_qn_correlations;
+      std::vector<std::vector<Qn::Axis>> qn_qn_rebin_axis;
+      qn_qn_correlations.reserve(resolution.size());
+      for(const auto& correlation : resolution){
+        qn_qn_correlations.push_back(correlations_names.at(correlation)+component+"_Sp");
+        qn_qn_rebin_axis.push_back(rebin_axis.at(correlation));
+      }
+      configurations.back().SetQnQnNames(qn_qn_correlations);
+      configurations.back().SetQnQnRebinAxis(qn_qn_rebin_axis);
+      configurations.back().SetUnQnNames({"TracksMdc_Fw3" + component + "_Sp"});
     }
     for(size_t i=0; i<forward_names.size(); ++i){
       configurations.emplace_back(forward_names.at(i) + component +"_Sp");
       std::vector<std::string> resolution = forward_resolutions.at(i);
-      std::for_each(
-          resolution.begin(), resolution.end(),
-          [component](std::string &str) { str += component + "_Sp"; });
-      configurations.back().SetQnQnNames(resolution);
-      configurations.back().SetUnQnNames(
-          {"TracksMdc_TracksMdc" + component + "_Sp"});
+      std::vector<std::string> qn_qn_correlations;
+      std::vector<std::vector<Qn::Axis>> qn_qn_rebin_axis;
+      qn_qn_correlations.reserve(resolution.size());
+      for(const auto& correlation : resolution){
+        qn_qn_correlations.push_back(correlations_names.at(correlation)+component+"_Sp");
+        qn_qn_rebin_axis.push_back(rebin_axis.at(correlation));
+      }
+      configurations.back().SetQnQnNames(qn_qn_correlations);
+      configurations.back().SetQnQnRebinAxis(qn_qn_rebin_axis);
+      configurations.back().SetUnQnNames({"TracksMdc_TracksMdc" + component + "_Sp"});
     }
     for(size_t i=0; i<backward_names.size(); ++i){
       configurations.emplace_back(backward_names.at(i) + component +"_Sp");
       std::vector<std::string> resolution = backward_resolutions.at(i);
-      std::for_each(
-          resolution.begin(), resolution.end(),
-          [component](std::string &str) { str += component + "_Sp"; });
-      configurations.back().SetQnQnNames(resolution);
-      configurations.back().SetUnQnNames(
-          {"TracksMdc_TracksMdc" + component + "_Sp"});
+      std::vector<std::string> qn_qn_correlations;
+      std::vector<std::vector<Qn::Axis>> qn_qn_rebin_axis;
+      qn_qn_correlations.reserve(resolution.size());
+      for(const auto& correlation : resolution){
+        qn_qn_correlations.push_back(correlations_names.at(correlation)+component+"_Sp");
+        qn_qn_rebin_axis.push_back(rebin_axis.at(correlation));
+      }
+      configurations.back().SetQnQnNames(qn_qn_correlations);
+      configurations.back().SetQnQnRebinAxis(qn_qn_rebin_axis);
+      configurations.back().SetUnQnNames({"TracksMdc_TracksMdc" + component + "_Sp"});
     }
   }
   std::vector<std::vector<std::string>> resolution_components = {

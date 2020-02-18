@@ -40,18 +40,19 @@ public:
   const std::vector<Qn::Axis> &GetRebinAxis(const std::string& config_name) const{
     FlowConfiguration* config;
     config_file_->GetObject(config_name.data(), config);
-    return config->GetRebinAxis();
+//    return config->GetRebinAxis();
   }
-  const std::string &GetProjectionAxisName(const std::string& config_name) const{
+  const std::vector<std::string> &GetProjectionAxisName(const std::string& config_name) const{
     FlowConfiguration* config;
     config_file_->GetObject(config_name.data(), config);
-    return config->GetProjectionAxisName();
+    return config->GetFlowProjectionAxisNames();
   }
   Method MakeMethod( const std::string& config_name ){
     FlowConfiguration* config;
     config_file_->GetObject(config_name.data(), config);
     Method method(config_name);
     method.SetQnQnCorrelations( GetQnQnContainers(config_name) );
+    method.SetQnQnRebinAxis( config->GetQnQnRebinAxis() );
     method.SetUnQnCorrelations( GetUnQnContainers(config_name) );
     return method;
   }

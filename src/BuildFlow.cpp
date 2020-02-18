@@ -28,6 +28,14 @@ int main( int argc, char** argv )
   std::vector<std::string> first_names{"FWs1(MDCf,MDCb)", "FWs1(MDCf,FWs2)",
                                        "FWs1(MDCf,FWs3)", "FWs1(MDCb,FWs2)",
                                        "FWs1(MDCb,FWs3)", "FWs1(FWs2,FWs3)"};
+  std::vector<std::vector<Qn::Axis>> first_axis{
+  	{{"0_Ycm", 2, -0.5, -0.3}, {"1_Ycm", 2, 0.3, 0.5}},
+  	{{"0_Ycm", 2, 0.3, 0.5}},
+  	{{"0_Ycm", 2, 0.3, 0.5}},
+  	{{"0_Ycm", 2, -0.5, 0.3}},
+  	{{"0_Ycm", 2, -0.5, 0.3}},
+  	{}
+  };
   std::vector<std::string> second_names{"FWs2(MDCf,MDCb)", "FWs2(MDCf,FWs1)",
                                         "FWs2(MDCf,FWs3)", "FWs2(MDCb,FWs1)",
                                         "FWs2(MDCb,FWs3)", "FWs2(FWs1,FWs3)"};
@@ -47,7 +55,7 @@ int main( int argc, char** argv )
   std::vector<std::string> methods{"_Sp"};
 
   // ******************************** Method of 3 Sub-Events in MDC+FW ******************************** //
-  for (auto component : components) {
+  for (const auto& component : components) {
     for(const auto & first_name : first_names){
       builder.ComputeMethodRamSaving(
           first_name + component + "_Sp",
@@ -90,7 +98,7 @@ int main( int argc, char** argv )
             Qn::DataContainer<Qn::Stats> result;
             result = corr.at(0) * 2 / corr.at(1);
             return result;
-          }, 
+          },
           file_out);
     }
     for(const auto & forward_name : forward_names){
@@ -104,11 +112,13 @@ int main( int argc, char** argv )
           [](std::vector<Qn::DataContainer<Qn::Stats>> corr) {
             Qn::DataContainer<Qn::Stats> result;
             result = corr.at(0) * 2 / corr.at(1);
+            result = result.Rebin({"1_Ycm", 1, 0.3, 0.5});
+            result = result.Projection({"0_Ycm", "Centrality"});
             return result;
-          }, 
+          },
           file_out);
     }
-    for(const auto & backward_name : backward_names){
+    for(const auto &backward_name : backward_names){
       builder.ComputeMethodRamSaving(
           backward_name + component + "_Sp",
           [](std::vector<Qn::DataContainer<Qn::Stats>> corr) {
@@ -118,11 +128,14 @@ int main( int argc, char** argv )
           },
           [](std::vector<Qn::DataContainer<Qn::Stats>> corr) {
             Qn::DataContainer<Qn::Stats> result;
-            result = corr.at(0) * 2 / corr.at(1);
+            result = corr.at(0) * -2 / corr.at(1);
+            result = result.Rebin({"1_Ycm", 1, 0.3, 0.5});
+            result = result.Projection({"0_Ycm", "Centrality"});
             return result;
-          }, 
+          },
           file_out);
     }
+
   }
   /*
   // ******************************** Second Harmonics ******************************** //

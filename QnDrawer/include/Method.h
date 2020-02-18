@@ -26,9 +26,13 @@ public:
     flow_rule_ = flowRule;
   }
   void SetQnQnCorrelations(const std::vector<Qn::DataContainer<Qn::Stats>> &qnQnCorrelations) {
-    qn_qn_correlations = qnQnCorrelations;
+    qn_qn_correlations_ = qnQnCorrelations;
   }
-  void SetUnQnCorrelations(const std::vector<Qn::DataContainer<Qn::Stats>> &unQnCorrelations) { un_qn_correlations = unQnCorrelations; }
+  void SetQnQnRebinAxis(const std::vector<std::vector<Qn::Axis>> &qnQnRebinAxis) {
+    qn_qn_rebin_axis_ = qnQnRebinAxis;
+  }
+  void SetUnQnCorrelations(const std::vector<Qn::DataContainer<Qn::Stats>> &unQnCorrelations) {
+    un_qn_correlations_ = unQnCorrelations; }
   void Compute(){
     if(!resolution_rule_){
       std::cout << "Empty resolution rule" << std::endl;
@@ -38,12 +42,18 @@ public:
       std::cout<< "Empty resolution rule" << std::endl;
       return;
     }
-    resolution_ = resolution_rule_( qn_qn_correlations );
-    std::vector<Qn::DataContainer<Qn::Stats>> values{un_qn_correlations};
+    for(size_t i=0; i< qn_qn_correlations_.size(); ++i){
+      for( const auto& axis : qn_qn_rebin_axis_.at(i) )
+        qn_qn_correlations_.at(i) = qn_qn_correlations_.at(i).Rebin(axis);
+      qn_qn_correlations_.at(i) = qn_qn_correlations_.at(i).Projection({"Centrality"});
+    }
+    resolution_ = resolution_rule_(qn_qn_correlations_);
+    std::vector<Qn::DataContainer<Qn::Stats>> values{un_qn_correlations_};
     values.push_back(resolution_);
+
     flow_ = flow_rule_( values );
-    qn_qn_correlations.clear();
-    un_qn_correlations.clear();
+    qn_qn_correlations_.clear();
+    un_qn_correlations_.clear();
   }
   void Rebin( const Qn::Axis& axis ){
     flow_.Rebin(axis);
@@ -52,8 +62,8 @@ public:
     for( auto axis : axis_vec )
       flow_ = flow_.Rebin(axis);
   }
-  void Projection( const std::string& axis_name ){
-    flow_ = flow_.Projection({axis_name});
+  void Projection( const std::vector<std::string>& axis_name ){
+    flow_ = flow_.Projection(axis_name);
   }
   void SaveGraphsToFile(TFile* file){
     file->cd();
@@ -85,8 +95,10 @@ protected:
   };
   Qn::DataContainer<Qn::Stats> resolution_;
   Qn::DataContainer<Qn::Stats> flow_;
-  std::vector<Qn::DataContainer<Qn::Stats>> qn_qn_correlations;
-  std::vector<Qn::DataContainer<Qn::Stats>> un_qn_correlations;
+  std::vector<std::vector<Qn::Axis>> un_qn_rebin_axis_;
+  std::vector<std::vector<Qn::Axis>> qn_qn_rebin_axis_;
+  std::vector<Qn::DataContainer<Qn::Stats>> qn_qn_correlations_;
+  std::vector<Qn::DataContainer<Qn::Stats>> un_qn_correlations_;
   ClassDef(Method, 1);
 };
 

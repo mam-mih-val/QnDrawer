@@ -28,46 +28,41 @@ public:
   void SetUnQnNames(const std::vector<std::string> &unQnNames) {
     un_qn_names_ = unQnNames;
   }
-  const std::vector<std::string> &GetComponentsNames() const {
-    return components_names_;
+  const std::vector<std::string> &GetFlowProjectionAxisNames() const {
+    return flow_projection_axis_names_;
   }
-  void SetComponentsNames(const std::vector<std::string> &componentsNames) {
-    components_names_ = componentsNames;
+  void
+  SetFlowProjectionAxisNames(const std::vector<std::string> &projectionAxisNames) {
+    flow_projection_axis_names_ = projectionAxisNames;
   }
-  const std::string &GetProjectionAxisName() const {
-    return projection_axis_name_;
+  const std::vector<std::vector<Qn::Axis>> &GetFlowRebinAxis() const {
+    return un_un_rebin_axis_;
   }
-  void SetProjectionAxisName(const std::string &projectionAxisName) {
-    projection_axis_name_ = projectionAxisName;
-  }
-  const std::vector<Qn::Axis> &GetRebinAxis() const { return rebin_axis_; }
-  void SetRebinAxis(const std::vector<Qn::Axis> &rebinAxis) {
-    rebin_axis_ = rebinAxis;
-  }
-  const std::vector<std::vector<ushort>> &GetResolutionIndicesMatrix() const {
-    return resolution_indices_matrix_;
-  }
-  void SetResolutionIndicesMatrix(
-      const std::vector<std::vector<ushort>> &resolutionIndicesMatrix) {
-    resolution_indices_matrix_ = resolutionIndicesMatrix;
+  void
+  SetFlowRebinAxis(const std::vector<std::vector<Qn::Axis>> &flowRebinAxis) {
+    un_un_rebin_axis_ = flowRebinAxis;
   }
   void SaveToFile( TFile* file ){
     file->cd();
     this->Write(name_.data());
   }
-  ushort GetNumberOfSe() const { return number_of_se_; }
-  void SetNumberOfSe(ushort numberOfSe) { number_of_se_ = numberOfSe; }
+  const std::vector<std::vector<Qn::Axis>> &GetQnQnRebinAxis() const {
+    return qn_qn_rebin_axis_;
+  }
+  void
+  SetQnQnRebinAxis(const std::vector<std::vector<Qn::Axis>> &qnQnRebinAxis) {
+    qn_qn_rebin_axis_ = qnQnRebinAxis;
+  }
+
 
 private:
   std::string name_;
-  ushort number_of_se_;
   std::vector<std::string> qn_qn_names_;
   std::vector<std::string> un_qn_names_;
-  std::vector<std::string> components_names_;
-  std::vector<std::vector<ushort>> resolution_indices_matrix_;
 
-  std::string projection_axis_name_;
-  std::vector<Qn::Axis> rebin_axis_;
+  std::vector<std::string> flow_projection_axis_names_;
+  std::vector<std::vector<Qn::Axis>> un_un_rebin_axis_;
+  std::vector<std::vector<Qn::Axis>> qn_qn_rebin_axis_;
   ClassDefOverride(FlowConfiguration, 1)
 };
 

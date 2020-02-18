@@ -23,7 +23,7 @@ public:
   virtual ~FlowHelper() = default;
   void SetFile(const std::string& fileName) { file_ = TFile::Open(fileName.data()); }
   void SetFile(TFile* file) { file_ = file; }
-  Qn::DataContainer<Qn::Stats>& GetDataContainer(const std::string& name){
+  Qn::DataContainer<Qn::Stats> &GetDataContainer(const std::string& name){
     Qn::DataContainer<Qn::Stats>* ptr{nullptr};
     if( heap_.count(name) !=0 )
       return heap_.at(name);
@@ -54,7 +54,7 @@ public:
   {
     auto arg = GetDataContainerVector(varNames);
     auto result = lambda(arg);
-    heap_.insert(make_pair(resultName, result));
+//    heap_.insert(make_pair(resultName, result));
     return result;
   }
 
@@ -74,7 +74,7 @@ public:
     for( const auto& name : inputName )
       array->AddLast( (Qn::DataContainer<Qn::Stats>*) &(this->GetDataContainer(name)) );
     out.Merge( (TList*) array );
-    heap_.insert(make_pair(outName, out));
+//    heap_.insert(make_pair(outName, out));
     return out;
   }
   Qn::DataContainer<Qn::Stats> Ratio( std::vector<std::string> corr, std::string resultName ){
