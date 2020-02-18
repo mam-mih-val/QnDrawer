@@ -129,7 +129,7 @@ int main( int argc, char** argv )
           [](std::vector<Qn::DataContainer<Qn::Stats>> corr) {
             Qn::DataContainer<Qn::Stats> result;
             result = corr.at(0) * -2 / corr.at(1);
-            result = result.Rebin({"1_Ycm", 1, 0.3, 0.5});
+            result = result.Rebin({"1_Ycm", 1, -0.5, -0.3});
             result = result.Projection({"0_Ycm", "Centrality"});
             return result;
           },

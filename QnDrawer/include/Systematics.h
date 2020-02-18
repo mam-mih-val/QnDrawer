@@ -29,9 +29,8 @@ public:
       for (const auto &component : componentsNames)
         for (const auto &sub_event : subEventsNames)
           for_merge.push_back(prefix + sub_event + component);
-      flow_helper_.Merge(for_merge, "merged");
-      averaged_ = flow_helper_.MakeComputations({"merged"}, rebin_projection_,
-                                                "averaged");
+      averaged_ = flow_helper_.Merge(for_merge, "merged");
+      averaged_ = rebin_projection_({averaged_});
     }
     for (const auto &sub_event : subEventsNames) {
       std::vector<std::string> for_merge;
@@ -40,10 +39,8 @@ public:
         for_merge.push_back(prefix + sub_event + component);
       }
       flow_helper_.Merge(for_merge, sub_event + "_merged");
-      sub_events_.push_back(flow_helper_.MakeComputations(
-          {sub_event + "_merged"}, rebin_projection_, sub_event));
-      ratio_sub_events_.push_back(
-          flow_helper_.Ratio({sub_event, "averaged"}, "ratio_" + sub_event));
+      sub_events_.push_back(flow_helper_.Merge(for_merge, sub_event + "_merged"));
+      sub_events_.back() = rebin_projection_({sub_events_.back()});
     }
     for (const auto &component : componentsNames) {
       std::vector<std::string> for_merge;
@@ -51,12 +48,10 @@ public:
       for (const auto &sub_event : subEventsNames) {
         for_merge.push_back(prefix + sub_event + component);
       }
-      flow_helper_.Merge(for_merge, component + "_merged");
-      components_.push_back(flow_helper_.MakeComputations(
-          {component + "_merged"}, rebin_projection_, component));
-      ratio_components_.push_back(
-          flow_helper_.Ratio({component, "averaged" }, "ratio_" + component));
+      components_.push_back(flow_helper_.Merge(for_merge, component + "_merged"));
+      components_.back() = rebin_projection_({components_.back()});
     }
+    RebuildRatios();
   }
   void RebuildRatios() {
     ratio_sub_events_.clear();
@@ -187,15 +182,18 @@ public:
     stack_title = ";" + x_axis_title_;
     auto ratio_pad = new TPad(pad_name.data(), "ratio", 0.0, 0.0, 1.0, .35);
     auto ratio_stack = new TMultiGraph("ratio", stack_title.data());
-    auto line = new TF1("line", "1", 0, 50);
+    TF1* line;
+    if( x_axis_range_.size() == 2 )
+      line = new TF1("line", "1", x_axis_range_.at(0), x_axis_range_.at(1));
+    else
+      line = new TF1("line", "1", -100, 100);
     TGraphAsymmErrors *graph;
     averaged_.SetSetting(Qn::Stats::Settings::CORRELATEDERRORS);
     graph = Qn::DataContainerHelper::ToTGraph(averaged_);
     graph->SetTitle("Default");
     graph->SetMarkerSize(1.4);
     result_stack->Add(graph);
-    auto averaged_ratio =
-        flow_helper_.Ratio({"averaged", "averaged"}, "ref_ratio");
+    auto averaged_ratio = averaged_/averaged_;
     averaged_ratio.SetSetting(Qn::Stats::Settings::CORRELATEDERRORS);
     graph = Qn::DataContainerHelper::ToTGraph(averaged_ratio);
     graph->SetMarkerSize(1.4);
@@ -244,6 +242,8 @@ public:
       result_stack->GetHistogram()->SetMinimum(result_plot_range_.at(0));
       result_stack->GetHistogram()->SetMaximum(result_plot_range_.at(1));
     }
+    if(x_axis_range_.size() == 2)
+      result_stack->GetXaxis()->SetLimits(x_axis_range_.at(0), x_axis_range_.at(1));
     ratio_pad->cd();
     ratio_pad->SetTopMargin(0);
     ratio_pad->SetBottomMargin(0.25);
@@ -258,6 +258,8 @@ public:
       ratio_stack->GetHistogram()->SetMinimum(ratio_plot_range_.at(0));
       ratio_stack->GetHistogram()->SetMaximum(ratio_plot_range_.at(1));
     }
+    if(x_axis_range_.size() == 2)
+      ratio_stack->GetXaxis()->SetLimits(x_axis_range_.at(0), x_axis_range_.at(1));
     canvas->cd();
     result_pad->Draw();
     ratio_pad->Draw();
@@ -298,6 +300,9 @@ public:
   void SetMarkerColors(const std::vector<int> &markerColors) {
     marker_colors_ = markerColors;
   }
+  void SetXAxisRange(const std::vector<float> &xAxisRange) {
+    x_axis_range_ = xAxisRange;
+  }
 
 private:
   std::string name_;
@@ -322,6 +327,7 @@ private:
   TGraph *compare_graph_{nullptr};
   std::vector<int> marker_styles_{};
   std::vector<int> marker_colors_{};
+  std::vector<float> x_axis_range_{};
   std::vector<float> result_plot_range_{0.0, 0.0};
   std::vector<float> ratio_plot_range_{0.0, 0.0};
 };

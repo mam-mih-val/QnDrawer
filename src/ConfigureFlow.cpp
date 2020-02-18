@@ -86,8 +86,8 @@ int main(int argv, char **argc) {
   };
   std::vector<std::vector<std::string>> backward_resolutions{
       {"<MDCb,FWs1>", "<MDCf,MDCb>", "<MDCf,FWs1>"},      // MDCb(MDCf,FWs1)
-      {"<MDCb,FWs2>", "<MDCf,MDCb>", "<MDCf,FWs2>"}, // MDCb(MDCf,FWs2)
-      {"<MDCb,FWs3>", "<MDCf,MDCb>", "<MDCf,FWs3>"}, // MDCb(MDCf,FWs3)
+      {"<MDCb,FWs2>", "<MDCf,MDCb>", "<MDCf,FWs2>"},      // MDCb(MDCf,FWs2)
+      {"<MDCb,FWs3>", "<MDCf,MDCb>", "<MDCf,FWs3>"},      // MDCb(MDCf,FWs3)
       {"<MDCb,FWs1>", "<MDCb,FWs2>", "<FWs1,FWs2>"},     // MDCb(FWs1,FWs2)
       {"<MDCb,FWs1>", "<MDCb,FWs3>", "<FWs1,FWs3>"},     // MDCb(FWs1,FWs3)
       {"<MDCb,FWs2>", "<MDCb,FWs3>", "<FWs2,FWs3>"}      // MDCb(FWs2,FWs3)
