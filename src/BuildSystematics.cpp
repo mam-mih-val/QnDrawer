@@ -36,7 +36,7 @@ void BuildDirected(const std::string& file_in_name, const std::string& file_out_
   auto rebin_proj = [](std::vector<Qn::DataContainer<Qn::Stats>> container){
     container.back() = container.back().Rebin({"0_Ycm", 1, -0.6, -0.5});
     container.back() = container.back().Projection({"Centrality"});
-    return container.back();
+    return container.back()*(-1);
   };
   Systematics default_value("FW-directed");
   default_value.GetFlowHelper().SetFile(file_in);
@@ -51,12 +51,12 @@ void BuildDirected(const std::string& file_in_name, const std::string& file_out_
     systematics.emplace_back(systematics_names.at(i));
     systematics.back().SetRebinProjection(rebin_proj);
     systematics.back().SetXAxisRange({0., 50.});
-    systematics.back().SetResultPlotRange({-0.399, -0.249});
+    systematics.back().SetResultPlotRange({0.229, 0.349});
     systematics.back().SetRatioPlotRange({0.71, 1.29});
     systematics.back().GetFlowHelper().SetFile(file_in);
     systematics.back().Init(prefix, sub_events_names.at(i), components_names.at(i));
     std::string canvas_name{systematics_names.at(i)+"_comp"};
-    canvases.push_back( new TCanvas(canvas_name.data(), "", 750, 1000) );
+    canvases.push_back( new TCanvas(canvas_name.data(), "", 1000, 1200) );
     systematics.back().SetDefault( default_value.GetAveraged() );
     systematics.back().SetSubEventsNames(sub_events_names.at(i));
     systematics.back().SetMarkerStyles({
@@ -75,6 +75,7 @@ void BuildDirected(const std::string& file_in_name, const std::string& file_out_
                                            kGreen+1,
                                            kMagenta+1
                                        });
+    systematics.back().SetDefaultTitle("FWs1,3(MDCf,b, FWs3,1)");
     systematics.back().SetAxisTitles("centrality (%)", "v_{1}");
     systematics.back().DrawSubEvents(canvases.back());
     canvas_name = file_out_name+"_"+systematics_names.at(i)+"_sub_evt.pdf";

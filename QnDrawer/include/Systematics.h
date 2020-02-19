@@ -10,6 +10,7 @@
 #include <DataContainer.h>
 #include <Stats.h>
 #include <TF1.h>
+#include <TLegend.h>
 #include <TMultiGraph.h>
 #include <utility>
 #include <vector>
@@ -174,6 +175,8 @@ public:
     gStyle->SetTitleSize(0.04,"Y");
     gStyle->SetTitleOffset(1.6,"Y");
     gStyle->SetTitleOffset(1.0,"X");
+    auto legend = new TLegend(0.35, 0.0, 0.7, 0.35);
+    legend->SetBorderSize(0);
     std::string pad_name = name_ + "_result";
     auto result_pad = new TPad(pad_name.data(), "result", 0.0, 0.35, 1.0, 1.0);
     auto stack_title = ";" + x_axis_title_ + ";" + y_axis_title_;
@@ -191,12 +194,15 @@ public:
     averaged_.SetSetting(Qn::Stats::Settings::CORRELATEDERRORS);
     graph = Qn::DataContainerHelper::ToTGraph(averaged_);
     graph->SetTitle("Default");
-    graph->SetMarkerSize(1.4);
+    if( !default_title_.empty() )
+      graph->SetTitle(default_title_.data() );
+    graph->SetMarkerSize(1.6);
+    graph->SetLineWidth(2);
     result_stack->Add(graph);
     auto averaged_ratio = averaged_/averaged_;
     averaged_ratio.SetSetting(Qn::Stats::Settings::CORRELATEDERRORS);
     graph = Qn::DataContainerHelper::ToTGraph(averaged_ratio);
-    graph->SetMarkerSize(1.4);
+    graph->SetMarkerSize(1.6);
     graph->SetMarkerColor(kBlack);
     graph->SetLineColor(kBlack);
     ratio_stack->Add(graph);
@@ -204,18 +210,21 @@ public:
       results.at(i).SetSetting(Qn::Stats::Settings::CORRELATEDERRORS);
       graph = Qn::DataContainerHelper::ToTGraph(results.at(i));
       graph->SetTitle(results_names.at(i).data());
-      graph->SetMarkerSize(1.4);
+      graph->SetMarkerSize(1.6);
       if( i<marker_styles_.size() )
         graph->SetMarkerStyle(marker_styles_.at(i));
       if( i<marker_colors_.size() ){
         graph->SetMarkerColor(marker_colors_.at(i));
         graph->SetLineColor(marker_colors_.at(i));
       }
+      graph->SetLineWidth(2);
       result_stack->Add(graph);
+      legend->AddEntry(graph, graph->GetTitle(), "P");
       ratios.at(i).SetSetting(Qn::Stats::Settings::CORRELATEDERRORS);
       graph = Qn::DataContainerHelper::ToTGraph(ratios.at(i));
       graph->SetMarkerStyle(marker_styles_.at(i));
-      graph->SetMarkerSize(1.4);
+      graph->SetMarkerSize(1.6);
+      graph->SetLineWidth(3);
       ratio_stack->Add(graph);
       if( i<marker_styles_.size() )
         graph->SetMarkerStyle(marker_styles_.at(i));
@@ -230,13 +239,14 @@ public:
     if(marker_colors_.size()==0)
       result_stack->Draw("AP+PMC+PLC");
     else
-      result_stack->Draw("AP");
+      result_stack->Draw("AP+E5");
     if (compare_graph_) {
       compare_graph_->SetMarkerColor(kBlack);
       compare_graph_->SetLineColor(kBlack);
       compare_graph_->Draw("same");
     }
-    result_pad->BuildLegend();
+//    result_pad->BuildLegend();
+    legend->Draw();
     result_stack->GetHistogram()->SetLabelSize(0.035, "Y");
     if (result_plot_range_.at(0) != result_plot_range_.at(1)) {
       result_stack->GetHistogram()->SetMinimum(result_plot_range_.at(0));
@@ -250,7 +260,7 @@ public:
     if(marker_colors_.size()==0)
       ratio_stack->Draw("AP+PMC+PLC");
     else
-      ratio_stack->Draw("AP");
+      ratio_stack->Draw("AP+E5");
     line->Draw("same");
     ratio_stack->GetHistogram()->SetLabelSize(0.065, "X");
     ratio_stack->GetHistogram()->SetLabelSize(0.065, "Y");
@@ -262,6 +272,7 @@ public:
       ratio_stack->GetXaxis()->SetLimits(x_axis_range_.at(0), x_axis_range_.at(1));
     canvas->cd();
     result_pad->Draw();
+    legend->Draw();
     ratio_pad->Draw();
     canvas->Draw();
   }
@@ -303,6 +314,9 @@ public:
   void SetXAxisRange(const std::vector<float> &xAxisRange) {
     x_axis_range_ = xAxisRange;
   }
+  void SetDefaultTitle(const std::string &defaultTitle) {
+    default_title_ = defaultTitle;
+  }
 
 private:
   std::string name_;
@@ -318,6 +332,7 @@ private:
   Qn::DataContainer<Qn::Stats> averaged_;
   std::vector<Qn::DataContainer<Qn::Stats>> sub_events_;
   std::vector<std::string> sub_events_titles_;
+  std::string default_title_;
   std::vector<Qn::DataContainer<Qn::Stats>> components_;
   std::vector<std::string> components_titles_;
   std::vector<Qn::DataContainer<Qn::Stats>> ratio_sub_events_;

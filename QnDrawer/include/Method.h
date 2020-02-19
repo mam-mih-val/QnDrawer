@@ -42,7 +42,7 @@ public:
       std::cout<< "Empty resolution rule" << std::endl;
       return;
     }
-    for(size_t i=0; i< qn_qn_correlations_.size(); ++i){
+    for(size_t i=0; i< qn_qn_rebin_axis_.size(); ++i){
       for( const auto& axis : qn_qn_rebin_axis_.at(i) )
         qn_qn_correlations_.at(i) = qn_qn_correlations_.at(i).Rebin(axis);
       qn_qn_correlations_.at(i) = qn_qn_correlations_.at(i).Projection({"Centrality"});

@@ -10,6 +10,8 @@
 
 // ./Build_Flow input_file output_file config_file
 
+void BuildFW3S( std::string, std::string, std::string );
+void BuildRNDS( std::string, std::string, std::string );
 
 int main( int argc, char** argv )
 {
@@ -23,20 +25,20 @@ int main( int argc, char** argv )
   std::string input_file_name=argv[1];
   std::string output_file_name=argv[2];
   std::string config_file_name=argv[3];
+  BuildRNDS(input_file_name, output_file_name, config_file_name);
+  auto end = std::chrono::system_clock::now();
+  std::chrono::duration<double> elapsed_seconds = end - start;
+  std::cout << "elapsed time: " << elapsed_seconds.count() << " s\n";
+  return 0;
+}
+
+void BuildFW3S( std::string input_file_name, std::string output_file_name, std::string config_file_name){
   auto file_out = new TFile(output_file_name.data(), "recreate");
   FlowBuilder builder;
   std::vector<std::string> first_names{"FWs1(MDCf,MDCb)", "FWs1(MDCf,FWs2)",
                                        "FWs1(MDCf,FWs3)", "FWs1(MDCb,FWs2)",
                                        "FWs1(MDCb,FWs3)", "FWs1(FWs2,FWs3)"};
-  std::vector<std::vector<Qn::Axis>> first_axis{
-  	{{"0_Ycm", 2, -0.5, -0.3}, {"1_Ycm", 2, 0.3, 0.5}},
-  	{{"0_Ycm", 2, 0.3, 0.5}},
-  	{{"0_Ycm", 2, 0.3, 0.5}},
-  	{{"0_Ycm", 2, -0.5, 0.3}},
-  	{{"0_Ycm", 2, -0.5, 0.3}},
-  	{}
-  };
-  std::vector<std::string> second_names{"FWs2(MDCf,MDCb)", "FWs2(MDCf,FWs1)",
+    std::vector<std::string> second_names{"FWs2(MDCf,MDCb)", "FWs2(MDCf,FWs1)",
                                         "FWs2(MDCf,FWs3)", "FWs2(MDCb,FWs1)",
                                         "FWs2(MDCb,FWs3)", "FWs2(FWs1,FWs3)"};
   std::vector<std::string> third_names{"FWs3(MDCf,MDCb)", "FWs3(MDCf,FWs1)",
@@ -225,9 +227,35 @@ int main( int argc, char** argv )
 //  builder.Projection();
 //  builder.SaveGraphsToFile(output_file_name);
 //  builder.SaveToFile(output_file_name);
-file_out->Close();
-  auto end = std::chrono::system_clock::now();
-  std::chrono::duration<double> elapsed_seconds = end - start;
-  std::cout << "elapsed time: " << elapsed_seconds.count() << " s\n";
-  return 0;
+  file_out->Close();
+}
+void BuildRNDS( std::string input_file_name, std::string output_file_name, std::string config_file_name){
+  auto file_out = new TFile(output_file_name.data(), "recreate");
+  FlowBuilder builder;
+  std::vector<std::string> first_names{"RND"};
+  builder.SetName("FlowBuilder");
+  builder.SetInputName(input_file_name);
+  builder.SetConfigFileName(config_file_name);
+  std::vector<std::string> components{"_XX", "_YY"};
+  std::vector<std::string> methods{"_Ep"};
+
+  // ******************************** Method of 3 Sub-Events in MDC+FW ******************************** //
+  for (const auto& component : components) {
+    for(const auto & first_name : first_names){
+      builder.ComputeMethodRamSaving(
+          first_name + component + "_Ep",
+          [](std::vector<Qn::DataContainer<Qn::Stats>> corr) {
+            Qn::DataContainer<Qn::Stats> result;
+            result = ResFullEvent(corr.at(0));
+            return result;
+          },
+          [](std::vector<Qn::DataContainer<Qn::Stats>> corr) {
+            Qn::DataContainer<Qn::Stats> result;
+            result = corr.at(0) * 2 / corr.at(1);
+            return result;
+          },
+          file_out);
+    }
+  }
+  file_out->Close();
 }

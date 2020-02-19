@@ -4,12 +4,21 @@
 #include "FlowConfiguration.h"
 #include <TFile.h>
 #include <iostream>
+
+void Configure3Sub(const std::string&);
+void ConfigureRnd(std::string);
+
 int main(int argv, char **argc) {
   if (argv < 2) {
     std::cout << "Error: Incorrect number of arguments." << std::endl;
     return 1;
   }
   std::string file_name{argc[1]};
+  ConfigureRnd(file_name);
+  return 0;
+}
+
+void Configure3Sub(const std::string& file_name){
   TFile *file = TFile::Open(file_name.data(), "recreate");
   std::vector<FlowConfiguration> configurations;
   std::vector<std::string> components{"_XX", "_YY"};
@@ -29,28 +38,28 @@ int main(int argv, char **argc) {
                                           "MDCb(MDCf,FWs3)", "MDCb(FWs1,FWs2)",
                                           "MDCb(FWs1,FWs3)", "MDCb(FWs2,FWs3)"};
   std::map<std::string, std::string> correlations_names{
-    std::make_pair("<MDCf,MDCb>","TracksMdc_TracksMdc"),
-    std::make_pair("<MDCf,FWs1>","TracksMdc_Fw1"),
-    std::make_pair("<MDCf,FWs2>","TracksMdc_Fw2"),
-    std::make_pair("<MDCf,FWs3>","TracksMdc_Fw3"),
-    std::make_pair("<MDCb,FWs1>","TracksMdc_Fw1"),
-    std::make_pair("<MDCb,FWs2>","TracksMdc_Fw2"),
-    std::make_pair("<MDCb,FWs3>","TracksMdc_Fw3"),
-    std::make_pair("<FWs1,FWs2>","Fw1_Fw2"),
-    std::make_pair("<FWs1,FWs3>","Fw1_Fw3"),
-    std::make_pair("<FWs2,FWs3>","Fw2_Fw3")
+      std::make_pair("<MDCf,MDCb>","TracksMdc_TracksMdc"),
+      std::make_pair("<MDCf,FWs1>","TracksMdc_Fw1"),
+      std::make_pair("<MDCf,FWs2>","TracksMdc_Fw2"),
+      std::make_pair("<MDCf,FWs3>","TracksMdc_Fw3"),
+      std::make_pair("<MDCb,FWs1>","TracksMdc_Fw1"),
+      std::make_pair("<MDCb,FWs2>","TracksMdc_Fw2"),
+      std::make_pair("<MDCb,FWs3>","TracksMdc_Fw3"),
+      std::make_pair("<FWs1,FWs2>","Fw1_Fw2"),
+      std::make_pair("<FWs1,FWs3>","Fw1_Fw3"),
+      std::make_pair("<FWs2,FWs3>","Fw2_Fw3")
   };
   std::map<std::string, std::vector<Qn::Axis>> rebin_axis{
-    std::make_pair<std::string, std::vector<Qn::Axis>>( "<MDCf,MDCb>", { {"0_Ycm", 1, -0.5, -0.3}, {"1_Ycm", 1, 0.3, 0.5} }),
-    std::make_pair<std::string, std::vector<Qn::Axis>>( "<MDCf,FWs1>", { {"0_Ycm", 1, 0.3, 0.5} }),
-    std::make_pair<std::string, std::vector<Qn::Axis>>( "<MDCf,FWs2>", { {"0_Ycm", 1, 0.3, 0.5} }),
-    std::make_pair<std::string, std::vector<Qn::Axis>>( "<MDCf,FWs3>", { {"0_Ycm", 1, 0.3, 0.5} }),
-    std::make_pair<std::string, std::vector<Qn::Axis>>( "<MDCb,FWs1>", { {"0_Ycm", 1, -0.5, -0.3} }),
-    std::make_pair<std::string, std::vector<Qn::Axis>>( "<MDCb,FWs2>", { {"0_Ycm", 1, -0.5, -0.3} }),
-    std::make_pair<std::string, std::vector<Qn::Axis>>( "<MDCb,FWs3>", { {"0_Ycm", 1, -0.5, -0.3} }),
-    std::make_pair<std::string, std::vector<Qn::Axis>>( "<FWs1,FWs2>", {}),
-    std::make_pair<std::string, std::vector<Qn::Axis>>( "<FWs1,FWs3>", {}),
-    std::make_pair<std::string, std::vector<Qn::Axis>>( "<FWs2,FWs3>", {})
+      std::make_pair<std::string, std::vector<Qn::Axis>>( "<MDCf,MDCb>", { {"0_Ycm", 1, -0.5, -0.3}, {"1_Ycm", 1, 0.3, 0.5} }),
+      std::make_pair<std::string, std::vector<Qn::Axis>>( "<MDCf,FWs1>", { {"0_Ycm", 1, 0.3, 0.5} }),
+      std::make_pair<std::string, std::vector<Qn::Axis>>( "<MDCf,FWs2>", { {"0_Ycm", 1, 0.3, 0.5} }),
+      std::make_pair<std::string, std::vector<Qn::Axis>>( "<MDCf,FWs3>", { {"0_Ycm", 1, 0.3, 0.5} }),
+      std::make_pair<std::string, std::vector<Qn::Axis>>( "<MDCb,FWs1>", { {"0_Ycm", 1, -0.5, -0.3} }),
+      std::make_pair<std::string, std::vector<Qn::Axis>>( "<MDCb,FWs2>", { {"0_Ycm", 1, -0.5, -0.3} }),
+      std::make_pair<std::string, std::vector<Qn::Axis>>( "<MDCb,FWs3>", { {"0_Ycm", 1, -0.5, -0.3} }),
+      std::make_pair<std::string, std::vector<Qn::Axis>>( "<FWs1,FWs2>", {}),
+      std::make_pair<std::string, std::vector<Qn::Axis>>( "<FWs1,FWs3>", {}),
+      std::make_pair<std::string, std::vector<Qn::Axis>>( "<FWs2,FWs3>", {})
   };
   std::vector<std::vector<std::string>> first_resolutions{
       {"<MDCf,FWs1>", "<MDCb,FWs1>", "<MDCf,MDCb>"}, // FWs1(MDCf, MDCb)
@@ -324,6 +333,36 @@ int main(int argv, char **argc) {
     }
   }
    */
+  file->cd();
+  for (auto &configuration : configurations)
+    configuration.SaveToFile(file);
+  std::cout << "Configurations written in " << file_name << std::endl;
+  file->Close();
+}
+
+void ConfigureRnd(std::string file_name){
+  TFile *file = TFile::Open(file_name.data(), "recreate");
+  std::vector<FlowConfiguration> configurations;
+  std::vector<std::string> components{"_XX", "_YY"};
+  std::vector<std::string> first_names{"RND"};
+
+  std::vector<std::vector<std::string>> first_resolutions{
+      {"Rs1_Rs2"},     // RND
+  };
+  // ******************************** Method of 3 Sub-Events in MDC+FW
+  // ******************************** //
+  for (const auto& component : components) {
+    for(size_t i=0; i<first_names.size(); ++i){
+      configurations.emplace_back(first_names.at(i) + component +"_Ep");
+      std::vector<std::string> resolution = first_resolutions.at(i);
+      for(auto& correlation : resolution)
+        correlation+=component+"_Ep";
+      configurations.back().SetQnQnNames(resolution);
+      configurations.back().SetUnQnNames({"TracksMdc_Full" + component + "_Ep"});
+    }
+
+  }
+
   file->cd();
   for (auto &configuration : configurations)
     configuration.SaveToFile(file);
