@@ -7,9 +7,13 @@ void BuildElliptic(const std::string& file_in_name, const std::string& file_out_
 void BuildDirected(const std::string& file_in_name, const std::string& file_out_name);
 
 int main(int n_args, char** args){
-  std::string file_in_name = args[1];
-  std::string file_out_name = args[2];
-  BuildDirected(file_in_name, file_out_name);
+  std::string flag = args[1];
+  std::string file_in_name = args[2];
+  std::string file_out_name = args[3];
+  if( flag == "--directed" )
+    BuildDirected(file_in_name, file_out_name);
+  if( flag == "--elliptic" )
+    BuildDirected(file_in_name, file_out_name);
   return 0;
 }
 
@@ -34,16 +38,17 @@ void BuildDirected(const std::string& file_in_name, const std::string& file_out_
       {"_XX_Sp", "_YY_Sp"},
   };
   auto rebin_proj = [](std::vector<Qn::DataContainer<Qn::Stats>> container){
-    container.back() = container.back().Rebin({"0_Ycm", 1, -0.6, -0.5});
+    container.back() = container.back().Rebin({"0_Ycm", 1, -0.2, -0.1});
     container.back() = container.back().Projection({"Centrality"});
-    return container.back()*(-1);
+    container.back() = container.back().Rebin({"Centrality", 5, 0.0, 50.0});
+    return container.back()*(1);
   };
-  Systematics default_value("FW-directed");
-  default_value.GetFlowHelper().SetFile(file_in);
+  auto file_ref = new TFile("../Output_Files/RND_Y.root");
+  Systematics default_value("RND-Sub");
+  default_value.GetFlowHelper().SetFile(file_ref);
   default_value.SetRebinProjection(rebin_proj);
-  default_value.Init(prefix, {"FWs1(MDCf,FWs3)","FWs1(MDCb,FWs3)",
-                              "FWs3(MDCf,FWs1)", "FWs3(MDCb,FWs1)"},
-                     {"_XX_Sp", "_YY_Sp"});
+  default_value.Init(prefix, {"RND"},
+                     {"_XX_Ep", "_YY_Ep"});
   std::vector<TCanvas*> canvases;
   auto file_name = file_out_name+".root";
   auto file_out = TFile::Open(file_name.data(), "recreate");
@@ -51,8 +56,8 @@ void BuildDirected(const std::string& file_in_name, const std::string& file_out_
     systematics.emplace_back(systematics_names.at(i));
     systematics.back().SetRebinProjection(rebin_proj);
     systematics.back().SetXAxisRange({0., 50.});
-    systematics.back().SetResultPlotRange({0.229, 0.349});
-    systematics.back().SetRatioPlotRange({0.71, 1.29});
+    systematics.back().SetResultPlotRange({-0.139, -0.041});
+    systematics.back().SetRatioPlotRange({0.81, 1.19});
     systematics.back().GetFlowHelper().SetFile(file_in);
     systematics.back().Init(prefix, sub_events_names.at(i), components_names.at(i));
     std::string canvas_name{systematics_names.at(i)+"_comp"};
@@ -75,10 +80,10 @@ void BuildDirected(const std::string& file_in_name, const std::string& file_out_
                                            kGreen+1,
                                            kMagenta+1
                                        });
-    systematics.back().SetDefaultTitle("FWs1,3(MDCf,b, FWs3,1)");
+    systematics.back().SetDefaultTitle("RND-Sub");
     systematics.back().SetAxisTitles("centrality (%)", "v_{1}");
     systematics.back().DrawSubEvents(canvases.back());
-    canvas_name = file_out_name+"_"+systematics_names.at(i)+"_sub_evt.pdf";
+    canvas_name = file_out_name+"_"+systematics_names.at(i)+"_sub_evt.png";
     canvases.back()->Print(canvas_name.data());
     systematics.back().SaveToFile(file_out);
   }

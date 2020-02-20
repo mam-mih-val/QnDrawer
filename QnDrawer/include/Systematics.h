@@ -6,6 +6,7 @@
 #define QNDRAWER_SYSTEMATICS_H
 
 #include "FlowHelper.h"
+#include "Painter.h"
 #include "TStyle.h"
 #include <DataContainer.h>
 #include <Stats.h>
@@ -17,8 +18,7 @@
 
 class Systematics {
 public:
-  Systematics() = default;
-  explicit Systematics(std::string name) : name_(std::move(name)) {}
+  explicit Systematics(std::string name) : name_(std::move(name)), painter_(name) {}
   virtual ~Systematics() = default;
   void Init(const std::string &prefix,
             const std::vector<std::string> &subEventsNames,
@@ -56,11 +56,11 @@ public:
   }
   void RebuildRatios() {
     ratio_sub_events_.clear();
-    for (auto sub_event : sub_events_) {
+    for (const auto& sub_event : sub_events_) {
       ratio_sub_events_.push_back(sub_event / averaged_);
     }
     ratio_components_.clear();
-    for (auto component : components_) {
+    for (const auto& component : components_) {
       ratio_components_.push_back(component / averaged_);
     }
   }
@@ -175,7 +175,7 @@ public:
     gStyle->SetTitleSize(0.04,"Y");
     gStyle->SetTitleOffset(1.6,"Y");
     gStyle->SetTitleOffset(1.0,"X");
-    auto legend = new TLegend(0.35, 0.0, 0.7, 0.35);
+    auto legend = new TLegend(0.5, 0.5, 0.9, 0.9);
     legend->SetBorderSize(0);
     std::string pad_name = name_ + "_result";
     auto result_pad = new TPad(pad_name.data(), "result", 0.0, 0.35, 1.0, 1.0);
@@ -196,13 +196,14 @@ public:
     graph->SetTitle("Default");
     if( !default_title_.empty() )
       graph->SetTitle(default_title_.data() );
-    graph->SetMarkerSize(1.6);
-    graph->SetLineWidth(2);
+    graph->SetMarkerSize(2.0);
+    graph->SetLineWidth(4);
     result_stack->Add(graph);
+    legend->AddEntry(graph, default_title_.data(), "P");
     auto averaged_ratio = averaged_/averaged_;
     averaged_ratio.SetSetting(Qn::Stats::Settings::CORRELATEDERRORS);
     graph = Qn::DataContainerHelper::ToTGraph(averaged_ratio);
-    graph->SetMarkerSize(1.6);
+    graph->SetMarkerSize(2.0);
     graph->SetMarkerColor(kBlack);
     graph->SetLineColor(kBlack);
     ratio_stack->Add(graph);
@@ -210,7 +211,7 @@ public:
       results.at(i).SetSetting(Qn::Stats::Settings::CORRELATEDERRORS);
       graph = Qn::DataContainerHelper::ToTGraph(results.at(i));
       graph->SetTitle(results_names.at(i).data());
-      graph->SetMarkerSize(1.6);
+      graph->SetMarkerSize(2.0);
       if( i<marker_styles_.size() )
         graph->SetMarkerStyle(marker_styles_.at(i));
       if( i<marker_colors_.size() ){
@@ -223,8 +224,8 @@ public:
       ratios.at(i).SetSetting(Qn::Stats::Settings::CORRELATEDERRORS);
       graph = Qn::DataContainerHelper::ToTGraph(ratios.at(i));
       graph->SetMarkerStyle(marker_styles_.at(i));
-      graph->SetMarkerSize(1.6);
-      graph->SetLineWidth(3);
+      graph->SetMarkerSize(2.0);
+      graph->SetLineWidth(4);
       ratio_stack->Add(graph);
       if( i<marker_styles_.size() )
         graph->SetMarkerStyle(marker_styles_.at(i));
@@ -245,7 +246,7 @@ public:
       compare_graph_->SetLineColor(kBlack);
       compare_graph_->Draw("same");
     }
-//    result_pad->BuildLegend();
+//    result_pad->BuildLegend("P");
     legend->Draw();
     result_stack->GetHistogram()->SetLabelSize(0.035, "Y");
     if (result_plot_range_.at(0) != result_plot_range_.at(1)) {
@@ -257,7 +258,7 @@ public:
     ratio_pad->cd();
     ratio_pad->SetTopMargin(0);
     ratio_pad->SetBottomMargin(0.25);
-    if(marker_colors_.size()==0)
+    if(marker_colors_.empty())
       ratio_stack->Draw("AP+PMC+PLC");
     else
       ratio_stack->Draw("AP+E5");
@@ -272,7 +273,6 @@ public:
       ratio_stack->GetXaxis()->SetLimits(x_axis_range_.at(0), x_axis_range_.at(1));
     canvas->cd();
     result_pad->Draw();
-    legend->Draw();
     ratio_pad->Draw();
     canvas->Draw();
   }
@@ -317,8 +317,11 @@ public:
   void SetDefaultTitle(const std::string &defaultTitle) {
     default_title_ = defaultTitle;
   }
+  Painter GetPainter() const { return painter_; }
 
 private:
+  Systematics();
+  Painter painter_;
   std::string name_;
   std::string x_axis_title_;
   std::string y_axis_title_;

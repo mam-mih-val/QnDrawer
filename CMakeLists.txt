@@ -38,6 +38,7 @@ set(HEADERS
 		QnDrawer/include/Comparator.h
 		QnDrawer/include/Method.h
 		QnDrawer/include/Systematics.h
+		QnDrawer/include/Painter.h
 		)
 
 set(SOURCES
@@ -48,6 +49,7 @@ set(SOURCES
 		QnDrawer/Method.cpp
 		QnDrawer/FlowHelper.cpp
 		QnDrawer/Systematics.cpp
+		QnDrawer/Painter.cpp
 		)
 
 set(PCM_FILE_NAME libQnDrawer)

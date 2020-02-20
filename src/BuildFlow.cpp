@@ -22,10 +22,14 @@ int main( int argc, char** argv )
     std::cout << "Exit." << std::endl;
     return 1;
   }
-  std::string input_file_name=argv[1];
-  std::string output_file_name=argv[2];
-  std::string config_file_name=argv[3];
-  BuildRNDS(input_file_name, output_file_name, config_file_name);
+  std::string flag{argv[1]};
+  std::string input_file_name=argv[2];
+  std::string output_file_name=argv[3];
+  std::string config_file_name=argv[4];
+  if( flag == "--3S" )
+    BuildFW3S(input_file_name, output_file_name, config_file_name);
+  if( flag == "--RND" )
+    BuildRNDS(input_file_name, output_file_name, config_file_name);
   auto end = std::chrono::system_clock::now();
   std::chrono::duration<double> elapsed_seconds = end - start;
   std::cout << "elapsed time: " << elapsed_seconds.count() << " s\n";
@@ -113,9 +117,9 @@ void BuildFW3S( std::string input_file_name, std::string output_file_name, std::
           },
           [](std::vector<Qn::DataContainer<Qn::Stats>> corr) {
             Qn::DataContainer<Qn::Stats> result;
+            corr.at(0) = corr.at(0).Rebin({"1_Ycm", 1, 0.3, 0.5});
+            corr.at(0) = corr.at(0).Projection({"0_Ycm","Centrality"});
             result = corr.at(0) * 2 / corr.at(1);
-            result = result.Rebin({"1_Ycm", 1, 0.3, 0.5});
-            result = result.Projection({"0_Ycm", "Centrality"});
             return result;
           },
           file_out);
@@ -130,16 +134,16 @@ void BuildFW3S( std::string input_file_name, std::string output_file_name, std::
           },
           [](std::vector<Qn::DataContainer<Qn::Stats>> corr) {
             Qn::DataContainer<Qn::Stats> result;
+            corr.at(0) = corr.at(0).Rebin({"1_Ycm", 1, -0.5, -0.3});
+            corr.at(0) = corr.at(0).Projection({"0_Ycm","Centrality"});
             result = corr.at(0) * -2 / corr.at(1);
-            result = result.Rebin({"1_Ycm", 1, -0.5, -0.3});
-            result = result.Projection({"0_Ycm", "Centrality"});
             return result;
           },
           file_out);
     }
 
   }
-  /*
+
   // ******************************** Second Harmonics ******************************** //
   components = {"_XXX", "_XYY", "_YXY", "_YYX"};
   for( const auto& component : components ) {
@@ -158,7 +162,8 @@ void BuildFW3S( std::string input_file_name, std::string output_file_name, std::
               Qn::DataContainer<Qn::Stats> result;
               result = corr.at(0) * 4 / corr.at(1);
               return result;
-            });
+            },
+            file_out);
       }
     }
     for(const auto & second_name : second_names){
@@ -176,7 +181,8 @@ void BuildFW3S( std::string input_file_name, std::string output_file_name, std::
               Qn::DataContainer<Qn::Stats> result;
               result = corr.at(0) * 4 / corr.at(1);
               return result;
-            });
+            },
+            file_out);
       }
     }
     for(const auto & first_name : first_names){
@@ -194,7 +200,8 @@ void BuildFW3S( std::string input_file_name, std::string output_file_name, std::
               Qn::DataContainer<Qn::Stats> result;
               result = corr.at(0) * 4 / corr.at(1);
               return result;
-            });
+            },
+            file_out);
       }
     }
   }

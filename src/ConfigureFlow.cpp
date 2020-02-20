@@ -13,8 +13,12 @@ int main(int argv, char **argc) {
     std::cout << "Error: Incorrect number of arguments." << std::endl;
     return 1;
   }
-  std::string file_name{argc[1]};
-  ConfigureRnd(file_name);
+  std::string flag{argc[1]};
+  std::string file_name{argc[2]};
+  if(flag == "--RND")
+    ConfigureRnd(file_name);
+  if(flag == "--3S")
+    Configure3Sub(file_name);
   return 0;
 }
 
@@ -97,9 +101,9 @@ void Configure3Sub(const std::string& file_name){
       {"<MDCb,FWs1>", "<MDCf,MDCb>", "<MDCf,FWs1>"},      // MDCb(MDCf,FWs1)
       {"<MDCb,FWs2>", "<MDCf,MDCb>", "<MDCf,FWs2>"},      // MDCb(MDCf,FWs2)
       {"<MDCb,FWs3>", "<MDCf,MDCb>", "<MDCf,FWs3>"},      // MDCb(MDCf,FWs3)
-      {"<MDCb,FWs1>", "<MDCb,FWs2>", "<FWs1,FWs2>"},     // MDCb(FWs1,FWs2)
-      {"<MDCb,FWs1>", "<MDCb,FWs3>", "<FWs1,FWs3>"},     // MDCb(FWs1,FWs3)
-      {"<MDCb,FWs2>", "<MDCb,FWs3>", "<FWs2,FWs3>"}      // MDCb(FWs2,FWs3)
+      {"<MDCb,FWs1>", "<MDCb,FWs2>", "<FWs1,FWs2>"},      // MDCb(FWs1,FWs2)
+      {"<MDCb,FWs1>", "<MDCb,FWs3>", "<FWs1,FWs3>"},      // MDCb(FWs1,FWs3)
+      {"<MDCb,FWs2>", "<MDCb,FWs3>", "<FWs2,FWs3>"}       // MDCb(FWs2,FWs3)
   };
   for(auto component : components){
     configurations.emplace_back("<MDCf,MDCb>(FWs1,FWs3)"+component);
@@ -212,6 +216,7 @@ void Configure3Sub(const std::string& file_name){
       configurations.back().SetUnQnNames({"TracksMdc_TracksMdc" + component + "_Sp"});
     }
   }
+  // Second Harmoinc
   std::vector<std::vector<std::string>> resolution_components = {
       {"_XXX", "_XX", "_XX"},
       {"_XYY", "_YY", "_YY"},
@@ -224,22 +229,23 @@ void Configure3Sub(const std::string& file_name){
         configurations.emplace_back(first_names.at(i) + "_" +
                                     second_names.at(j) + component.at(0) +
                                     "_Sp");
-        std::vector<std::string> resolution;
-        std::vector<std::string> first_resolution = first_resolutions.at(i);
-        std::for_each(
-            first_resolution.begin(), first_resolution.end(),
-            [component](std::string &str) { str += component.at(1) + "_Sp"; });
-        std::vector<std::string> second_resolution = second_resolutions.at(j);
-        std::for_each(
-            second_resolution.begin(), second_resolution.end(),
-            [component](std::string &str) { str += component.at(2) + "_Sp"; });
-        resolution.insert(resolution.end(), first_resolution.begin(),
-                          first_resolution.end());
-        resolution.insert(resolution.end(), second_resolution.begin(),
-                          second_resolution.end());
-        configurations.back().SetQnQnNames(resolution);
+        std::vector<std::string> resolution_first = first_resolutions.at(i);
+        std::vector<std::string> resolution_second = second_resolutions.at(j);
+        std::vector<std::string> qn_qn_correlations;
+        std::vector<std::vector<Qn::Axis>> qn_qn_rebin_axis;
+        qn_qn_correlations.reserve(resolution_first.size());
+        for(const auto& correlation : resolution_first){
+          qn_qn_correlations.push_back(correlations_names.at(correlation)+component.at(1)+"_Sp");
+          qn_qn_rebin_axis.push_back(rebin_axis.at(correlation));
+        }
+        for(const auto& correlation : resolution_second){
+          qn_qn_correlations.push_back(correlations_names.at(correlation)+component.at(2)+"_Sp");
+          qn_qn_rebin_axis.push_back(rebin_axis.at(correlation));
+        }
+        configurations.back().SetQnQnNames(qn_qn_correlations);
+        configurations.back().SetQnQnRebinAxis(qn_qn_rebin_axis);
         configurations.back().SetUnQnNames(
-            {"TracksMdcPt_Fw1_Fw2" + component.at(0) + "_Sp"});
+            {"TracksMdc_Fw1_Fw2" + component.at(0) + "_Sp"});
       }
     }
     for (size_t i = 0; i < second_names.size(); ++i) {
@@ -247,22 +253,23 @@ void Configure3Sub(const std::string& file_name){
         configurations.emplace_back(second_names.at(i) + "_" +
                                     third_names.at(j) + component.at(0) +
                                     "_Sp");
-        std::vector<std::string> resolution;
-        std::vector<std::string> third_resolution = third_resolutions.at(j);
-        std::for_each(
-            third_resolution.begin(), third_resolution.end(),
-            [component](std::string &str) { str += component.at(2) + "_Sp"; });
-        std::vector<std::string> second_resolution = second_resolutions.at(i);
-        std::for_each(
-            second_resolution.begin(), second_resolution.end(),
-            [component](std::string &str) { str += component.at(1) + "_Sp"; });
-        resolution.insert(resolution.end(), third_resolution.begin(),
-                          third_resolution.end());
-        resolution.insert(resolution.end(), second_resolution.begin(),
-                          second_resolution.end());
-        configurations.back().SetQnQnNames(resolution);
+        std::vector<std::string> resolution_second = second_resolutions.at(i);
+        std::vector<std::string> resolution_third = third_resolutions.at(j);
+        std::vector<std::string> qn_qn_correlations;
+        std::vector<std::vector<Qn::Axis>> qn_qn_rebin_axis;
+        qn_qn_correlations.reserve(resolution_third.size());
+        for(const auto& correlation : resolution_second){
+          qn_qn_correlations.push_back(correlations_names.at(correlation)+component.at(1)+"_Sp");
+          qn_qn_rebin_axis.push_back(rebin_axis.at(correlation));
+        }
+        for(const auto& correlation : resolution_third){
+          qn_qn_correlations.push_back(correlations_names.at(correlation)+component.at(2)+"_Sp");
+          qn_qn_rebin_axis.push_back(rebin_axis.at(correlation));
+        }
+        configurations.back().SetQnQnNames(qn_qn_correlations);
+        configurations.back().SetQnQnRebinAxis(qn_qn_rebin_axis);
         configurations.back().SetUnQnNames(
-            {"TracksMdcPt_Fw2_Fw3" + component.at(0) + "_Sp"});
+            {"TracksMdc_Fw2_Fw3" + component.at(0) + "_Sp"});
       }
     }
     for (size_t i = 0; i < first_names.size(); ++i) {
@@ -270,22 +277,23 @@ void Configure3Sub(const std::string& file_name){
         configurations.emplace_back(first_names.at(i) + "_" +
                                     third_names.at(j) + component.at(0) +
                                     "_Sp");
-        std::vector<std::string> resolution;
-        std::vector<std::string> first_resolution = first_resolutions.at(i);
-        std::for_each(
-            first_resolution.begin(), first_resolution.end(),
-            [component](std::string &str) { str += component.at(1) + "_Sp"; });
-        std::vector<std::string> second_resolution = second_resolutions.at(j);
-        std::for_each(
-            second_resolution.begin(), second_resolution.end(),
-            [component](std::string &str) { str += component.at(2) + "_Sp"; });
-        resolution.insert(resolution.end(), first_resolution.begin(),
-                          first_resolution.end());
-        resolution.insert(resolution.end(), second_resolution.begin(),
-                          second_resolution.end());
-        configurations.back().SetQnQnNames(resolution);
+        std::vector<std::string> resolution_first = first_resolutions.at(i);
+        std::vector<std::string> resolution_third = third_resolutions.at(j);
+        std::vector<std::string> qn_qn_correlations;
+        std::vector<std::vector<Qn::Axis>> qn_qn_rebin_axis;
+        qn_qn_correlations.reserve(resolution_first.size());
+        for(const auto& correlation : resolution_first){
+          qn_qn_correlations.push_back(correlations_names.at(correlation)+component.at(1)+"_Sp");
+          qn_qn_rebin_axis.push_back(rebin_axis.at(correlation));
+        }
+        for(const auto& correlation : resolution_third){
+          qn_qn_correlations.push_back(correlations_names.at(correlation)+component.at(2)+"_Sp");
+          qn_qn_rebin_axis.push_back(rebin_axis.at(correlation));
+        }
+        configurations.back().SetQnQnNames(qn_qn_correlations);
+        configurations.back().SetQnQnRebinAxis(qn_qn_rebin_axis);
         configurations.back().SetUnQnNames(
-            {"TracksMdcPt_Fw1_Fw3" + component.at(0) + "_Sp"});
+            {"TracksMdc_Fw1_Fw3" + component.at(0) + "_Sp"});
       }
     }
   }
@@ -326,7 +334,7 @@ void Configure3Sub(const std::string& file_name){
                             third_resolution.end());
           configurations.back().SetQnQnNames(resolution);
           configurations.back().SetUnQnNames(
-              {"TracksMdcPt_Fw1_Fw2_Fw3" + component.at(0) + "_Sp"});
+              {"TracksMdc_Fw1_Fw2_Fw3" + component.at(0) + "_Sp"});
           configurations.back().SetProjectionAxisName("Centrality");
         }
       }
