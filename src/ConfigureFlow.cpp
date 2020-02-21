@@ -42,13 +42,13 @@ void Configure3Sub(const std::string& file_name){
                                           "MDCb(MDCf,FWs3)", "MDCb(FWs1,FWs2)",
                                           "MDCb(FWs1,FWs3)", "MDCb(FWs2,FWs3)"};
   std::map<std::string, std::string> correlations_names{
-      std::make_pair("<MDCf,MDCb>","TracksMdc_TracksMdc"),
-      std::make_pair("<MDCf,FWs1>","TracksMdc_Fw1"),
-      std::make_pair("<MDCf,FWs2>","TracksMdc_Fw2"),
-      std::make_pair("<MDCf,FWs3>","TracksMdc_Fw3"),
-      std::make_pair("<MDCb,FWs1>","TracksMdc_Fw1"),
-      std::make_pair("<MDCb,FWs2>","TracksMdc_Fw2"),
-      std::make_pair("<MDCb,FWs3>","TracksMdc_Fw3"),
+      std::make_pair("<MDCf,MDCb>","MdcQ_MdcQ"),
+      std::make_pair("<MDCf,FWs1>","MdcQ_Fw1"),
+      std::make_pair("<MDCf,FWs2>","MdcQ_Fw2"),
+      std::make_pair("<MDCf,FWs3>","MdcQ_Fw3"),
+      std::make_pair("<MDCb,FWs1>","MdcQ_Fw1"),
+      std::make_pair("<MDCb,FWs2>","MdcQ_Fw2"),
+      std::make_pair("<MDCb,FWs3>","MdcQ_Fw3"),
       std::make_pair("<FWs1,FWs2>","Fw1_Fw2"),
       std::make_pair("<FWs1,FWs3>","Fw1_Fw3"),
       std::make_pair("<FWs2,FWs3>","Fw2_Fw3")
@@ -199,7 +199,7 @@ void Configure3Sub(const std::string& file_name){
       }
       configurations.back().SetQnQnNames(qn_qn_correlations);
       configurations.back().SetQnQnRebinAxis(qn_qn_rebin_axis);
-      configurations.back().SetUnQnNames({"TracksMdc_TracksMdc" + component + "_Sp"});
+      configurations.back().SetUnQnNames({"TracksMdc_MdcQ" + component + "_Sp"});
     }
     for(size_t i=0; i<backward_names.size(); ++i){
       configurations.emplace_back(backward_names.at(i) + component +"_Sp");
@@ -213,7 +213,7 @@ void Configure3Sub(const std::string& file_name){
       }
       configurations.back().SetQnQnNames(qn_qn_correlations);
       configurations.back().SetQnQnRebinAxis(qn_qn_rebin_axis);
-      configurations.back().SetUnQnNames({"TracksMdc_TracksMdc" + component + "_Sp"});
+      configurations.back().SetUnQnNames({"TracksMdc_MdcQ" + component + "_Sp"});
     }
   }
   // Second Harmoinc

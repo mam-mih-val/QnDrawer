@@ -13,7 +13,7 @@ int main(int n_args, char** args){
   if( flag == "--directed" )
     BuildDirected(file_in_name, file_out_name);
   if( flag == "--elliptic" )
-    BuildDirected(file_in_name, file_out_name);
+    BuildElliptic(file_in_name, file_out_name);
   return 0;
 }
 
@@ -56,7 +56,7 @@ void BuildDirected(const std::string& file_in_name, const std::string& file_out_
     systematics.emplace_back(systematics_names.at(i));
     systematics.back().SetRebinProjection(rebin_proj);
     systematics.back().SetXAxisRange({0., 50.});
-    systematics.back().SetResultPlotRange({-0.139, -0.041});
+    systematics.back().SetResultPlotRange({-0.139, -0.03});
     systematics.back().SetRatioPlotRange({0.81, 1.19});
     systematics.back().GetFlowHelper().SetFile(file_in);
     systematics.back().Init(prefix, sub_events_names.at(i), components_names.at(i));
@@ -81,6 +81,7 @@ void BuildDirected(const std::string& file_in_name, const std::string& file_out_
                                            kMagenta+1
                                        });
     systematics.back().SetDefaultTitle("RND-Sub");
+    systematics.back().SetLegendPosition({0.4, 0.0, 0.75, 0.4});
     systematics.back().SetAxisTitles("centrality (%)", "v_{1}");
     systematics.back().DrawSubEvents(canvases.back());
     canvas_name = file_out_name+"_"+systematics_names.at(i)+"_sub_evt.png";
@@ -95,25 +96,51 @@ void BuildDirected(const std::string& file_in_name, const std::string& file_out_
 void BuildElliptic(const std::string& file_in_name, const std::string& file_out_name){
   auto file_in = TFile::Open(file_in_name.data());
   std::vector<Systematics> systematics;
-  std::vector<std::string> systematics_names{ "FWs1,FWs2", "FWs1,FWs3", "FWs2,FWs3" };
+  std::vector<std::string> systematics_names{ "FWs1_FWs2", "FWs1_FWs3", "FWs2_FWs3" };
   std::string prefix{"flow_"};
   std::vector<std::vector<std::string>> sub_events_names{
-      {"FWs1(MDCf,MDCb)_FWs2(MDCf,MDCb)", "FWs1(MDCf,FWs2)_FWs2(MDCf,FWs1)", "FWs1(MDCf,FWs3)_FWs2(MDCf,FWs3)", "FWs1(MDCb,FWs2)_FWs2(MDCb,FWs1)", "FWs1(MDCb,FWs3)_FWs2(MDCb,FWs3)", "FWs1(FWs2,FWs3)_FWs2(FWs1,FWs3)"},
-      {"FWs1(MDCf,MDCb)_FWs3(MDCf,MDCb)", "FWs1(MDCb,FWs3)_FWs3(MDCb,FWs1)", "FWs1(MDCf,FWs2)_FWs3(MDCf,FWs2)", "FWs1(MDCb,FWs3)_FWs3(MDCb,FWs1)", "FWs1(MDCb,FWs2)_FWs3(MDCb,FWs2)", "FWs1(FWs2,FWs3)_FWs3(FWs1,FWs2)"},
-      {"FWs2(MDCf,MDCb)_FWs3(MDCf,MDCb)", "FWs2(MDCf,FWs3)_FWs3(MDCf,FWs2)", "FWs2(MDCf,FWs3)_FWs3(MDCf,FWs2)", "FWs2(MDCb,FWs3)_FWs3(MDCb,FWs2)", "FWs2(MDCb,FWs1)_FWs3(MDCb,FWs1)", "FWs2(FWs1,FWs3)_FWs3(FWs1,FWs2)"}
+      {"FWs1(MDCf,MDCb)_FWs2(MDCf,MDCb)", "FWs1(MDCf,FWs3)_FWs2(MDCf,MDCb)", "FWs1(MDCb,FWs3)_FWs2(MDCf,MDCb)", "FWs1(MDCb,FWs2)_FWs2(MDCb,FWs1)", "FWs1(MDCb,FWs3)_FWs2(MDCb,FWs3)", "FWs1(FWs2,FWs3)_FWs2(FWs1,FWs3)"},
+      {"FWs1(MDCf,MDCb)_FWs3(MDCf,MDCb)", "FWs1(MDCf,MDCb)_FWs3(MDCf,FWs1)", "FWs1(MDCf,MDCb)_FWs3(MDCb,FWs1)", "FWs1(MDCf,FWs3)_FWs3(MDCf,MDCb)", "FWs1(MDCb,FWs3)_FWs3(MDCf,MDCb)", "FWs1(MDCf,FWs3)_FWs3(MDCf,FWs1)"},
+      {"FWs2(MDCf,MDCb)_FWs3(MDCf,MDCb)", "FWs2(MDCf,MDCb)_FWs3(MDCf,FWs1)", "FWs2(MDCf,MDCb)_FWs3(MDCb,FWs1)", "FWs2(MDCb,FWs3)_FWs3(MDCb,FWs2)", "FWs2(MDCb,FWs1)_FWs3(MDCb,FWs1)", "FWs2(FWs1,FWs3)_FWs3(FWs1,FWs2)"}
   };
   std::vector<std::vector<std::string>> sub_events_titles{
-      {"FWs1,FWs2(MDCf,MDCb)", "FWs1,FWs2(MDCf)", "FWs1,FWs2(MDCf,FWs3)", "FWs1,FWs2(MDCb)", "FWs1,FWs2(MDCb,FWs3)", "FWs1,FWs2(FWs3)"},
-      {"FWs1,FWs3(MDCf,MDCb)", "FWs1,FWs3(MDCf)", "FWs1,FWs3(MDCf,FWs2)", "FWs1,FWs3(MDCb)", "FWs1,FWs3(MDCb,FWs2)", "FWs1,FWs3(FWs2)"},
-      {"FWs2,FWs3(MDCf,MDCb)", "FWs2,FWs3(MDCf)", "FWs2,FWs3(MDCf,FWs1)", "FWs2,FWs3(MDCb)", "FWs2,FWs3(MDCb,FWs1)", "FWs2,FWs3(FWs1)"}
+    { // <u,FWs1,FWs2>
+      "W1(Mf,Mb) #times W2(Mf,Mb)",
+      "W1(Mf,W3) #times W2(Mf,Mb)",
+      "W1(Mb,W3) #times W2(Mf,Mb)",
+      "W1(Mb,W2) #times W2(Mb,W1)",
+      "W1(Mb,W3) #times W2(Mb,W3)",
+      "W1(W2,W3) #times W2(W1,W3)"},
+    {// <u, W1, W3>
+      "W1(Mf,Mb) #times W3(Mf,Mb)",
+      "W1(Mf,Mb) #times W3(Mf,W1)",
+      "W1(Mf,Mb) #times W3(Mb,W1)",
+      "W1(Mf,W3) #times W3(Mf,Mb)",
+      "W1(Mb,W3) #times W3(Mf,Mb)",
+      "W1(Mf,W3) #times W3(Mf,W1)",
+      },
+    {// <u, W2, W3>
+       "W2(Mf,Mb) #times W3(Mf,Mb)",
+      "W2(Mf,Mb) #times W3(Mf,W1)",
+      "W2(Mf,Mb) #times W3(Mb,W1)",
+      "W2(Mb,W3) #times W3(Mb,W2)",
+      "W2(Mb,W1) #times W3(Mb,W1)",
+      "W2(W1,W3) #times W3(W1,W2)"}
   };
   std::vector<std::vector<std::string>> components_names{
       {"_XXX_Sp", "_XYY_Sp", "_YXY_Sp", "_YYX_Sp"},
       {"_XXX_Sp", "_XYY_Sp", "_YXY_Sp", "_YYX_Sp"},
       {"_XXX_Sp", "_XYY_Sp", "_YXY_Sp", "_YYX_Sp"}
   };
+  auto rebin_proj = [](std::vector<Qn::DataContainer<Qn::Stats>> container){
+	container.back() = container.back().Rebin({"0_Ycm", 1, -0.2, -0.1});
+	container.back() = container.back().Projection({"Centrality"});
+	container.back() = container.back().Rebin({"Centrality", 5, 0.0, 50.0});
+	return container.back()*(1);
+  };
   Systematics default_value("FW-elliptic");
   default_value.GetFlowHelper().SetFile(file_in);
+  default_value.SetRebinProjection(rebin_proj);
   default_value.Init(prefix, {"FWs1(FWs2,FWs3)_FWs2(FWs1,FWs3)",
                               "FWs1(FWs2,FWs3)_FWs3(FWs1,FWs2)",
                               "FWs2(FWs1,FWs3)_FWs3(FWs1,FWs2)"},
@@ -123,16 +150,14 @@ void BuildElliptic(const std::string& file_in_name, const std::string& file_out_
   auto file_out = TFile::Open(file_name.data(), "recreate");
   for( size_t i=0; i<systematics_names.size(); i++ ){
     systematics.emplace_back(systematics_names.at(i));
-    systematics.back().SetRebinProjection([](std::vector<Qn::DataContainer<Qn::Stats>> container){
-//      container.back() = container.back().Rebin({"0_Pt", 32, 0.2, 1.8});
-      return container.back();
-    });
-    systematics.back().SetResultPlotRange({-0.139, -0.019});
-    systematics.back().SetRatioPlotRange({0.51, 1.49});
+    systematics.back().SetRebinProjection(rebin_proj);
+    systematics.back().SetXAxisRange({0., 50.});
+    systematics.back().SetResultPlotRange({-0.16, -0.02});
+    systematics.back().SetRatioPlotRange({0.81, 1.19});
     systematics.back().GetFlowHelper().SetFile(file_in);
     systematics.back().Init(prefix, sub_events_names.at(i), components_names.at(i));
     std::string canvas_name{systematics_names.at(i)+"_comp"};
-    canvases.push_back( new TCanvas(canvas_name.data(), "", 750, 1000) );
+    canvases.push_back( new TCanvas(canvas_name.data(), "", 1000, 1200) );
     systematics.back().SetDefault( default_value.GetAveraged() );
     systematics.back().SetSubEventsNames(sub_events_titles.at(i));
     systematics.back().SetMarkerStyles({
@@ -152,8 +177,10 @@ void BuildElliptic(const std::string& file_in_name, const std::string& file_out_
                                            kMagenta+1
                                        });
     systematics.back().SetAxisTitles("centrality (%)", "v_{2}");
+    systematics.back().SetLegendPosition({0.16, 0.0, 0.5, 0.4});
+    systematics.back().SetDefaultTitle("FW-Elliptic");
     systematics.back().DrawSubEvents(canvases.back());
-    canvas_name = file_out_name+"_"+systematics_names.at(i)+"_sub_evt.pdf";
+    canvas_name = file_out_name+"_"+systematics_names.at(i)+"_sub_evt.png";
     canvases.back()->Print(canvas_name.data());
     systematics.back().SaveToFile(file_out);
   }

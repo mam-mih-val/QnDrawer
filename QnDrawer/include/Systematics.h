@@ -18,7 +18,8 @@
 
 class Systematics {
 public:
-  explicit Systematics(std::string name) : name_(std::move(name)), painter_(name) {}
+  Systematics() = default;
+  explicit Systematics(std::string name) : name_(std::move(name)) {}
   virtual ~Systematics() = default;
   void Init(const std::string &prefix,
             const std::vector<std::string> &subEventsNames,
@@ -175,7 +176,12 @@ public:
     gStyle->SetTitleSize(0.04,"Y");
     gStyle->SetTitleOffset(1.6,"Y");
     gStyle->SetTitleOffset(1.0,"X");
-    auto legend = new TLegend(0.5, 0.5, 0.9, 0.9);
+    TLegend* legend;
+    if( !legend_position_.empty() )
+      legend = new TLegend(legend_position_.at(0), legend_position_.at(1),
+                           legend_position_.at(2), legend_position_.at(3));
+    else
+      legend = new TLegend(0.5, 0.5, 0.9, 0.9);
     legend->SetBorderSize(0);
     std::string pad_name = name_ + "_result";
     auto result_pad = new TPad(pad_name.data(), "result", 0.0, 0.35, 1.0, 1.0);
@@ -317,11 +323,11 @@ public:
   void SetDefaultTitle(const std::string &defaultTitle) {
     default_title_ = defaultTitle;
   }
-  Painter GetPainter() const { return painter_; }
+  void SetLegendPosition(const std::vector<float> &legendPosition) {
+    legend_position_ = legendPosition;
+  }
 
 private:
-  Systematics();
-  Painter painter_;
   std::string name_;
   std::string x_axis_title_;
   std::string y_axis_title_;
@@ -348,6 +354,7 @@ private:
   std::vector<float> x_axis_range_{};
   std::vector<float> result_plot_range_{0.0, 0.0};
   std::vector<float> ratio_plot_range_{0.0, 0.0};
+  std::vector<float> legend_position_{};
 };
 
 #endif // QNDRAWER_SYSTEMATICS_H

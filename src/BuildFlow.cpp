@@ -118,7 +118,7 @@ void BuildFW3S( std::string input_file_name, std::string output_file_name, std::
           [](std::vector<Qn::DataContainer<Qn::Stats>> corr) {
             Qn::DataContainer<Qn::Stats> result;
             corr.at(0) = corr.at(0).Rebin({"1_Ycm", 1, 0.3, 0.5});
-            corr.at(0) = corr.at(0).Projection({"0_Ycm","Centrality"});
+            corr.at(0) = corr.at(0).Projection({"0_Ycm","0_Pt","Centrality"});
             result = corr.at(0) * 2 / corr.at(1);
             return result;
           },
@@ -135,7 +135,7 @@ void BuildFW3S( std::string input_file_name, std::string output_file_name, std::
           [](std::vector<Qn::DataContainer<Qn::Stats>> corr) {
             Qn::DataContainer<Qn::Stats> result;
             corr.at(0) = corr.at(0).Rebin({"1_Ycm", 1, -0.5, -0.3});
-            corr.at(0) = corr.at(0).Projection({"0_Ycm","Centrality"});
+            corr.at(0) = corr.at(0).Projection({"0_Ycm","0_Pt","Centrality"});
             result = corr.at(0) * -2 / corr.at(1);
             return result;
           },
