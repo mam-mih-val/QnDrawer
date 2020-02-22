@@ -17,7 +17,7 @@ int main(int argv, char **argc) {
   std::string file_name{argc[2]};
   if(flag == "--RND")
     ConfigureRnd(file_name);
-  if(flag == "--3S")
+  if(flag == "--FW3S")
     Configure3Sub(file_name);
   return 0;
 }
@@ -54,13 +54,13 @@ void Configure3Sub(const std::string& file_name){
       std::make_pair("<FWs2,FWs3>","Fw2_Fw3")
   };
   std::map<std::string, std::vector<Qn::Axis>> rebin_axis{
-      std::make_pair<std::string, std::vector<Qn::Axis>>( "<MDCf,MDCb>", { {"0_Ycm", 1, -0.5, -0.3}, {"1_Ycm", 1, 0.3, 0.5} }),
-      std::make_pair<std::string, std::vector<Qn::Axis>>( "<MDCf,FWs1>", { {"0_Ycm", 1, 0.3, 0.5} }),
-      std::make_pair<std::string, std::vector<Qn::Axis>>( "<MDCf,FWs2>", { {"0_Ycm", 1, 0.3, 0.5} }),
-      std::make_pair<std::string, std::vector<Qn::Axis>>( "<MDCf,FWs3>", { {"0_Ycm", 1, 0.3, 0.5} }),
-      std::make_pair<std::string, std::vector<Qn::Axis>>( "<MDCb,FWs1>", { {"0_Ycm", 1, -0.5, -0.3} }),
-      std::make_pair<std::string, std::vector<Qn::Axis>>( "<MDCb,FWs2>", { {"0_Ycm", 1, -0.5, -0.3} }),
-      std::make_pair<std::string, std::vector<Qn::Axis>>( "<MDCb,FWs3>", { {"0_Ycm", 1, -0.5, -0.3} }),
+      std::make_pair<std::string, std::vector<Qn::Axis>>( "<MDCf,MDCb>", { {"0_Ycm", 1, -0.55, -0.35}, {"1_Ycm", 1, 0.35, 0.55} }),
+      std::make_pair<std::string, std::vector<Qn::Axis>>( "<MDCf,FWs1>", { {"0_Ycm", 1, 0.35, 0.55} }),
+      std::make_pair<std::string, std::vector<Qn::Axis>>( "<MDCf,FWs2>", { {"0_Ycm", 1, 0.35, 0.55} }),
+      std::make_pair<std::string, std::vector<Qn::Axis>>( "<MDCf,FWs3>", { {"0_Ycm", 1, 0.35, 0.55} }),
+      std::make_pair<std::string, std::vector<Qn::Axis>>( "<MDCb,FWs1>", { {"0_Ycm", 1, -0.55, -0.35} }),
+      std::make_pair<std::string, std::vector<Qn::Axis>>( "<MDCb,FWs2>", { {"0_Ycm", 1, -0.55, -0.35} }),
+      std::make_pair<std::string, std::vector<Qn::Axis>>( "<MDCb,FWs3>", { {"0_Ycm", 1, -0.55, -0.35} }),
       std::make_pair<std::string, std::vector<Qn::Axis>>( "<FWs1,FWs2>", {}),
       std::make_pair<std::string, std::vector<Qn::Axis>>( "<FWs1,FWs3>", {}),
       std::make_pair<std::string, std::vector<Qn::Axis>>( "<FWs2,FWs3>", {})
@@ -353,8 +353,12 @@ void ConfigureRnd(std::string file_name){
   std::vector<FlowConfiguration> configurations;
   std::vector<std::string> components{"_XX", "_YY"};
   std::vector<std::string> first_names{"RND"};
+  std::vector<std::string> second_names{"RND_2"};
 
   std::vector<std::vector<std::string>> first_resolutions{
+      {"Rs1_Rs2"},     // RND
+  };
+  std::vector<std::vector<std::string>> second_resolutions{
       {"Rs1_Rs2"},     // RND
   };
   // ******************************** Method of 3 Sub-Events in MDC+FW
@@ -368,7 +372,14 @@ void ConfigureRnd(std::string file_name){
       configurations.back().SetQnQnNames(resolution);
       configurations.back().SetUnQnNames({"TracksMdc_Full" + component + "_Ep"});
     }
-
+    for(size_t i=0; i<second_names.size(); ++i){
+      configurations.emplace_back(second_names.at(i) + component +"_Ep");
+      std::vector<std::string> resolution = second_resolutions.at(i);
+      for(auto& correlation : resolution)
+        correlation+=component+"_Ep";
+      configurations.back().SetQnQnNames(resolution);
+      configurations.back().SetUnQnNames({"TracksMdc2_Full2" + component + "_Ep"});
+    }
   }
 
   file->cd();

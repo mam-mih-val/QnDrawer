@@ -20,98 +20,113 @@ public:
   Comparator() = default;
   explicit Comparator(std::string name) : name_(std::move(name)) {}
   ~Comparator() = default;
-  void AddGraph(TGraph* graph, const std::string& graph_title="graph"){
+  void AddGraph(TGraph* graph, const std::string& graph_title="graph", const std::vector<int>& marker={}){
     if(!graphs_)
       graphs_ = new TMultiGraph("stack", "");
     graph->SetTitle(graph_title.data());
+    if( !marker.empty() ){
+      graph->SetMarkerStyle(marker.at(0));
+      graph->SetMarkerColor(marker.at(1));
+      graph->SetLineColor(marker.at(1));
+    }
     graphs_->Add(graph);
   }
-  void AddTh1(TH1* histo){
+  void AddTh1(TH1* histo, const std::vector<int>& marker={}){
     if(!histos_)
       histos_ = new THStack("histo_stack", "");
     histos_->Add(histo);
+    if( !marker.empty() ){
+      histo->SetMarkerStyle(marker.at(0));
+      histo->SetMarkerColor(marker.at(1));
+      histo->SetLineColor(marker.at(1));
+    }
   }
   void AddFile(const std::string& file_name_){ flow_helpers_.emplace( file_name_, file_name_ ); }
   void AddFile(TFile* file, const std::string& file_name_){ flow_helpers_.emplace( file_name_, file ); }
-  void PutOnCanvas( const std::string& file_name_, const std::string& container_name, const std::string& graph_title="graph" ){
-    Qn::DataContainer<Qn::Stats> container{ flow_helpers_.at(file_name_).GetDataContainer(container_name) };
-    container.SetSetting(Qn::Stats::Settings::CORRELATEDERRORS);
-    auto graph = Qn::DataContainerHelper::ToTGraph( container );
-    AddGraph(graph, graph_title);
-  }
-  void PutOnCanvas( const std::string& file_name_, const std::vector<std::string>& container_names, const std::vector<std::string>& container_titles ){
-    for( size_t i=0; i<container_names.size(); i++ ){
-      PutOnCanvas(file_name_, container_names.at(i), container_titles.at(i));
-    }
-  }
-  void MergeAndPutOnCanvas(const std::string& file_name_, const std::vector<std::string>& container_names, const std::string& graph_title){
+  void MergeAddContainers(const std::string& file_name_,
+      const std::vector<std::string>& container_names,
+      const std::string& graph_title,
+      const std::vector<int>& marker={}){
     Qn::DataContainer<Qn::Stats> container{ flow_helpers_.at(file_name_).Merge(container_names) };
-    container.SetSetting(Qn::Stats::Settings::CORRELATEDERRORS);
-    auto graph = Qn::DataContainerHelper::ToTGraph( container );
-    AddGraph(graph, graph_title);
+    AddContainer(container, graph_title, marker);
   }
-  void PutOnCanvas( Qn::DataContainer<Qn::Stats>& container, const std::string& title ){
-    TGraphAsymmErrors* graph{nullptr};;
+  void AddContainer( Qn::DataContainer<Qn::Stats> container, const std::string& title, const std::vector<int>& marker={}){
+    TGraphAsymmErrors* graph{nullptr};
+    if( rebin_projection_ ){
+      container = rebin_projection_(container);
+    }
     container.SetSetting(Qn::Stats::Settings::CORRELATEDERRORS);
     graph = Qn::DataContainerHelper::ToTGraph( container );
-    graph->SetTitle(title.data());
-    graphs_->Add(graph);
-  }
-  void PutOnCanvas( std::vector<Qn::DataContainer<Qn::Stats>>& containers, std::vector<std::string> titles ){
-    for(size_t i=0; i<containers.size(); i++){
-      PutOnCanvas(containers.at(i), titles.at(i));
-    }
+    AddGraph(graph, title, marker);
   }
   void Draw(){
-    SetStyle();
     canvas_->cd();
-    if( graphs_ )
-      graphs_->Draw("AP+PMC+PLC+NOSTACK");
+    gStyle->SetLegendBorderSize(0);
+    gStyle->SetPadLeftMargin(0.0);
+    gStyle->SetTitleSize(0.035,"X");
+    gStyle->SetTitleSize(0.035,"Y");
+    gStyle->SetTitleOffset(1.8,"Y");
+    gStyle->SetTitleOffset(1.0,"X");
+    gPad->SetLeftMargin(0.15);
+    if( graphs_ ){
+      graphs_->Draw();
+      std::string title = ";"+x_axis_title_+";"+y_axis_title_;
+      graphs_->SetTitle(title.data());
+      if( !y_axis_range_.empty() ){
+        graphs_->SetMinimum(y_axis_range_.at(0));
+        graphs_->SetMaximum(y_axis_range_.at(1));
+      }
+      if( !x_axis_range_.empty() )
+        graphs_->GetXaxis()->SetLimits(x_axis_range_.at(0), x_axis_range_.at(1));
+      graphs_->Draw("AP+E5");
+    }
     if( histos_ )
-      histos_->Draw("NOSTACK+SAME");
-    gPad->BuildLegend();
+      histos_->Draw("SAME");
+
+    if( histos_ && !graphs_ )
+      histos_->Draw("NOSTACK");
+//    if( !legend_position_.empty() )
+//      gPad->BuildLegend(legend_position_.at(0),
+//                      legend_position_.at(1),
+//                      legend_position_.at(2),
+//                      legend_position_.at(3));
+//    else
+//      gPad->BuildLegend();
   }
   void SetCanvas(TCanvas *canvas) { canvas_ = canvas; }
   TCanvas *GetCanvas() const { return canvas_; }
   TMultiGraph *GetGraphs() const { return graphs_; }
   void SetGraphs(TMultiGraph *graphs) { graphs_ = graphs; }
+  void SetRebinProjection(
+      const std::function<Qn::DataContainer<Qn::Stats>(Qn::DataContainer<Qn::Stats>)>
+          &rebinProjection) {
+    rebin_projection_ = rebinProjection;
+  }
+  void SetXAxisTitle(const std::string &xAxisTitle) {
+    x_axis_title_ = xAxisTitle;
+  }
+  void SetYAxisTitle(const std::string &yAxisTitle) {
+    y_axis_title_ = yAxisTitle;
+  }
+  void SetXAxisRange(const std::vector<float> &xAxisRange) {
+    x_axis_range_ = xAxisRange;
+  }
+  void SetYAxisRange(const std::vector<float> &yAxisRange) {
+    y_axis_range_ = yAxisRange;
+  }
+  void SetLegendPosition(const std::vector<float> &legendPosition) {
+    legend_position_ = legendPosition;
+  }
 
 private:
-  void SetStyle(){
-    gStyle->SetTitleSize(0.04,"T");
-    gStyle->SetTitleSize(0.035,"X");
-    gStyle->SetTitleSize(0.04,"Y");
-    gStyle->SetTitleSize(0.035,"Z");
-    gStyle->SetTitleOffset(1.6,"Y");
-    gStyle->SetTitleOffset(1.0,"X");
-    gStyle->SetFrameLineWidth(2);
-    gStyle->SetFrameFillColor(0);
-    gStyle->SetPadColor(0);
-    gStyle->SetLabelSize(0.03,"X");
-    gStyle->SetLabelSize(0.03,"Y");
-    gStyle->SetLabelSize(0.03,"Z");
-    gStyle->SetPadTopMargin(0.1);
-    gStyle->SetPadBottomMargin(0.18);
-    gStyle->SetPadLeftMargin(0.15);
-    gStyle->SetPadRightMargin(0.15);
-    gStyle->SetMarkerSize(2.0);
-    gStyle->SetErrorX(0);
-    gStyle->SetOptStat(0);
-    gStyle->SetCanvasColor(0);
-    gStyle->SetTitleFillColor(0);
-    gStyle->SetTitleBorderSize(0);
-    gStyle->SetHistLineWidth(3);
-    gStyle->SetLineWidth(3);
-    gStyle->SetCanvasBorderMode(0);
-    gStyle->SetLegendBorderSize(0);
-    gStyle->SetPadBorderMode(0);
-    gStyle->SetEndErrorSize(5);
-    gStyle->SetPadTickX(1);
-    gStyle->SetPadTickY(1);
-    gStyle->SetMarkerSize(2);
-    gStyle->SetLineWidth(4);
-  }
   std::string name_;
+  std::string x_axis_title_;
+  std::string y_axis_title_;
+  std::vector<float> legend_position_{};
+  std::vector<float> x_axis_range_{};
+  std::vector<float> y_axis_range_{};
+  std::function<Qn::DataContainer<Qn::Stats>(Qn::DataContainer<Qn::Stats>)>
+      rebin_projection_ = {};
   std::map<std::string, FlowHelper> flow_helpers_;
   TMultiGraph* graphs_{nullptr};
   THStack* histos_{nullptr};

@@ -6,7 +6,6 @@
 #define QNDRAWER_SYSTEMATICS_H
 
 #include "FlowHelper.h"
-#include "Painter.h"
 #include "TStyle.h"
 #include <DataContainer.h>
 #include <Stats.h>

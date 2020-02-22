@@ -26,7 +26,7 @@ int main( int argc, char** argv )
   std::string input_file_name=argv[2];
   std::string output_file_name=argv[3];
   std::string config_file_name=argv[4];
-  if( flag == "--3S" )
+  if( flag == "--FW3S" )
     BuildFW3S(input_file_name, output_file_name, config_file_name);
   if( flag == "--RND" )
     BuildRNDS(input_file_name, output_file_name, config_file_name);
@@ -117,7 +117,7 @@ void BuildFW3S( std::string input_file_name, std::string output_file_name, std::
           },
           [](std::vector<Qn::DataContainer<Qn::Stats>> corr) {
             Qn::DataContainer<Qn::Stats> result;
-            corr.at(0) = corr.at(0).Rebin({"1_Ycm", 1, 0.3, 0.5});
+            corr.at(0) = corr.at(0).Rebin({"1_Ycm", 1, 0.35, 0.55});
             corr.at(0) = corr.at(0).Projection({"0_Ycm","0_Pt","Centrality"});
             result = corr.at(0) * 2 / corr.at(1);
             return result;
@@ -134,7 +134,7 @@ void BuildFW3S( std::string input_file_name, std::string output_file_name, std::
           },
           [](std::vector<Qn::DataContainer<Qn::Stats>> corr) {
             Qn::DataContainer<Qn::Stats> result;
-            corr.at(0) = corr.at(0).Rebin({"1_Ycm", 1, -0.5, -0.3});
+            corr.at(0) = corr.at(0).Rebin({"1_Ycm", 1, -0.55, -0.35});
             corr.at(0) = corr.at(0).Projection({"0_Ycm","0_Pt","Centrality"});
             result = corr.at(0) * -2 / corr.at(1);
             return result;
@@ -240,6 +240,7 @@ void BuildRNDS( std::string input_file_name, std::string output_file_name, std::
   auto file_out = new TFile(output_file_name.data(), "recreate");
   FlowBuilder builder;
   std::vector<std::string> first_names{"RND"};
+  std::vector<std::string> second_names{"RND_2"};
   builder.SetName("FlowBuilder");
   builder.SetInputName(input_file_name);
   builder.SetConfigFileName(config_file_name);
@@ -254,6 +255,21 @@ void BuildRNDS( std::string input_file_name, std::string output_file_name, std::
           [](std::vector<Qn::DataContainer<Qn::Stats>> corr) {
             Qn::DataContainer<Qn::Stats> result;
             result = ResFullEvent(corr.at(0));
+            return result;
+          },
+          [](std::vector<Qn::DataContainer<Qn::Stats>> corr) {
+            Qn::DataContainer<Qn::Stats> result;
+            result = corr.at(0) * 2 / corr.at(1);
+            return result;
+          },
+          file_out);
+    }
+    for(const auto &name : second_names){
+      builder.ComputeMethodRamSaving(
+          name + component + "_Ep",
+          [](std::vector<Qn::DataContainer<Qn::Stats>> corr) {
+            Qn::DataContainer<Qn::Stats> result;
+            result = ResFullEventElliptic(corr.at(0));
             return result;
           },
           [](std::vector<Qn::DataContainer<Qn::Stats>> corr) {

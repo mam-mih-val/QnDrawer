@@ -38,12 +38,12 @@ void BuildDirected(const std::string& file_in_name, const std::string& file_out_
       {"_XX_Sp", "_YY_Sp"},
   };
   auto rebin_proj = [](std::vector<Qn::DataContainer<Qn::Stats>> container){
-    container.back() = container.back().Rebin({"0_Ycm", 1, -0.2, -0.1});
+    container.back() = container.back().Rebin({"0_Ycm", 1, -0.25, -0.15});
     container.back() = container.back().Projection({"Centrality"});
     container.back() = container.back().Rebin({"Centrality", 5, 0.0, 50.0});
     return container.back()*(1);
   };
-  auto file_ref = new TFile("../Output_Files/RND_Y.root");
+  auto file_ref = new TFile("../Output_Files/RND_PT2.root");
   Systematics default_value("RND-Sub");
   default_value.GetFlowHelper().SetFile(file_ref);
   default_value.SetRebinProjection(rebin_proj);
@@ -56,7 +56,7 @@ void BuildDirected(const std::string& file_in_name, const std::string& file_out_
     systematics.emplace_back(systematics_names.at(i));
     systematics.back().SetRebinProjection(rebin_proj);
     systematics.back().SetXAxisRange({0., 50.});
-    systematics.back().SetResultPlotRange({-0.139, -0.03});
+    systematics.back().SetResultPlotRange({-0.149, -0.08});
     systematics.back().SetRatioPlotRange({0.81, 1.19});
     systematics.back().GetFlowHelper().SetFile(file_in);
     systematics.back().Init(prefix, sub_events_names.at(i), components_names.at(i));
@@ -81,7 +81,7 @@ void BuildDirected(const std::string& file_in_name, const std::string& file_out_
                                            kMagenta+1
                                        });
     systematics.back().SetDefaultTitle("RND-Sub");
-    systematics.back().SetLegendPosition({0.4, 0.0, 0.75, 0.4});
+    systematics.back().SetLegendPosition({0.4, 0.85, 0.75, 0.5});
     systematics.back().SetAxisTitles("centrality (%)", "v_{1}");
     systematics.back().DrawSubEvents(canvases.back());
     canvas_name = file_out_name+"_"+systematics_names.at(i)+"_sub_evt.png";
@@ -97,7 +97,7 @@ void BuildElliptic(const std::string& file_in_name, const std::string& file_out_
   auto file_in = TFile::Open(file_in_name.data());
   std::vector<Systematics> systematics;
   std::vector<std::string> systematics_names{ "FWs1_FWs2", "FWs1_FWs3", "FWs2_FWs3" };
-  std::string prefix{"flow_"};
+  std::string prefix{"resolution_"};
   std::vector<std::vector<std::string>> sub_events_names{
       {"FWs1(MDCf,MDCb)_FWs2(MDCf,MDCb)", "FWs1(MDCf,FWs3)_FWs2(MDCf,MDCb)", "FWs1(MDCb,FWs3)_FWs2(MDCf,MDCb)", "FWs1(MDCb,FWs2)_FWs2(MDCb,FWs1)", "FWs1(MDCb,FWs3)_FWs2(MDCb,FWs3)", "FWs1(FWs2,FWs3)_FWs2(FWs1,FWs3)"},
       {"FWs1(MDCf,MDCb)_FWs3(MDCf,MDCb)", "FWs1(MDCf,MDCb)_FWs3(MDCf,FWs1)", "FWs1(MDCf,MDCb)_FWs3(MDCb,FWs1)", "FWs1(MDCf,FWs3)_FWs3(MDCf,MDCb)", "FWs1(MDCb,FWs3)_FWs3(MDCf,MDCb)", "FWs1(MDCf,FWs3)_FWs3(MDCf,FWs1)"},
@@ -133,7 +133,7 @@ void BuildElliptic(const std::string& file_in_name, const std::string& file_out_
       {"_XXX_Sp", "_XYY_Sp", "_YXY_Sp", "_YYX_Sp"}
   };
   auto rebin_proj = [](std::vector<Qn::DataContainer<Qn::Stats>> container){
-	container.back() = container.back().Rebin({"0_Ycm", 1, -0.2, -0.1});
+//	container.back() = container.back().Rebin({"0_Ycm", 1, -0.2, -0.1});
 	container.back() = container.back().Projection({"Centrality"});
 	container.back() = container.back().Rebin({"Centrality", 5, 0.0, 50.0});
 	return container.back()*(1);
@@ -152,13 +152,13 @@ void BuildElliptic(const std::string& file_in_name, const std::string& file_out_
     systematics.emplace_back(systematics_names.at(i));
     systematics.back().SetRebinProjection(rebin_proj);
     systematics.back().SetXAxisRange({0., 50.});
-    systematics.back().SetResultPlotRange({-0.16, -0.02});
+    systematics.back().SetResultPlotRange({0.01, 0.16});
     systematics.back().SetRatioPlotRange({0.81, 1.19});
     systematics.back().GetFlowHelper().SetFile(file_in);
     systematics.back().Init(prefix, sub_events_names.at(i), components_names.at(i));
     std::string canvas_name{systematics_names.at(i)+"_comp"};
     canvases.push_back( new TCanvas(canvas_name.data(), "", 1000, 1200) );
-    systematics.back().SetDefault( default_value.GetAveraged() );
+//    systematics.back().SetDefault( default_value.GetAveraged() );
     systematics.back().SetSubEventsNames(sub_events_titles.at(i));
     systematics.back().SetMarkerStyles({
                                            kFullSquare,
@@ -176,11 +176,11 @@ void BuildElliptic(const std::string& file_in_name, const std::string& file_out_
                                            kGreen+1,
                                            kMagenta+1
                                        });
-    systematics.back().SetAxisTitles("centrality (%)", "v_{2}");
-    systematics.back().SetLegendPosition({0.16, 0.0, 0.5, 0.4});
-    systematics.back().SetDefaultTitle("FW-Elliptic");
+    systematics.back().SetAxisTitles("centrality (%)", "R_{2}");
+    systematics.back().SetLegendPosition({0.4, 0.0, 0.75, 0.4});
+    systematics.back().SetDefaultTitle("Averaged");
     systematics.back().DrawSubEvents(canvases.back());
-    canvas_name = file_out_name+"_"+systematics_names.at(i)+"_sub_evt.png";
+    canvas_name = file_out_name+"_"+systematics_names.at(i)+"_sub_evt.pdf";
     canvases.back()->Print(canvas_name.data());
     systematics.back().SaveToFile(file_out);
   }
