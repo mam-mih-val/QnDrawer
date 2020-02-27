@@ -153,9 +153,8 @@ void BuildFW3S( std::string input_file_name, std::string output_file_name, std::
             first_name + "_" + second_name + component + "_Sp",
             [](std::vector<Qn::DataContainer<Qn::Stats>> corr) {
               Qn::DataContainer<Qn::Stats> result;
-              result = Sqrt(corr.at(0) * corr.at(1) / corr.at(2) * corr.at(3) *
-                            corr.at(4) / corr.at(5)) *
-                       2;
+              result = Sqrt(corr.at(0) * corr.at(1) / corr.at(2) * 2 ) * Sqrt(corr.at(3) *
+                                                                              corr.at(4) / corr.at(5) * 2);
               return result;
             },
             [](std::vector<Qn::DataContainer<Qn::Stats>> corr) {
@@ -172,9 +171,8 @@ void BuildFW3S( std::string input_file_name, std::string output_file_name, std::
             second_name + "_" + third_name + component + "_Sp",
             [](std::vector<Qn::DataContainer<Qn::Stats>> corr) {
               Qn::DataContainer<Qn::Stats> result;
-              result = Sqrt(corr.at(0) * corr.at(1) / corr.at(2) * corr.at(3) *
-                            corr.at(4) / corr.at(5)) *
-                       2;
+              result = Sqrt(corr.at(0) * corr.at(1) / corr.at(2) * 2 ) * Sqrt(corr.at(3) *
+                                                                              corr.at(4) / corr.at(5) * 2);
               return result;
             },
             [](std::vector<Qn::DataContainer<Qn::Stats>> corr) {
@@ -191,9 +189,8 @@ void BuildFW3S( std::string input_file_name, std::string output_file_name, std::
             first_name + "_" + third_name + component + "_Sp",
             [](std::vector<Qn::DataContainer<Qn::Stats>> corr) {
               Qn::DataContainer<Qn::Stats> result;
-              result = Sqrt(corr.at(0) * corr.at(1) / corr.at(2) * corr.at(3) *
-                            corr.at(4) / corr.at(5)) *
-                       2;
+              result = Sqrt(corr.at(0) * corr.at(1) / corr.at(2) * 2 ) * Sqrt(corr.at(3) *
+                            corr.at(4) / corr.at(5) * 2);
               return result;
             },
             [](std::vector<Qn::DataContainer<Qn::Stats>> corr) {
@@ -241,23 +238,28 @@ void BuildRNDS( std::string input_file_name, std::string output_file_name, std::
   FlowBuilder builder;
   std::vector<std::string> first_names{"RND"};
   std::vector<std::string> second_names{"RND_2"};
+  std::vector<std::string> third_names{"RND_2_NE"};
+  std::vector<std::string> fourth_names{"RND_NE1", "RND_NE2"};
   builder.SetName("FlowBuilder");
   builder.SetInputName(input_file_name);
   builder.SetConfigFileName(config_file_name);
   std::vector<std::string> components{"_XX", "_YY"};
   std::vector<std::string> methods{"_Ep"};
+  Qn::Axis centrality{"Centrality", 4, 0.0, 40.0};
 
   // ******************************** Method of 3 Sub-Events in MDC+FW ******************************** //
   for (const auto& component : components) {
     for(const auto & first_name : first_names){
       builder.ComputeMethodRamSaving(
           first_name + component + "_Ep",
-          [](std::vector<Qn::DataContainer<Qn::Stats>> corr) {
+          [centrality](std::vector<Qn::DataContainer<Qn::Stats>> corr) {
             Qn::DataContainer<Qn::Stats> result;
+            // corr.at(0) = corr.at(0).Rebin(centrality);
             result = ResFullEvent(corr.at(0));
             return result;
           },
-          [](std::vector<Qn::DataContainer<Qn::Stats>> corr) {
+          [centrality](std::vector<Qn::DataContainer<Qn::Stats>> corr) {
+            // corr.at(0) = corr.at(0).Rebin(centrality);
             Qn::DataContainer<Qn::Stats> result;
             result = corr.at(0) * 2 / corr.at(1);
             return result;
@@ -267,17 +269,54 @@ void BuildRNDS( std::string input_file_name, std::string output_file_name, std::
     for(const auto &name : second_names){
       builder.ComputeMethodRamSaving(
           name + component + "_Ep",
-          [](std::vector<Qn::DataContainer<Qn::Stats>> corr) {
+          [centrality](std::vector<Qn::DataContainer<Qn::Stats>> corr) {
+            // corr.at(0) = corr.at(0).Rebin(centrality);
             Qn::DataContainer<Qn::Stats> result;
             result = ResFullEventElliptic(corr.at(0));
             return result;
           },
-          [](std::vector<Qn::DataContainer<Qn::Stats>> corr) {
+          [centrality](std::vector<Qn::DataContainer<Qn::Stats>> corr) {
+            // corr.at(0) = corr.at(0).Rebin(centrality);
             Qn::DataContainer<Qn::Stats> result;
             result = corr.at(0) * 2 / corr.at(1);
             return result;
           },
           file_out);
+    }
+    for(const auto & fourth_name : fourth_names){
+      builder.ComputeMethodRamSaving(fourth_name + component +"_Ep",
+         [centrality](std::vector<Qn::DataContainer<Qn::Stats>> corr) {
+           // corr.at(0) = corr.at(0).Rebin(centrality);
+           Qn::DataContainer<Qn::Stats> result;
+           result = Sqrt( corr.at(0)*2.0 );
+           return result;
+         },
+         [centrality](std::vector<Qn::DataContainer<Qn::Stats>> corr) {
+           // corr.at(0) = corr.at(0).Rebin(centrality);
+           Qn::DataContainer<Qn::Stats> result;
+           result = corr.at(0) * 2.0 / corr.at(1);
+           return result;
+         },
+         file_out);
+    }
+  }
+  components = {"_XXX", "_XYY"};
+  for(const auto& component : components){
+    for(const auto & third_name : third_names){
+      builder.ComputeMethodRamSaving(third_name + component +"_Ep",
+          [centrality](std::vector<Qn::DataContainer<Qn::Stats>> corr) {
+           // corr.at(0) = corr.at(0).Rebin(centrality);
+           Qn::DataContainer<Qn::Stats> result;
+           result = corr.at(0)*2.0 ;
+           return result;
+         },
+         [centrality](std::vector<Qn::DataContainer<Qn::Stats>> corr) {
+           // corr.at(0) = corr.at(0).Rebin(centrality);
+           Qn::DataContainer<Qn::Stats> result;
+           result = corr.at(0) * 4.0 / corr.at(1);
+           return result;
+         },
+         file_out);
     }
   }
   file_out->Close();

@@ -190,11 +190,16 @@ public:
     stack_title = ";" + x_axis_title_;
     auto ratio_pad = new TPad(pad_name.data(), "ratio", 0.0, 0.0, 1.0, .35);
     auto ratio_stack = new TMultiGraph("ratio", stack_title.data());
-    TF1* line;
-    if( x_axis_range_.size() == 2 )
-      line = new TF1("line", "1", x_axis_range_.at(0), x_axis_range_.at(1));
-    else
-      line = new TF1("line", "1", -100, 100);
+    TF1* line_ration;
+    TF1* line_result;
+    if( x_axis_range_.size() == 2 ){
+      line_ration = new TF1("line_ration", "1", x_axis_range_.at(0), x_axis_range_.at(1));
+      line_result = new TF1("line_result", "0", x_axis_range_.at(0), x_axis_range_.at(1));
+    }
+    else{
+      line_ration = new TF1("line_ration", "1", -100, 100);
+      line_result = new TF1("line_result", "0", -100, 100);
+    }
     TGraphAsymmErrors *graph;
     averaged_.SetSetting(Qn::Stats::Settings::CORRELATEDERRORS);
     graph = Qn::DataContainerHelper::ToTGraph(averaged_);
@@ -252,6 +257,7 @@ public:
       compare_graph_->Draw("same");
     }
 //    result_pad->BuildLegend("P");
+    line_result->Draw("same");
     legend->Draw();
     result_stack->GetHistogram()->SetLabelSize(0.035, "Y");
     if (result_plot_range_.at(0) != result_plot_range_.at(1)) {
@@ -267,7 +273,7 @@ public:
       ratio_stack->Draw("AP+PMC+PLC");
     else
       ratio_stack->Draw("AP+E5");
-    line->Draw("same");
+    line_ration->Draw("same");
     ratio_stack->GetHistogram()->SetLabelSize(0.065, "X");
     ratio_stack->GetHistogram()->SetLabelSize(0.065, "Y");
     if (ratio_plot_range_.at(0) != ratio_plot_range_.at(1)) {

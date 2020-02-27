@@ -28,6 +28,8 @@ public:
       graph->SetMarkerStyle(marker.at(0));
       graph->SetMarkerColor(marker.at(1));
       graph->SetLineColor(marker.at(1));
+      graph->SetMarkerSize(marker_size_);
+      graph->SetLineWidth(line_width_);
     }
     graphs_->Add(graph);
   }
@@ -39,6 +41,8 @@ public:
       histo->SetMarkerStyle(marker.at(0));
       histo->SetMarkerColor(marker.at(1));
       histo->SetLineColor(marker.at(1));
+      histo->SetMarkerSize(marker_size_);
+      histo->SetLineWidth(line_width_);
     }
   }
   void AddFile(const std::string& file_name_){ flow_helpers_.emplace( file_name_, file_name_ ); }
@@ -67,31 +71,32 @@ public:
     gStyle->SetTitleSize(0.035,"Y");
     gStyle->SetTitleOffset(1.8,"Y");
     gStyle->SetTitleOffset(1.0,"X");
+    gStyle->SetErrorX(0);
     gPad->SetLeftMargin(0.15);
     if( graphs_ ){
       graphs_->Draw();
       std::string title = ";"+x_axis_title_+";"+y_axis_title_;
       graphs_->SetTitle(title.data());
       if( !y_axis_range_.empty() ){
-        graphs_->SetMinimum(y_axis_range_.at(0));
-        graphs_->SetMaximum(y_axis_range_.at(1));
+        graphs_->GetHistogram()->SetMinimum(y_axis_range_.at(0));
+        graphs_->GetHistogram()->SetMaximum(y_axis_range_.at(1));
       }
       if( !x_axis_range_.empty() )
         graphs_->GetXaxis()->SetLimits(x_axis_range_.at(0), x_axis_range_.at(1));
       graphs_->Draw("AP+E5");
     }
     if( histos_ )
-      histos_->Draw("SAME");
+      histos_->Draw("SAME+NOSTACK");
 
     if( histos_ && !graphs_ )
       histos_->Draw("NOSTACK");
-//    if( !legend_position_.empty() )
-//      gPad->BuildLegend(legend_position_.at(0),
-//                      legend_position_.at(1),
-//                      legend_position_.at(2),
-//                      legend_position_.at(3));
-//    else
-//      gPad->BuildLegend();
+    if( !legend_position_.empty() )
+      gPad->BuildLegend(legend_position_.at(0),
+                      legend_position_.at(1),
+                      legend_position_.at(2),
+                      legend_position_.at(3));
+    else
+      gPad->BuildLegend();
   }
   void SetCanvas(TCanvas *canvas) { canvas_ = canvas; }
   TCanvas *GetCanvas() const { return canvas_; }
@@ -117,9 +122,13 @@ public:
   void SetLegendPosition(const std::vector<float> &legendPosition) {
     legend_position_ = legendPosition;
   }
+  void SetMarkerSize(float markerSize) { marker_size_ = markerSize; }
+  void SetLineWidth(float lineWidth) { line_width_ = lineWidth; }
 
 private:
   std::string name_;
+  float marker_size_{2.0};
+  float line_width_{2.0};
   std::string x_axis_title_;
   std::string y_axis_title_;
   std::vector<float> legend_position_{};

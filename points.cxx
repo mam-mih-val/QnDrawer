@@ -1,0 +1,95 @@
+{
+//========= Macro generated from object: projection_y/PtY_v2EPcent1020_v2_p_ref
+//========= by ROOT version6.18/05
+   
+   TH1D *projection_y__1 = new TH1D("projection_y__1","PtY_v2EPcent1020_v2_p_ref",40,0,2000);
+   projection_y__1->SetBinContent(5,-0.0204733);
+   projection_y__1->SetBinContent(6,-0.0227109);
+   projection_y__1->SetBinContent(7,-0.0246764);
+   projection_y__1->SetBinContent(8,-0.0272646);
+   projection_y__1->SetBinContent(9,-0.0309411);
+   projection_y__1->SetBinContent(10,-0.0353408);
+   projection_y__1->SetBinContent(11,-0.0407377);
+   projection_y__1->SetBinContent(12,-0.0471014);
+   projection_y__1->SetBinContent(13,-0.054554);
+   projection_y__1->SetBinContent(14,-0.0623329);
+   projection_y__1->SetBinContent(15,-0.0699693);
+   projection_y__1->SetBinContent(16,-0.0779089);
+   projection_y__1->SetBinContent(17,-0.0855044);
+   projection_y__1->SetBinContent(18,-0.0938259);
+   projection_y__1->SetBinContent(19,-0.10174);
+   projection_y__1->SetBinContent(20,-0.108972);
+   projection_y__1->SetBinContent(21,-0.116149);
+   projection_y__1->SetBinContent(22,-0.123236);
+   projection_y__1->SetBinContent(23,-0.128971);
+   projection_y__1->SetBinContent(24,-0.135209);
+   projection_y__1->SetBinContent(25,-0.141646);
+   projection_y__1->SetBinContent(26,-0.145462);
+   projection_y__1->SetBinContent(27,-0.150002);
+   projection_y__1->SetBinContent(28,-0.155602);
+   projection_y__1->SetBinContent(29,-0.160709);
+   projection_y__1->SetBinContent(30,-0.161628);
+   projection_y__1->SetBinContent(31,-0.163394);
+   projection_y__1->SetBinContent(32,-0.165385);
+   projection_y__1->SetBinContent(33,-0.170482);
+   projection_y__1->SetBinContent(34,-0.167221);
+   projection_y__1->SetBinContent(35,-0.175585);
+   projection_y__1->SetBinContent(36,-0.16616);
+   projection_y__1->SetBinContent(37,-0.176479);
+   projection_y__1->SetBinContent(38,-0.166659);
+   projection_y__1->SetBinError(5,0.000144338);
+   projection_y__1->SetBinError(6,0.000129728);
+   projection_y__1->SetBinError(7,0.000123192);
+   projection_y__1->SetBinError(8,0.000119985);
+   projection_y__1->SetBinError(9,0.00011888);
+   projection_y__1->SetBinError(10,0.000119788);
+   projection_y__1->SetBinError(11,0.000122385);
+   projection_y__1->SetBinError(12,0.000126504);
+   projection_y__1->SetBinError(13,0.000133075);
+   projection_y__1->SetBinError(14,0.000143106);
+   projection_y__1->SetBinError(15,0.000155573);
+   projection_y__1->SetBinError(16,0.000170835);
+   projection_y__1->SetBinError(17,0.000188751);
+   projection_y__1->SetBinError(18,0.000209841);
+   projection_y__1->SetBinError(19,0.000234525);
+   projection_y__1->SetBinError(20,0.000264433);
+   projection_y__1->SetBinError(21,0.000300666);
+   projection_y__1->SetBinError(22,0.000344342);
+   projection_y__1->SetBinError(23,0.000397469);
+   projection_y__1->SetBinError(24,0.000461487);
+   projection_y__1->SetBinError(25,0.000538578);
+   projection_y__1->SetBinError(26,0.000631134);
+   projection_y__1->SetBinError(27,0.000741775);
+   projection_y__1->SetBinError(28,0.000874225);
+   projection_y__1->SetBinError(29,0.00103463);
+   projection_y__1->SetBinError(30,0.00122742);
+   projection_y__1->SetBinError(31,0.00145975);
+   projection_y__1->SetBinError(32,0.0017387);
+   projection_y__1->SetBinError(33,0.00207569);
+   projection_y__1->SetBinError(34,0.00248359);
+   projection_y__1->SetBinError(35,0.00296592);
+   projection_y__1->SetBinError(36,0.00355777);
+   projection_y__1->SetBinError(37,0.00423158);
+   projection_y__1->SetBinError(38,0.00523562);
+   projection_y__1->SetEntries(153417);
+
+   Int_t ci;      // for color index setting
+   TColor *color; // for color definition with alpha
+   ci = TColor::GetColor("#000099");
+   projection_y__1->SetLineColor(ci);
+   projection_y__1->GetXaxis()->SetTitle("#it{p}_{t} (GeV/#it{c})");
+   projection_y__1->GetXaxis()->SetLabelFont(42);
+   projection_y__1->GetXaxis()->SetLabelSize(0.035);
+   projection_y__1->GetXaxis()->SetTitleSize(0.035);
+   projection_y__1->GetXaxis()->SetTitleFont(42);
+   projection_y__1->GetYaxis()->SetLabelFont(42);
+   projection_y__1->GetYaxis()->SetLabelSize(0.035);
+   projection_y__1->GetYaxis()->SetTitleSize(0.035);
+   projection_y__1->GetYaxis()->SetTitleFont(42);
+   projection_y__1->GetZaxis()->SetLabelFont(42);
+   projection_y__1->GetZaxis()->SetLabelSize(0.035);
+   projection_y__1->GetZaxis()->SetTitleSize(0.035);
+   projection_y__1->GetZaxis()->SetTitleOffset(1);
+   projection_y__1->GetZaxis()->SetTitleFont(42);
+   projection_y__1->Draw("");
+}

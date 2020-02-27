@@ -354,6 +354,8 @@ void ConfigureRnd(std::string file_name){
   std::vector<std::string> components{"_XX", "_YY"};
   std::vector<std::string> first_names{"RND"};
   std::vector<std::string> second_names{"RND_2"};
+  std::vector<std::string> third_names{"RND_2_NE"};
+  std::vector<std::string> fourth_names{"RND_NE1", "RND_NE2"};
 
   std::vector<std::vector<std::string>> first_resolutions{
       {"Rs1_Rs2"},     // RND
@@ -361,8 +363,14 @@ void ConfigureRnd(std::string file_name){
   std::vector<std::vector<std::string>> second_resolutions{
       {"Rs1_Rs2"},     // RND
   };
-  // ******************************** Method of 3 Sub-Events in MDC+FW
-  // ******************************** //
+  std::vector<std::vector<std::string>> third_resolutions{
+      {"Rs1_Rs2"},     // RND
+  };
+  std::vector<std::vector<std::string>> fourth_resolutions{
+      {"Rs1_Rs2"},     // RND
+      {"Rs1_Rs2"}     // RND
+  };
+
   for (const auto& component : components) {
     for(size_t i=0; i<first_names.size(); ++i){
       configurations.emplace_back(first_names.at(i) + component +"_Ep");
@@ -380,8 +388,34 @@ void ConfigureRnd(std::string file_name){
       configurations.back().SetQnQnNames(resolution);
       configurations.back().SetUnQnNames({"TracksMdc2_Full2" + component + "_Ep"});
     }
+    for(size_t i=0; i<third_names.size(); ++i){
+      configurations.emplace_back(third_names.at(i) + component +"_Ep");
+      std::vector<std::string> resolution = third_resolutions.at(i);
+      for(auto& correlation : resolution)
+        correlation+=component+"_Ep";
+      configurations.back().SetQnQnNames(resolution);
+      configurations.back().SetUnQnNames({"TracksMdc_Rs1_Rs2" + component + "_Ep"});
+    }
+    for(size_t i=0; i< fourth_names.size(); ++i){
+      configurations.emplace_back(fourth_names.at(i) + component +"_Ep");
+      std::vector<std::string> resolution = fourth_resolutions.at(i);
+      for(auto& correlation : resolution)
+        correlation+=component+"_Ep";
+      configurations.back().SetQnQnNames(resolution);
+      configurations.back().SetUnQnNames({"TracksMdc_Rs"+std::to_string(i+1) + component + "_Ep"});
+    }
   }
-
+  components = {"XX", "YY"};
+  for(const auto& component : components){
+    for(size_t i=0; i<third_names.size(); ++i){
+      configurations.emplace_back(third_names.at(i) + "_X" + component +"_Ep");
+      std::vector<std::string> resolution = third_resolutions.at(i);
+      for(auto& correlation : resolution)
+        correlation+="_"+component+"_Ep";
+      configurations.back().SetQnQnNames(resolution);
+      configurations.back().SetUnQnNames({"TracksMdc_Rs1_Rs2_X" + component + "_Ep"});
+    }
+  }
   file->cd();
   for (auto &configuration : configurations)
     configuration.SaveToFile(file);
