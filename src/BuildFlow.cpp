@@ -10,8 +10,9 @@
 
 // ./Build_Flow input_file output_file config_file
 
-void BuildFW3S( std::string, std::string, std::string );
-void BuildRNDS( std::string, std::string, std::string );
+void BuildFw3s( std::string input_file_name, std::string output_file_name, std::string config_file_name);
+void BuildFw3x( std::string input_file_name, std::string output_file_name, std::string config_file_name);
+void BuildRnds( std::string input_file_name, std::string output_file_name, std::string config_file_name);
 
 int main( int argc, char** argv )
 {
@@ -27,16 +28,18 @@ int main( int argc, char** argv )
   std::string output_file_name=argv[3];
   std::string config_file_name=argv[4];
   if( flag == "--FW3S" )
-    BuildFW3S(input_file_name, output_file_name, config_file_name);
+    BuildFw3s(input_file_name, output_file_name, config_file_name);
+  if( flag == "--FW3X" )
+    BuildFw3x(input_file_name, output_file_name, config_file_name);
   if( flag == "--RND" )
-    BuildRNDS(input_file_name, output_file_name, config_file_name);
+    BuildRnds(input_file_name, output_file_name, config_file_name);
   auto end = std::chrono::system_clock::now();
   std::chrono::duration<double> elapsed_seconds = end - start;
   std::cout << "elapsed time: " << elapsed_seconds.count() << " s\n";
   return 0;
 }
 
-void BuildFW3S( std::string input_file_name, std::string output_file_name, std::string config_file_name){
+void BuildFw3s( std::string input_file_name, std::string output_file_name, std::string config_file_name){
   auto file_out = new TFile(output_file_name.data(), "recreate");
   FlowBuilder builder;
   std::vector<std::string> first_names{"FWs1(MDCf,MDCb)", "FWs1(MDCf,FWs2)",
@@ -233,7 +236,57 @@ void BuildFW3S( std::string input_file_name, std::string output_file_name, std::
 //  builder.SaveToFile(output_file_name);
   file_out->Close();
 }
-void BuildRNDS( std::string input_file_name, std::string output_file_name, std::string config_file_name){
+void BuildFw3x( std::string input_file_name, std::string output_file_name, std::string config_file_name){
+  auto file_out = new TFile(output_file_name.data(), "recreate");
+  FlowBuilder builder;
+  std::vector<std::string> forward_names{"MDCf(FWs1,FWs2)", "MDCf(FWs1,FWs3)", "MDCf(FWs2,FWs3)"};
+  std::vector<std::string> backward_names{"MDCb(FWs1,FWs2)", "MDCb(FWs1,FWs3)", "MDCb(FWs2,FWs3)"};
+  builder.SetName("FlowBuilder");
+  builder.SetInputName(input_file_name);
+  builder.SetConfigFileName(config_file_name);
+  std::vector<std::string> components{"_XXx", "_XXy"};
+  std::vector<std::string> methods{"_Sp"};
+
+  // ******************************** Method of 3 Sub-Events in MDC+FW ******************************** //
+  for (const auto& component : components) {
+    for(const auto & forward_name : forward_names){
+      builder.ComputeMethodRamSaving(
+          forward_name + component + "_Sp",
+          [](std::vector<Qn::DataContainer<Qn::Stats>> corr) {
+            Qn::DataContainer<Qn::Stats> result;
+            result = corr.at(0) / corr.at(1) * 2;
+            return result;
+          },
+          [](std::vector<Qn::DataContainer<Qn::Stats>> corr) {
+            Qn::DataContainer<Qn::Stats> result;
+            corr.at(0) = corr.at(0).Rebin({"1_Ycm", 1, 0.35, 0.55});
+            corr.at(0) = corr.at(0).Projection({"0_Ycm","0_Pt","Centrality"});
+            result = corr.at(0) / corr.at(1) * 2;
+            return result;
+          },
+          file_out);
+    }
+    for(const auto &backward_name : backward_names){
+      builder.ComputeMethodRamSaving(
+          backward_name + component + "_Sp",
+          [](std::vector<Qn::DataContainer<Qn::Stats>> corr) {
+            Qn::DataContainer<Qn::Stats> result;
+            result = corr.at(0) / corr.at(1) * 2;
+            return result;
+          },
+          [](std::vector<Qn::DataContainer<Qn::Stats>> corr) {
+            Qn::DataContainer<Qn::Stats> result;
+            corr.at(0) = corr.at(0).Rebin({"1_Ycm", 1, -0.55, -0.35});
+            corr.at(0) = corr.at(0).Projection({"0_Ycm","0_Pt","Centrality"});
+            result = corr.at(0) / corr.at(1) * 2;
+            return result;
+          },
+          file_out);
+    }
+  }
+  file_out->Close();
+}
+void BuildRnds( std::string input_file_name, std::string output_file_name, std::string config_file_name){
   auto file_out = new TFile(output_file_name.data(), "recreate");
   FlowBuilder builder;
   std::vector<std::string> first_names{"RND"};

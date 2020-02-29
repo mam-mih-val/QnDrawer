@@ -5,7 +5,8 @@
 #include <TFile.h>
 #include <iostream>
 
-void Configure3Sub(const std::string&);
+void ConfigureFw3s(const std::string& file_name);
+void ConfigureFw3x(const std::string& file_name);
 void ConfigureRnd(std::string);
 
 int main(int argv, char **argc) {
@@ -18,11 +19,13 @@ int main(int argv, char **argc) {
   if(flag == "--RND")
     ConfigureRnd(file_name);
   if(flag == "--FW3S")
-    Configure3Sub(file_name);
+    ConfigureFw3s(file_name);
+  if(flag == "--FW3X")
+    ConfigureFw3x(file_name);
   return 0;
 }
 
-void Configure3Sub(const std::string& file_name){
+void ConfigureFw3s(const std::string& file_name){
   TFile *file = TFile::Open(file_name.data(), "recreate");
   std::vector<FlowConfiguration> configurations;
   std::vector<std::string> components{"_XX", "_YY"};
@@ -347,6 +350,94 @@ void Configure3Sub(const std::string& file_name){
   std::cout << "Configurations written in " << file_name << std::endl;
   file->Close();
 }
+void ConfigureFw3x(const std::string& file_name){
+  TFile *file = TFile::Open(file_name.data(), "recreate");
+  std::vector<FlowConfiguration> configurations;
+  std::vector<std::string> forward_names{"MDCf(FWs1,FWs2)", "MDCf(FWs1,FWs3)", "MDCf(FWs2,FWs3)"};
+  std::vector<std::string> backward_names{"MDCb(FWs1,FWs2)", "MDCb(FWs1,FWs3)", "MDCb(FWs2,FWs3)"};
+  std::map<std::string, std::string> correlations_names{
+      std::make_pair("<MDCf,FWs1,FWs2>","MdcQ_Fw1_Fw2"),
+      std::make_pair("<MDCf,FWs1,FWs3>","MdcQ_Fw1_Fw3"),
+      std::make_pair("<MDCf,FWs2,FWs3>","MdcQ_Fw2_Fw3"),
+      std::make_pair("<MDCb,FWs1,FWs2>","MdcQ_Fw1_Fw2"),
+      std::make_pair("<MDCb,FWs1,FWs3>","MdcQ_Fw1_Fw3"),
+      std::make_pair("<MDCb,FWs2,FWs3>","MdcQ_Fw2_Fw3"),
+      std::make_pair("<FWs1,FWs2>","Fw1_Fw2"),
+      std::make_pair("<FWs1,FWs3>","Fw1_Fw3"),
+      std::make_pair("<FWs2,FWs3>","Fw2_Fw3")
+  };
+  std::map<std::string, std::vector<Qn::Axis>> rebin_axis{
+      std::make_pair<std::string, std::vector<Qn::Axis>>( "<MDCf,FWs1,FWs2>", { {"0_Ycm", 1, 0.35, 0.55} }),
+      std::make_pair<std::string, std::vector<Qn::Axis>>( "<MDCf,FWs1,FWs3>", { {"0_Ycm", 1, 0.35, 0.55} }),
+      std::make_pair<std::string, std::vector<Qn::Axis>>( "<MDCf,FWs2,FWs3>", { {"0_Ycm", 1, 0.35, 0.55} }),
+      std::make_pair<std::string, std::vector<Qn::Axis>>( "<MDCb,FWs1,FWs2>", { {"0_Ycm", 1, -0.55, -0.35} }),
+      std::make_pair<std::string, std::vector<Qn::Axis>>( "<MDCb,FWs1,FWs3>", { {"0_Ycm", 1, -0.55, -0.35} }),
+      std::make_pair<std::string, std::vector<Qn::Axis>>( "<MDCb,FWs2,FWs3>", { {"0_Ycm", 1, -0.55, -0.35} }),
+      std::make_pair<std::string, std::vector<Qn::Axis>>( "<FWs1,FWs2>", {}),
+      std::make_pair<std::string, std::vector<Qn::Axis>>( "<FWs1,FWs3>", {}),
+      std::make_pair<std::string, std::vector<Qn::Axis>>( "<FWs2,FWs3>", {})
+  };
+  std::vector<std::vector<std::string>> forward_resolutions{
+      {"<MDCf,FWs1,FWs2>", "<FWs1,FWs2>"},      // MDCf(FWs1,FWs2)
+      {"<MDCf,FWs1,FWs3>", "<FWs1,FWs3>"},      // MDCf(FWs1,FWs3)
+      {"<MDCf,FWs2,FWs3>", "<FWs2,FWs3>"},      // MDCf(FWs2,FWs3)
+  };
+  std::vector<std::vector<std::string>> backward_resolutions{
+      {"<MDCb,FWs1,FWs2>", "<FWs1,FWs2>"},      // MDCb(FWs1,FWs2)
+      {"<MDCb,FWs1,FWs3>", "<FWs1,FWs3>"},      // MDCb(FWs1,FWs3)
+      {"<MDCb,FWs2,FWs3>", "<FWs2,FWs3>"},      // MDCb(FWs2,FWs3)
+  };
+  std::vector<std::vector<std::string>> resolution_components = {
+      {"_XXx", "_XX", "_XXX", "_XX"},
+      {"_XXy", "_XX", "_XYY", "_YY"},
+  };
+  for (const auto &component : resolution_components) {
+    for (size_t i = 0; i < forward_names.size(); ++i) {
+      configurations.emplace_back(forward_names.at(i) + component.at(0) +
+                                  "_Sp");
+      std::vector<std::string> resolution = forward_resolutions.at(i);
+      std::vector<std::string> qn_qn_correlations;
+      std::vector<std::vector<Qn::Axis>> qn_qn_rebin_axis;
+      qn_qn_correlations.reserve(resolution.size());
+      int j = 2;
+      for (const auto &correlation : resolution) {
+        qn_qn_correlations.push_back(correlations_names.at(correlation) +
+                                     component.at(j) + "_Sp");
+        qn_qn_rebin_axis.push_back(rebin_axis.at(correlation));
+        j++;
+      }
+      configurations.back().SetQnQnNames(qn_qn_correlations);
+      configurations.back().SetQnQnRebinAxis(qn_qn_rebin_axis);
+      configurations.back().SetUnQnNames(
+          {"TracksMdc2_MdcQ2" + component.at(1) + "_Sp"});
+    }
+    for (size_t i = 0; i < backward_names.size(); ++i) {
+      configurations.emplace_back(backward_names.at(i) + component.at(0) +
+                                  "_Sp");
+      std::vector<std::string> resolution = backward_resolutions.at(i);
+      std::vector<std::string> qn_qn_correlations;
+      std::vector<std::vector<Qn::Axis>> qn_qn_rebin_axis;
+      qn_qn_correlations.reserve(resolution.size());
+      int j = 2;
+      for (const auto &correlation : resolution) {
+        qn_qn_correlations.push_back(correlations_names.at(correlation) +
+                                     component.at(j) + "_Sp");
+        qn_qn_rebin_axis.push_back(rebin_axis.at(correlation));
+        j++;
+      }
+      configurations.back().SetQnQnNames(qn_qn_correlations);
+      configurations.back().SetQnQnRebinAxis(qn_qn_rebin_axis);
+      configurations.back().SetUnQnNames(
+          {"TracksMdc2_MdcQ2" + component.at(1) + "_Sp"});
+    }
+  }
+
+  file->cd();
+  for (auto &configuration : configurations)
+    configuration.SaveToFile(file);
+  std::cout << "Configurations written in " << file_name << std::endl;
+  file->Close();
+}
 
 void ConfigureRnd(std::string file_name){
   TFile *file = TFile::Open(file_name.data(), "recreate");
@@ -422,3 +513,4 @@ void ConfigureRnd(std::string file_name){
   std::cout << "Configurations written in " << file_name << std::endl;
   file->Close();
 }
+
