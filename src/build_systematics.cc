@@ -1,8 +1,8 @@
 //
 // Created by mikhail on 26.11.2019.
 //
-#include <Comparator.h>
-#include <Systematics.h>
+#include <comparator.h>
+#include <systematics.h>
 void BuildElliptic(const std::string& file_in_name, const std::string& file_out_name);
 void BuildDirected(const std::string& file_in_name, const std::string& file_out_name);
 void BuildDirectedResolution(const std::string& file_in_name, const std::string& file_out_name);

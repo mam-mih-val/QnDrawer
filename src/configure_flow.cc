@@ -1,7 +1,7 @@
 //
 // Created by mikhail on 18.10.2019.
 //
-#include "FlowConfiguration.h"
+#include "flow_configuration.h"
 #include <TFile.h>
 #include <iostream>
 

@@ -2,8 +2,8 @@
 // Created by mikhail on 11.11.2019.
 //
 
-#ifndef QNDRAWER_FLOWHELPER_H
-#define QNDRAWER_FLOWHELPER_H
+#ifndef QNDRAWER_FLOW_HELPER_H
+#define QNDRAWER_FLOW_HELPER_H
 
 #include <memory>
 #include <string>
@@ -98,4 +98,4 @@ protected:
  ClassDef(FlowHelper,1)
 };
 
-#endif // QNDRAWER_FLOWHELPER_H
+#endif // QNDRAWER_FLOW_HELPER_H

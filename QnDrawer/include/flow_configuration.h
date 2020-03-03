@@ -1,8 +1,8 @@
 //
 // Created by mikhail on 18.10.2019.
 //
-#ifndef QNDRAWER_FLOWCONFIGURATION_H
-#define QNDRAWER_FLOWCONFIGURATION_H
+#ifndef QNDRAWER_FLOW_CONFIGURATION_H
+#define QNDRAWER_FLOW_CONFIGURATION_H
 
 #include "TObject.h"
 #include <Axis.h>
@@ -66,4 +66,4 @@ private:
   ClassDefOverride(FlowConfiguration, 1)
 };
 
-#endif //QNDRAWER_FLOWCONFIGURATION_H
+#endif // QNDRAWER_FLOW_CONFIGURATION_H

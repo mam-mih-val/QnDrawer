@@ -5,7 +5,7 @@
 #ifndef QNDRAWER_COMPARATOR_H
 #define QNDRAWER_COMPARATOR_H
 
-#include "FlowHelper.h"
+#include "flow_helper.h"
 #include <DataContainer.h>
 #include <Stats.h>
 #include <TCanvas.h>

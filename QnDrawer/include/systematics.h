@@ -5,8 +5,8 @@
 #ifndef QNDRAWER_SYSTEMATICS_H
 #define QNDRAWER_SYSTEMATICS_H
 
-#include "FlowHelper.h"
 #include "TStyle.h"
+#include "flow_helper.h"
 #include <DataContainer.h>
 #include <Stats.h>
 #include <TF1.h>

@@ -1,15 +1,15 @@
 //
 // Created by mikhail on 15.10.2019.
 //
-#ifndef QNDRAWER_CORRELATIONMANANGER_H
-#define QNDRAWER_CORRELATIONMANANGER_H
+#ifndef QNDRAWER_CORRELATION_MANANGER_H
+#define QNDRAWER_CORRELATION_MANANGER_H
 
 #include "DataContainer.h"
-#include "FlowConfiguration.h"
-#include "FlowHelper.h"
-#include "Method.h"
 #include "Stats.h"
 #include "TFile.h"
+#include "flow_configuration.h"
+#include "flow_helper.h"
+#include "method.h"
 #include <algorithm>
 #include <map>
 #include <memory>
@@ -62,4 +62,4 @@ protected:
 };
 
 
-#endif //QNDRAWER_CORRELATIONMANANGER_H
+#endif // QNDRAWER_CORRELATION_MANANGER_H

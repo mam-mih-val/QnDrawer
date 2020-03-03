@@ -2,11 +2,11 @@
 // Created by mikhail on 17.10.2019.
 //
 
-#include <vector>
+#include "flow_builder.h"
 #include <chrono>
-#include <string>
 #include <iostream>
-#include "FlowBuilder.h"
+#include <string>
+#include <vector>
 
 // ./Build_Flow input_file output_file config_file
 

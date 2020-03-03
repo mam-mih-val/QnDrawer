@@ -2,13 +2,13 @@
 // Created by mikhail on 05.11.2019.
 //
 
-#ifndef QNDRAWER_FLOWBUILDER_H
-#define QNDRAWER_FLOWBUILDER_H
+#ifndef QNDRAWER_FLOW_BUILDER_H
+#define QNDRAWER_FLOW_BUILDER_H
 
 #include <utility>
 
-#include "CorrelationMananger.h"
-#include "Method.h"
+#include "correlation_mananger.h"
+#include "method.h"
 #include <Axis.h>
 #include <iostream>
 #include <string>
@@ -90,4 +90,4 @@ protected:
   std::vector<Method> methods_;
 };
 
-#endif // QNDRAWER_FLOWBUILDER_H
+#endif // QNDRAWER_FLOW_BUILDER_H

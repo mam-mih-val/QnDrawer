@@ -1,8 +1,8 @@
 //
 // Created by mikhail on 14.11.2019.
 //
-#include <Comparator.h>
 #include <TFile.h>
+#include <comparator.h>
 
 TGraphErrors*MakeBkGraphV1();
 TH1F* MakeOgHisto();

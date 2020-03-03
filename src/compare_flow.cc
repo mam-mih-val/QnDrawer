@@ -2,9 +2,9 @@
 // Created by mikhail on 12.11.2019.
 //
 
-#include <Comparator.h>
 #include <TFile.h>
 #include <TH2D.h>
+#include <comparator.h>
 #include <vector>
 
 int main( int n_args, char** args ){
