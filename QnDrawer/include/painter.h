@@ -29,7 +29,7 @@ public:
   void SetMarkerColors(const std::vector<int> &markerColors) {
     marker_colors_ = markerColors;
   }
-  const SetXAxisRange(const std::vector<float> &xAxisRange) {
+  void SetXAxisRange(const std::vector<float> &xAxisRange) {
     x_axis_range_ = xAxisRange;
   }
   void SetResultPlotRange(const std::vector<float> &resultPlotRange) {
@@ -38,21 +38,10 @@ public:
   void SetRatioPlotRange(const std::vector<float> &ratioPlotRange) {
     ratio_plot_range_ = ratioPlotRange;
   }
-  void Draw(TCanvas *canvas) {
-    gStyle->SetPadLeftMargin(0.15);
-    gStyle->SetTitleSize(0.08,"X");
-    gStyle->SetTitleSize(0.04,"Y");
-    gStyle->SetTitleOffset(1.6,"Y");
-    gStyle->SetTitleOffset(1.0,"X");
-    TLegend* legend = nullptr;
-    THStack* stack = nullptr;
-    TMultiGraph* graph = nullptr;
-    if( !legend_positon_.empty() )
-      legend = new TLegend(legend_positon_.at(0), legend_positon_.at(1),
-                           legend_positon_.at(2), legend_positon_.at(3));
-    else
-      legend = new TLegend(0.35, 0.0, 0.7, 0.35);
-
+  void SetAxisTitles(const std::string &xAxisTitle,
+                     const std::string &yAxisTitle) {
+    x_axis_title_ = xAxisTitle;
+    y_axis_title_ = yAxisTitle;
   }
   void SetXAxisTitle(const std::string &xAxisTitle) {
     x_axis_title_ = xAxisTitle;
@@ -60,15 +49,93 @@ public:
   void SetYAxisTitle(const std::string &yAxisTitle) {
     y_axis_title_ = yAxisTitle;
   }
-  void SetLegendPositon(const std::vector<float> &legendPositon) {
-    legend_positon_ = legendPositon;
+  void SetLegendPosition(const std::vector<float> &legendPositon) {
+    legend_position_ = legendPositon;
   }
+  void SetCanvas(const std::shared_ptr<TCanvas> &canvas) { canvas_ = canvas; }
+  void SetLegend(TLegend *legend) { legend_ = legend; }
 
-private:
+protected:
+  TLegend* legend_{nullptr};
+  void DrawWithRatio( TMultiGraph* result_stack, TMultiGraph* ratio_stack ){
+    gStyle->SetPadLeftMargin(0.15);
+    gStyle->SetLegendBorderSize(0);
+    gStyle->SetFrameLineWidth(3);
+    gStyle->SetTitleSize(0.08,"X");
+    gStyle->SetTitleSize(0.04,"Y");
+    gStyle->SetTitleOffset(1.6,"Y");
+    gStyle->SetTitleOffset(1.0,"X");
+    gStyle->SetMarkerSize(2);
+    gStyle->SetLineWidth(3);
+
+    TLegend* legend;
+    if( !legend_position_.empty() )
+      legend = new TLegend(legend_position_.at(0), legend_position_.at(1),
+                           legend_position_.at(2), legend_position_.at(3));
+    else
+      legend = new TLegend(0.5, 0.5, 0.9, 0.9);
+    legend->SetBorderSize(0);
+    std::string pad_name = name_ + "_result";
+    auto result_pad = new TPad(pad_name.data(), "result", 0.0, 0.35, 1.0, 1.0);
+    auto stack_title = ";" + x_axis_title_ + ";" + y_axis_title_;
+    pad_name = name_ + "_ratio";
+    stack_title = ";" + x_axis_title_;
+    auto ratio_pad = new TPad(pad_name.data(), "ratio", 0.0, 0.0, 1.0, .35);
+    TF1* line_ratio;
+    TF1* line_result;
+    if( x_axis_range_.size() == 2 ){
+      line_ratio = new TF1("line_ratio", "1", x_axis_range_.at(0), x_axis_range_.at(1));
+      line_result = new TF1("line_result", "0", x_axis_range_.at(0), x_axis_range_.at(1));
+    }
+    else{
+      line_ratio = new TF1("line_ratio", "1", -100, 100);
+      line_result = new TF1("line_result", "0", -100, 100);
+    }
+
+    result_pad->cd();
+    result_pad->SetBottomMargin(0);
+    if(marker_colors_.empty())
+      result_stack->Draw("AP+PMC+PLC");
+    else
+      result_stack->Draw("AP+E5");
+    gPad->BuildLegend(legend_position_.at(0), legend_position_.at(1),
+                      legend_position_.at(2), legend_position_.at(3),
+                      "","P");
+    line_result->Draw("same");
+    result_stack->GetHistogram()->SetLabelSize(0.035, "Y");
+    if (result_plot_range_.at(0) != result_plot_range_.at(1)) {
+      result_stack->GetHistogram()->SetMinimum(result_plot_range_.at(0));
+      result_stack->GetHistogram()->SetMaximum(result_plot_range_.at(1));
+    }
+    if(x_axis_range_.size() == 2)
+      result_stack->GetXaxis()->SetLimits(x_axis_range_.at(0), x_axis_range_.at(1));
+    ratio_pad->cd();
+    ratio_pad->SetTopMargin(0);
+    ratio_pad->SetBottomMargin(0.25);
+    if(marker_colors_.empty())
+      ratio_stack->Draw("AP+PMC+PLC");
+    else
+      ratio_stack->Draw("AP+E5");
+    line_ratio->Draw("same");
+    ratio_stack->GetHistogram()->SetLabelSize(0.065, "X");
+    ratio_stack->GetHistogram()->SetLabelSize(0.065, "Y");
+    if (ratio_plot_range_.at(0) != ratio_plot_range_.at(1)) {
+      ratio_stack->GetHistogram()->SetMinimum(ratio_plot_range_.at(0));
+      ratio_stack->GetHistogram()->SetMaximum(ratio_plot_range_.at(1));
+    }
+    if(x_axis_range_.size() == 2)
+      ratio_stack->GetXaxis()->SetLimits(x_axis_range_.at(0), x_axis_range_.at(1));
+    if( !canvas_ ){
+      std::cout << "Canvas is not set" << std::endl;
+      abort();
+    }
+    canvas_->cd();
+    result_pad->Draw();
+    ratio_pad->Draw();
+    canvas_->Draw();
+  }
   std::string name_;
-  std::vectot<TH1*> histograms_;
-  std::vector<TGraph*> tgraphs_;
-  std::vector<Qn::DataContainer<Qn::Stats>> containers_;
+  std::shared_ptr<TCanvas> canvas_{nullptr};
   std::string x_axis_title_;
   std::string y_axis_title_;
   std::vector<std::string> titles_;
@@ -77,7 +144,7 @@ private:
   std::vector<float> x_axis_range_{};
   std::vector<float> result_plot_range_{0.0, 0.0};
   std::vector<float> ratio_plot_range_{0.0, 0.0};
-  std::vector<float> legend_positon_{};
+  std::vector<float> legend_position_{};
 };
 
 #endif // QNDRAWER_PAINTER_H

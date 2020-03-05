@@ -3,8 +3,9 @@
 //
 #include <comparator.h>
 #include <systematics.h>
-void BuildElliptic(const std::string& file_in_name, const std::string& file_out_name);
 void BuildDirected(const std::string& file_in_name, const std::string& file_out_name);
+void BuildDirectedExtra(const std::string& file_in_name, const std::string& file_out_name)
+void BuildElliptic(const std::string& file_in_name, const std::string& file_out_name);
 void BuildDirectedResolution(const std::string& file_in_name, const std::string& file_out_name);
 void BuildEllipticResolution(const std::string& file_in_name, const std::string& file_out_name);
 void BuildEllipticExtra(const std::string& file_in_name, const std::string& file_out_name);
