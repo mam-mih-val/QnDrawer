@@ -58,23 +58,6 @@ public:
 protected:
   TLegend* legend_{nullptr};
   void DrawWithRatio( TMultiGraph* result_stack, TMultiGraph* ratio_stack ){
-    gStyle->SetPadLeftMargin(0.15);
-    gStyle->SetLegendBorderSize(0);
-    gStyle->SetFrameLineWidth(3);
-    gStyle->SetTitleSize(0.08,"X");
-    gStyle->SetTitleSize(0.04,"Y");
-    gStyle->SetTitleOffset(1.6,"Y");
-    gStyle->SetTitleOffset(1.0,"X");
-    gStyle->SetMarkerSize(2);
-    gStyle->SetLineWidth(3);
-
-    TLegend* legend;
-    if( !legend_position_.empty() )
-      legend = new TLegend(legend_position_.at(0), legend_position_.at(1),
-                           legend_position_.at(2), legend_position_.at(3));
-    else
-      legend = new TLegend(0.5, 0.5, 0.9, 0.9);
-    legend->SetBorderSize(0);
     std::string pad_name = name_ + "_result";
     auto result_pad = new TPad(pad_name.data(), "result", 0.0, 0.35, 1.0, 1.0);
     auto stack_title = ";" + x_axis_title_ + ";" + y_axis_title_;

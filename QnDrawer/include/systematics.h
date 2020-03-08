@@ -25,6 +25,16 @@ class Systematics : public Painter {
   ~Systematics() override = default;
   void SetName(const std::string &name) { name_ = name; }
   void DrawSystematics() {
+    gStyle->SetPadLeftMargin(0.15);
+    gStyle->SetLegendBorderSize(0);
+    gStyle->SetFrameLineWidth(3);
+    gStyle->SetTitleSize(0.08,"X");
+    gStyle->SetTitleSize(0.04,"Y");
+    gStyle->SetTitleOffset(1.6,"Y");
+    gStyle->SetTitleOffset(1.0,"X");
+    gStyle->SetMarkerSize(2);
+    gStyle->SetLineWidth(3);
+
     auto stack_title = ";" + x_axis_title_ + ";" + y_axis_title_;
     auto result_stack = new TMultiGraph("result", stack_title.data());
     stack_title = ";" + x_axis_title_;
@@ -60,8 +70,13 @@ class Systematics : public Painter {
                      std::vector<std::string> components,
                      std::shared_ptr<TFile> file) {
     reference_observable_ = Observable(title, rebin_projection_rule_);
-    reference_observable_.SetFileIn(file);
-    reference_observable_.Init(prefix, components);
+    if( prefix == "AVERAGED" && components.empty() && !file ){
+      auto container = Observable::Merge(observables_);
+      reference_observable_.SetContainer(container);
+    }else{
+      reference_observable_.SetFileIn(file);
+      reference_observable_.Init(prefix, components);
+    }
   }
   void AddObservables(std::vector<std::string> title,
                       std::vector<std::string> prefix,
@@ -84,6 +99,10 @@ class Systematics : public Painter {
       const std::function<Qn::DataContainer<Qn::Stats>(
           Qn::DataContainer<Qn::Stats>)> &rebin_projection_rule) {
     rebin_projection_rule_ = rebin_projection_rule;
+  }
+  void SaveToFile( std::shared_ptr<TFile> file_out ){
+    for( auto observable : observables_  )
+      observable.SaveToFile(file_out);
   }
 
 private:

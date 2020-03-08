@@ -34,6 +34,19 @@ public:
     auto graph = ToGraph(averaged_, name_, marker);
     return graph;
   }
+  void SaveToFile(std::shared_ptr<TFile> file){
+    file->cd();
+    averaged_.Write(name_.data());
+  }
+  void SetContainer(const Qn::DataContainer<Qn::Stats> &averaged) {
+    averaged_ = averaged;
+  }
+  static Qn::DataContainer<Qn::Stats> Merge( const std::vector<Observable> observables ){
+    std::vector<Qn::DataContainer<Qn::Stats>> containers;
+    for( auto observable : observables )
+      containers.push_back( observable.averaged_ );
+    return MergeDataContainers(containers);
+  }
   static Qn::DataContainer<Qn::Stats> Ratio( const Qn::DataContainer<Qn::Stats>& reference, const Observable& value ){
     return value.averaged_/reference;
   };
