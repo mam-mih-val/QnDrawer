@@ -201,7 +201,7 @@ void BuildElliptic(const std::string& file_in_name, const std::string& file_out_
                                            kMagenta+1,
                                            kCyan+1,
                                        });
-    systematics.back().SetLegendPosition({0.4, 0.5, 0.75, 0.89});
+    systematics.back().SetLegendPosition({0.16, 0.01, 0.5, 0.5});
     systematics.back().SetAxisTitles("centrality (%)", "v_{1}");
     systematics.back().SetCanvas(canvases.back());
     systematics.back().DrawSystematics();

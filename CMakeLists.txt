@@ -85,3 +85,6 @@ target_link_libraries(CompareFlow PUBLIC QnDrawer Qn::Base ${ROOT_LIBRARIES})
 
 add_executable(Systematics src/draw_systematics.cc G__QnDrawer.cxx)
 target_link_libraries(Systematics PUBLIC QnDrawer Qn::Base ${ROOT_LIBRARIES})
+
+add_executable(Sectors src/draw_sectors.cc G__QnDrawer.cxx)
+target_link_libraries(Sectors PUBLIC QnDrawer Qn::Base ${ROOT_LIBRARIES})
