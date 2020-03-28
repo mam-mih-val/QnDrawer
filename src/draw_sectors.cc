@@ -10,8 +10,8 @@ int main(){
   std::vector<Systematics> systematics;
   std::vector<std::string> systematics_names{ "FWs1", "FWs2", "FWs3", "FWs1_FWs2", "FWs1_FWs3", "FWs2_FWs3", "RND1", "RND2" };
   std::string prefix{"flow_"};
-  std::vector<std::string> file_names{"FW3S_PT2_5sectors", "FW3S_PT2_5sectors", "FW3S_PT2_5sectors",
-                                      "FW3S_PT2_5sectors", "FW3S_PT2_5sectors", "FW3S_PT2_5sectors",
+  std::vector<std::string> file_names{"FW3S_PT2_5sectors_NoBugs", "FW3S_PT2_5sectors_NoBugs", "FW3S_PT2_5sectors_NoBugs",
+                                      "FW3S_PT2_5sectors_NoBugs", "FW3S_PT2_5sectors_NoBugs", "FW3S_PT2_5sectors_NoBugs",
                                       "RND_PT2_NC_5sectors", "RND_PT2_NC_5sectors"};
 
   std::vector<std::vector<std::string>> sub_events_names{

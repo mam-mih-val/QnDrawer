@@ -19,7 +19,7 @@ public:
                           Qn::DataContainer<Qn::Stats>)> rebinProjectionRule)
       : FileManager( name, rebinProjectionRule ) {}
   ~Observable() override = default;
-  void Init(const std::string&prefix, std::vector<std::string> component_names){
+  void Init(const std::string& prefix, std::vector<std::string> component_names){
     std::for_each(component_names.begin(), component_names.end(), [prefix](std::string& str){
       str = prefix +str;
     } );
